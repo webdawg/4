@@ -10,6 +10,15 @@ Status as of 2026-08-12. Written so a new session can pick this up cold.
 > (`npm run build` and `npm run dev` both succeed; textures load). The
 > "Not yet done / next steps" list further down is now mostly done —
 > see the bottom of this file for what's actually still open.
+>
+> **Update (same day, further session)**: user confirmed the moving
+> delivery objects render correctly ("it is perfect"). Dev server is now
+> pinned to **port 60004** via `vite.config.ts` (`npm run dev` always
+> serves there). User then asked to turn the sample distribution routes
+> (arcs, moving objects, knowledge-broadcast rings) **off without
+> deleting them**, since they look cool and may come back. See
+> "Distribution routes toggle" section near the bottom for how this
+> works and how to re-enable.
 
 ## Mission
 
@@ -131,19 +140,52 @@ As of writing this spec, `/home/neoweb/DATA/CODE/4` contained only this
     mode, legend overlay.
 - `README.md` and `docs/VISION.md` written (mission, modalities table,
   explicit "what this is not" section, loose roadmap).
-- `npm run build` and `npm run dev` both verified working. Dev server was
-  visually unverified by the agent (no browser automation tool was
-  available in that session) — user should eyeball it in an actual
-  browser before trusting the render is correct.
+- `npm run build` and `npm run dev` both verified working. **User has
+  visually confirmed the render in a real browser** ("it is perfect") —
+  this includes the globe, zoom range, and moving delivery objects.
+- Moving delivery objects added: one mesh per physical route (icosahedron
+  = space, octahedron = plane, box = ship, tetrahedron = catapult),
+  traveling repeatedly along a `QuadraticBezierCurve3` built from each
+  route's start/end/altitude, at a speed derived from
+  `MODE_STYLES[mode].dashDuration` (catapult fastest, ship slowest). See
+  `buildArcCurve` / `makeModeMesh` / `movingObjects` in `src/main.ts`.
+- Zoom range tightened: `controls.minDistance` 150 → 104 (globe radius is
+  100, from `globe.getGlobeRadius()`), so the camera can get close to the
+  surface.
+- Dev server pinned to **port 60004** via `vite.config.ts`
+  (`server.port` / `preview.port`, both `strictPort: true`). `npm run dev`
+  and `npm run preview` always use this port now — don't let it drift.
+
+## Distribution routes toggle
+
+The sample routes (arcs, moving delivery-object meshes, and the
+knowledge-broadcast pulsing rings for the "instructions" mode) are
+**currently turned off**, but the code and data behind them are untouched
+— nothing was deleted.
+
+- Single switch: `SHOW_DISTRIBUTION_ROUTES` constant near the top of
+  `src/main.ts` (currently `false`).
+- When `false`: `physicalRoutes` and `instructionRoutes` both resolve to
+  `[]`, which cascades to empty `arcsData`/`ringsData` and an empty
+  `movingObjects` array (the `.map()` over `physicalRoutes` just produces
+  nothing) — so nothing route-related gets created or added to the scene.
+  The globe still renders with all the hub/need-region points.
+  The legend also drops its per-mode rows when the flag is off, showing
+  just the title/tagline.
+- **To turn routes back on**: flip `SHOW_DISTRIBUTION_ROUTES` to `true` in
+  `src/main.ts` — no other changes needed, everything downstream reacts to
+  the flag automatically.
+- Why it's off: user's call after seeing it — routes/objects "seem cool"
+  and are being kept, just not part of what's shown right now. Treat this
+  as a deliberate, reversible product decision, not a bug or cleanup.
 
 ## Open items for next session
 
-1. Visually verify the globe actually renders correctly in a real browser
-   (arcs, rings, colors, legend) — not yet confirmed by a human or by
-   agent screenshot.
-2. Everything in `docs/VISION.md`'s "Next candidates" roadmap section is
+1. Everything in `docs/VISION.md`'s "Next candidates" roadmap section is
    still just ideas, nothing started: time-based simulation, click-through
    detail panel, pluggable/real data source, capacity modeling, cost
    scoring per mode.
-3. Bundle size warning from `npm run build` (~1.8MB main chunk, mostly
+2. Bundle size warning from `npm run build` (~1.8MB main chunk, mostly
    three.js) — not addressed, noted but not blocking.
+3. No decision yet on what (if anything) replaces the routes visually
+   while they're off — currently it's just the bare globe + points.

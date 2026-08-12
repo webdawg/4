@@ -6,6 +6,12 @@ import { routes } from "./data/routes";
 import { MODE_STYLES, type DeliveryMode } from "./data/modes";
 import "./style.css";
 
+// Toggle: show/hide the sample distribution routes (arcs, moving delivery
+// objects, knowledge-broadcast rings). The route code/data is kept intact
+// either way — flip this back to `true` to bring it all back. See
+// SPEC.md "Distribution routes toggle" for details.
+const SHOW_DISTRIBUTION_ROUTES = false;
+
 const app = document.querySelector<HTMLDivElement>("#app")!;
 app.innerHTML = `<canvas id="globe-canvas"></canvas>`;
 buildLegend();
@@ -35,8 +41,8 @@ controls.zoomSpeed = 0.7;
 
 // --- Globe -----------------------------------------------------------
 
-const physicalRoutes = routes.filter((r) => MODE_STYLES[r.mode].isPhysical);
-const instructionRoutes = routes.filter((r) => !MODE_STYLES[r.mode].isPhysical);
+const physicalRoutes = SHOW_DISTRIBUTION_ROUTES ? routes.filter((r) => MODE_STYLES[r.mode].isPhysical) : [];
+const instructionRoutes = SHOW_DISTRIBUTION_ROUTES ? routes.filter((r) => !MODE_STYLES[r.mode].isPhysical) : [];
 
 const arcsData = physicalRoutes.map((r) => {
   const from = nodeById.get(r.from)!;
@@ -211,12 +217,14 @@ renderer.setAnimationLoop(() => {
 function buildLegend() {
   const legend = document.createElement("div");
   legend.id = "legend";
-  const rows = Object.entries(MODE_STYLES)
-    .map(
-      ([, style]) =>
-        `<div class="legend-row"><span class="swatch" style="background:${style.color[0]}"></span>${style.label}</div>`,
-    )
-    .join("");
+  const rows = SHOW_DISTRIBUTION_ROUTES
+    ? Object.entries(MODE_STYLES)
+        .map(
+          ([, style]) =>
+            `<div class="legend-row"><span class="swatch" style="background:${style.color[0]}"></span>${style.label}</div>`,
+        )
+        .join("")
+    : "";
   legend.innerHTML = `
     <h1>Food Relief Network</h1>
     <p class="tagline">Simulated global delivery — every modality on the table.</p>
