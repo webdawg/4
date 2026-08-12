@@ -84,6 +84,20 @@ Status as of 2026-08-12. Written so a new session can pick this up cold.
 > implementation detail. Build/typecheck pass; **not yet visually
 > confirmed by the user** in this session — no browser tool available to
 > the agent, same limitation as every prior session.
+>
+> **Update (same day, further session)**: user said "make everything
+> selectable so we can understand all the information about it." Added a
+> click-to-inspect system in `src/main.ts` covering every rendered thing:
+> hub/need points, arcs, instructions rings, ship/plane/catapult moving
+> objects, orbital satellites, deorbit capsules, and resupply beams —
+> clicking any of them opens an info panel (top-right) with structured
+> detail; clicking empty space or the panel's close button dismisses it.
+> Hovering a selectable object changes the cursor to a pointer. See
+> "Selection / info panel" section near the bottom for implementation
+> detail — notably, this reuses three-globe's internal `__data`/
+> `__globeObjType` tagging on generated meshes rather than rebuilding
+> point/arc/ring rendering from scratch just to make them clickable.
+> Build/typecheck pass; **not yet visually confirmed by the user**.
 
 ## Mission
 
@@ -355,3 +369,59 @@ arc/moving-object/ring code).
   agent. Check the constellation is actually visible/reasonable-looking at
   the default camera distance (350, per `camera.position.set` near the top
   of `src/main.ts`) before trusting this description further.
+
+## Selection / info panel
+
+Click-to-inspect for every rendered entity, implemented in `src/main.ts`
+after the legend section.
+
+- **Why this works without rebuilding point/arc/ring rendering**:
+  three-globe internally tags every generated mesh with `__globeObjType`
+  (`"point" | "arc" | "ring" | ...`) and `__data` (a reference back to the
+  exact datum passed into `.pointsData()`/`.arcsData()`/`.ringsData()`).
+  This isn't in the public `.d.ts` API surface (confirmed by grepping the
+  type defs — nothing there), but it's real, stable behavior in the
+  compiled `three-globe.mjs` (`ThreeDigest` class, `dataBindAttr: '__data'`
+  default) used consistently across every layer type. `pointsMerge`
+  defaults to `false`, which is required for this — merged points would
+  collapse to one mesh with no per-point identity.
+- **`resolveSelectable(object)`**: walks up the clicked object's parent
+  chain (raycast hits a leaf mesh — e.g. a satellite's body box, not the
+  satellite `Group` — so parent-walking is required) until it finds either
+  `.userData.selectableType` (for meshes this project created directly:
+  satellites, moving objects, capsules, resupply beams) or
+  `__globeObjType` + `__data` (for three-globe-generated meshes: points,
+  arcs, rings). Stops at `globe` itself so it never walks into `scene`.
+- **Data enrichment**: `arcsData` and `ringsData` were extended with
+  `mode`/`fromName`/`toName` (arcs) and `mode`/`nodeName` (rings) — the
+  original data objects didn't carry enough to build a readable panel, so
+  the enrichment happens once at data-build time rather than doing lookups
+  at click time.
+- **`SelectableHit`**: a discriminated union (`type` + typed `data`) over
+  all seven selectable kinds (`node`, `arc`, `ring`, `moving`, `satellite`,
+  `capsule`, `beam`) so `describeSelection`'s switch is exhaustively typed.
+- **Live values at click time**: satellite and capsule info panels compute
+  values (position, reentry progress) at the moment of the click using
+  `latestElapsedMs` — a module-level variable updated at the top of the
+  render loop every frame — rather than freezing stale values from when
+  the object was created.
+- **Click vs. drag disambiguation**: `pointerdown`/`pointerup` on `canvas`
+  track the pixel distance moved; anything over 5px is treated as an
+  OrbitControls rotate/pan gesture and ignored, not a click. Without this,
+  every drag-to-rotate would also fire a selection (or clear one).
+- **Hover feedback**: `pointermove` raycasts on every move and sets
+  `canvas.style.cursor` to `"pointer"` when hovering something selectable,
+  `""` (default) otherwise. Cheap at this scene's object count; would need
+  throttling if the object count grows substantially.
+- **`raycaster.params.Line.threshold`** is widened to `GLOBE_RADIUS * 0.01`
+  (1 unit) — the default threshold is far too small to reliably hit a
+  zero-width `THREE.Line` (used for resupply beams) at this scene's scale.
+- Clicking empty space (ocean, or nothing) hides the panel — `pickAt`
+  returns `null` when no selectable object is found along the ray, and the
+  click handler calls `infoPanel.hide()` in that case.
+- Not yet done: no visual highlight on the selected object itself (only
+  the panel appears) — a future pass could add an outline/scale-pulse.
+  Arcs/rings/points are selectable via the three-globe `__data` mechanism
+  everywhere it's used, but nothing was added to make the globe surface,
+  atmosphere, or graticules selectable — those intentionally resolve to
+  `null` and fall through to "deselect."

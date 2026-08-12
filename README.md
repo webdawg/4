@@ -57,4 +57,10 @@ route; the "instructions" (knowledge-broadcast) mode renders as pulsing
 rings; and the "space" mode is its own subsystem — an orbiting satellite
 constellation that periodically launches deorbit capsules down to target
 need-regions, implementing [`docs/SPACE_DELIVERY.md`](docs/SPACE_DELIVERY.md).
+
+Everything on the globe is **selectable** — click any hub, need-region,
+arc, ring, moving delivery object, orbital satellite, deorbit capsule, or
+resupply beam to open an info panel with detail about it. Click empty
+space, or the panel's close button, to dismiss it.
+
 See `SPEC.md` for full implementation detail.

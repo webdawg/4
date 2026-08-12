@@ -51,7 +51,21 @@ const instructionRoutes = SHOW_DISTRIBUTION_ROUTES ? routes.filter((r) => !MODE_
 const surfaceRoutes = physicalRoutes.filter((r) => r.mode !== "space");
 const spaceRoutes = physicalRoutes.filter((r) => r.mode === "space");
 
-const arcsData = surfaceRoutes.map((r) => {
+interface ArcDatum {
+  startLat: number;
+  startLng: number;
+  endLat: number;
+  endLng: number;
+  color: [string, string];
+  altitude: number;
+  stroke: number;
+  dashDuration: number;
+  mode: DeliveryMode;
+  fromName: string;
+  toName: string;
+}
+
+const arcsData: ArcDatum[] = surfaceRoutes.map((r) => {
   const from = nodeById.get(r.from)!;
   const to = nodeById.get(r.to)!;
   const style = MODE_STYLES[r.mode];
@@ -64,20 +78,33 @@ const arcsData = surfaceRoutes.map((r) => {
     altitude: style.altitude,
     stroke: style.stroke,
     dashDuration: style.dashDuration,
+    mode: r.mode,
+    fromName: from.name,
+    toName: to.name,
   };
 });
+
+interface RingDatum {
+  lat: number;
+  lng: number;
+  color: string;
+  mode: DeliveryMode;
+  nodeName: string;
+}
 
 // Knowledge-broadcast routes render as pulsing rings on the destination
 // (non-physical delivery has no path to draw).
 const instructionTargets = new Map<string, DeliveryMode>();
 for (const r of instructionRoutes) instructionTargets.set(r.to, r.mode);
-const ringsData = [...instructionTargets.entries()].map(([nodeId, mode]) => {
+const ringsData: RingDatum[] = [...instructionTargets.entries()].map(([nodeId, mode]) => {
   const node = nodeById.get(nodeId)!;
   const style = MODE_STYLES[mode];
   return {
     lat: node.lat,
     lng: node.lng,
     color: style.color[0],
+    mode,
+    nodeName: node.name,
   };
 });
 
@@ -86,6 +113,13 @@ const HUB_TYPE_COLORS: Record<string, string> = {
   air: "#fbbf24",
   space: "#a78bfa",
   depot: "#2dd4bf",
+};
+
+const HUB_TYPE_LABELS: Record<string, string> = {
+  port: "Sea Port",
+  air: "Air Cargo Hub",
+  space: "Launch Site",
+  depot: "Humanitarian Depot",
 };
 
 function getPointColor(node: DeliveryNode): string {
@@ -197,6 +231,8 @@ const movingObjects: MovingObject[] = surfaceRoutes.map((r, i) => {
   const style = MODE_STYLES[r.mode];
   const curve = buildArcCurve(from.lat, from.lng, to.lat, to.lng, style.altitude);
   const mesh = makeModeMesh(r.mode);
+  mesh.userData.selectableType = "moving";
+  mesh.userData.selectableData = { mode: r.mode, fromName: from.name, toName: to.name };
   globe.add(mesh);
   return {
     curve,
@@ -267,6 +303,8 @@ function satellitePosition(sat: Satellite, elapsedMs: number): THREE.Vector3 {
 const satellites: Satellite[] = SHOW_DISTRIBUTION_ROUTES
   ? Array.from({ length: SATELLITE_COUNT }, (_, i) => {
       const mesh = makeSatelliteMesh();
+      mesh.userData.selectableType = "satellite";
+      mesh.userData.selectableData = { index: i };
       globe.add(mesh);
       return {
         mesh,
@@ -289,13 +327,17 @@ if (SHOW_DISTRIBUTION_ROUTES) {
     const sky = ground.clone().normalize().multiplyScalar(ORBIT_RADIUS);
     const geometry = new THREE.BufferGeometry().setFromPoints([ground, sky]);
     const material = new THREE.LineBasicMaterial({ color: 0xa78bfa, transparent: true, opacity: 0.3 });
-    globe.add(new THREE.Line(geometry, material));
+    const beam = new THREE.Line(geometry, material);
+    beam.userData.selectableType = "beam";
+    beam.userData.selectableData = { hubName: hub.name };
+    globe.add(beam);
   }
 }
 
 interface CapsuleSpawner {
   targetLat: number;
   targetLng: number;
+  targetName: string;
   cadenceMs: number;
   nextLaunchMs: number;
   durationMs: number;
@@ -306,6 +348,7 @@ const capsuleSpawners: CapsuleSpawner[] = spaceRoutes.map((r, i) => {
   return {
     targetLat: to.lat,
     targetLng: to.lng,
+    targetName: to.name,
     cadenceMs: 9000,
     nextLaunchMs: 2000 + i * 3000,
     durationMs: 3000,
@@ -348,6 +391,14 @@ function spawnCapsule(spawner: CapsuleSpawner, elapsedMs: number) {
     roughness: 0.3,
   });
   const mesh = new THREE.Mesh(new THREE.ConeGeometry(1.1, 2.6, 6), material);
+  mesh.userData.selectableType = "capsule";
+  mesh.userData.selectableData = {
+    targetName: spawner.targetName,
+    targetLat: spawner.targetLat,
+    targetLng: spawner.targetLng,
+    startMs: elapsedMs,
+    durationMs: spawner.durationMs,
+  };
   globe.add(mesh);
   activeCapsules.push({ mesh, curve, startMs: elapsedMs, durationMs: spawner.durationMs });
 }
@@ -361,9 +412,11 @@ window.addEventListener("resize", () => {
 });
 
 const clock = new THREE.Clock();
+let latestElapsedMs = 0;
 
 renderer.setAnimationLoop(() => {
   const elapsedMs = clock.getElapsedTime() * 1000;
+  latestElapsedMs = elapsedMs;
 
   for (const obj of movingObjects) {
     const t = ((elapsedMs + obj.offsetMs) % obj.durationMs) / obj.durationMs;
@@ -401,13 +454,6 @@ buildLegend();
 
 // --- Legend overlay -----------------------------------------------------
 
-const HUB_TYPE_LABELS: Record<string, string> = {
-  port: "Sea Port",
-  air: "Air Cargo Hub",
-  space: "Launch Site",
-  depot: "Humanitarian Depot",
-};
-
 function buildLegend() {
   const legend = document.createElement("div");
   legend.id = "legend";
@@ -430,9 +476,230 @@ function buildLegend() {
 
   legend.innerHTML = `
     <h1>Food Relief Network</h1>
-    <p class="tagline">Global hub network — every delivery mode active.</p>
+    <p class="tagline">Click anything on the globe to inspect it.</p>
     ${hubRows}
     ${routeRows}
   `;
   document.body.appendChild(legend);
 }
+
+// --- Selection / info panel -----------------------------------------------
+// Click any point, arc, ring, moving object, satellite, capsule, or
+// resupply beam to see structured information about it. three-globe
+// attaches the original datum (`__data`) and a type tag
+// (`__globeObjType`) to every mesh it generates for points/arcs/rings —
+// this reuses that instead of re-implementing point/arc rendering just to
+// make them clickable. Custom objects (satellites, moving objects,
+// capsules, resupply beams) carry the same information via `.userData`.
+
+interface SelectionInfo {
+  title: string;
+  subtitle?: string;
+  rows: Array<[string, string]>;
+}
+
+interface GlobeObjectExtras {
+  __globeObjType?: string;
+  __data?: unknown;
+}
+
+type SelectableHit =
+  | { type: "node"; data: DeliveryNode }
+  | { type: "arc"; data: ArcDatum }
+  | { type: "ring"; data: RingDatum }
+  | { type: "moving"; data: { mode: DeliveryMode; fromName: string; toName: string } }
+  | { type: "satellite"; data: { index: number } }
+  | {
+      type: "capsule";
+      data: { targetName: string; targetLat: number; targetLng: number; startMs: number; durationMs: number };
+    }
+  | { type: "beam"; data: { hubName: string } };
+
+function resolveSelectable(object: THREE.Object3D): SelectableHit | null {
+  let obj: THREE.Object3D | null = object;
+  while (obj && obj !== globe) {
+    const userType = obj.userData?.selectableType as SelectableHit["type"] | undefined;
+    if (userType) {
+      return { type: userType, data: obj.userData.selectableData } as SelectableHit;
+    }
+    const extras = obj as unknown as GlobeObjectExtras;
+    if (extras.__data !== undefined) {
+      if (extras.__globeObjType === "point") return { type: "node", data: extras.__data as DeliveryNode };
+      if (extras.__globeObjType === "arc") return { type: "arc", data: extras.__data as ArcDatum };
+      if (extras.__globeObjType === "ring") return { type: "ring", data: extras.__data as RingDatum };
+    }
+    obj = obj.parent;
+  }
+  return null;
+}
+
+function describeSelection(hit: SelectableHit): SelectionInfo {
+  switch (hit.type) {
+    case "node": {
+      const node = hit.data;
+      if (node.kind === "hub") {
+        const typeLabel = HUB_TYPE_LABELS[node.hubType ?? "port"];
+        return {
+          title: node.name,
+          subtitle: typeLabel,
+          rows: [
+            ["Type", typeLabel],
+            ["Coordinates", `${node.lat.toFixed(2)}, ${node.lng.toFixed(2)}`],
+          ],
+        };
+      }
+      return {
+        title: node.name,
+        subtitle: "Need region",
+        rows: [
+          ["Need severity", `${Math.round((node.needLevel ?? 0.5) * 100)}%`],
+          ["Coordinates", `${node.lat.toFixed(2)}, ${node.lng.toFixed(2)}`],
+        ],
+      };
+    }
+    case "arc": {
+      const arc = hit.data;
+      const style = MODE_STYLES[arc.mode];
+      return {
+        title: `${arc.fromName} → ${arc.toName}`,
+        subtitle: style.label,
+        rows: [["Description", style.description]],
+      };
+    }
+    case "ring": {
+      const ring = hit.data;
+      const style = MODE_STYLES[ring.mode];
+      return {
+        title: ring.nodeName,
+        subtitle: style.label,
+        rows: [["Description", style.description]],
+      };
+    }
+    case "moving": {
+      const { mode, fromName, toName } = hit.data;
+      const style = MODE_STYLES[mode];
+      return {
+        title: `${fromName} → ${toName}`,
+        subtitle: `${style.label} (in transit)`,
+        rows: [["Description", style.description]],
+      };
+    }
+    case "satellite": {
+      const sat = satellites[hit.data.index];
+      const pos = sat ? satellitePosition(sat, latestElapsedMs) : new THREE.Vector3();
+      return {
+        title: `Orbital Platform ${hit.data.index + 1}`,
+        subtitle: "Autonomous food-growing satellite",
+        rows: [
+          ["Orbit", "Dawn-dusk sun-synchronous LEO"],
+          ["Altitude", `${(ORBIT_ALTITUDE * 100).toFixed(0)}% of globe radius (sim scale)`],
+          ["Inclination", sat ? `${(sat.inclination * (180 / Math.PI)).toFixed(0)}°` : "—"],
+          ["Position (sim coords)", `${pos.x.toFixed(0)}, ${pos.y.toFixed(0)}, ${pos.z.toFixed(0)}`],
+          ["Design reference", "docs/SPACE_DELIVERY.md"],
+        ],
+      };
+    }
+    case "capsule": {
+      const { targetName, startMs, durationMs } = hit.data;
+      const progress = Math.min(1, Math.max(0, (latestElapsedMs - startMs) / durationMs));
+      return {
+        title: "Deorbit Capsule",
+        subtitle: `→ ${targetName}`,
+        rows: [
+          ["Target", targetName],
+          ["Reentry progress", `${Math.round(progress * 100)}%`],
+          ["Payload", "Dehydrated spirulina / microbial protein"],
+        ],
+      };
+    }
+    case "beam": {
+      const { hubName } = hit.data;
+      return {
+        title: "Resupply Corridor",
+        subtitle: hubName,
+        rows: [
+          ["From", hubName],
+          ["Carries", "Nutrient salts, water, seed culture, propellant, spares"],
+        ],
+      };
+    }
+  }
+}
+
+function buildInfoPanel() {
+  const panel = document.createElement("div");
+  panel.id = "info-panel";
+  panel.classList.add("hidden");
+  document.body.appendChild(panel);
+
+  function show(info: SelectionInfo) {
+    const rows = info.rows
+      .map(
+        ([label, value]) =>
+          `<div class="info-row"><span class="info-label">${label}</span><span class="info-value">${value}</span></div>`,
+      )
+      .join("");
+    panel.innerHTML = `
+      <button id="info-panel-close" aria-label="Close">×</button>
+      <h2>${info.title}</h2>
+      ${info.subtitle ? `<p class="info-subtitle">${info.subtitle}</p>` : ""}
+      ${rows}
+    `;
+    panel.classList.remove("hidden");
+    panel.querySelector<HTMLButtonElement>("#info-panel-close")!.addEventListener("click", hide);
+  }
+
+  function hide() {
+    panel.classList.add("hidden");
+  }
+
+  return { show, hide };
+}
+
+const infoPanel = buildInfoPanel();
+
+const raycaster = new THREE.Raycaster();
+raycaster.params.Line = { threshold: GLOBE_RADIUS * 0.01 };
+
+function pointerToNDC(e: PointerEvent): THREE.Vector2 {
+  const rect = canvas.getBoundingClientRect();
+  return new THREE.Vector2(
+    ((e.clientX - rect.left) / rect.width) * 2 - 1,
+    -((e.clientY - rect.top) / rect.height) * 2 + 1,
+  );
+}
+
+function pickAt(e: PointerEvent): SelectableHit | null {
+  raycaster.setFromCamera(pointerToNDC(e), camera);
+  const intersects = raycaster.intersectObject(globe, true);
+  for (const intersect of intersects) {
+    const resolved = resolveSelectable(intersect.object);
+    if (resolved) return resolved;
+  }
+  return null;
+}
+
+let pointerDownPos: { x: number; y: number } | null = null;
+
+canvas.addEventListener("pointerdown", (e) => {
+  pointerDownPos = { x: e.clientX, y: e.clientY };
+});
+
+canvas.addEventListener("pointerup", (e) => {
+  if (!pointerDownPos) return;
+  const dx = e.clientX - pointerDownPos.x;
+  const dy = e.clientY - pointerDownPos.y;
+  pointerDownPos = null;
+  if (Math.hypot(dx, dy) > 5) return; // was a drag/rotate gesture, not a click
+
+  const hit = pickAt(e);
+  if (hit) {
+    infoPanel.show(describeSelection(hit));
+  } else {
+    infoPanel.hide();
+  }
+});
+
+canvas.addEventListener("pointermove", (e) => {
+  canvas.style.cursor = pickAt(e) ? "pointer" : "";
+});

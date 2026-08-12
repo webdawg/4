@@ -36,15 +36,20 @@ primitive entirely (pulsing rings instead of arcs).
 
 ## Roadmap (loose, not sequenced/committed)
 
-1. **Now**: static sample dataset, interactive globe, all five modes
-   rendered with distinct visual language.
+1. **Now**: real hub/need-region dataset, all five modes active
+   (ship/plane/catapult arcs, instructions rings, an orbital constellation
+   + deorbit capsules for space per `docs/SPACE_DELIVERY.md`), and a
+   click-to-inspect info panel covering every selectable thing on the
+   globe — points, arcs, rings, moving objects, satellites, capsules,
+   resupply beams.
 2. **Next candidates** (unordered, pick based on what's actually
    interesting to build):
    - Time-based simulation (routes animate delivery over a simulated
      clock instead of a fixed loop)
-   - Click-through node/route detail panel
    - Pluggable data source (swap sample data for a real public dataset,
      e.g. WFP/FEWS NET food-insecurity indicators, for the "need" side)
    - Capacity/throughput modeling per route (how much food, how often)
    - Cost/feasibility scoring per mode to make the "any cost" premise
      explicit and comparable rather than purely visual
+   - Visual "impact" effect when a deorbit capsule lands, and a clearer
+     in-flight vs. delivered state for capsules
