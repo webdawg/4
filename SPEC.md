@@ -2,6 +2,15 @@
 
 Status as of 2026-08-12. Written so a new session can pick this up cold.
 
+> **Update (same day, later session)**: the blockers below are resolved.
+> npm is installed, the repo is initialized, scaffolded, committed, and
+> pushed to **https://github.com/webdawg/food-relief-network** (public).
+> Git identity on this machine: `HACK SPHERE LABS <webdawg@gmail.com>`
+> (repo-local config, user-confirmed). Dev server verified working
+> (`npm run build` and `npm run dev` both succeed; textures load). The
+> "Not yet done / next steps" list further down is now mostly done —
+> see the bottom of this file for what's actually still open.
+
 ## Mission
 
 Build a **3D, web-browser-viewable simulation of a global automated food
@@ -101,6 +110,40 @@ logistics infrastructure.
 
 ## Nothing has been committed or pushed yet
 
-As of writing this spec, `/home/neoweb/DATA/CODE/4` contains only this
-`SPEC.md` file. No git repo, no GitHub repo, no code exists yet. Everything
-above is planning/decisions only.
+(Historical — see update banner at top of file. This has since happened.)
+
+As of writing this spec, `/home/neoweb/DATA/CODE/4` contained only this
+`SPEC.md` file. No git repo, no GitHub repo, no code existed yet.
+
+## Actual current state (see update banner)
+
+- Repo live at https://github.com/webdawg/food-relief-network, one commit
+  on `main`, pushed.
+- Working Vite + TS + Three.js/three-globe app in `src/`:
+  - `src/data/modes.ts` — the 5 delivery modes (space, plane, ship,
+    catapult, instructions) with per-mode visual style; this is the
+    extension point for adding new modes.
+  - `src/data/nodes.ts` — sample hub + need-region lat/lng data
+    (illustrative only, not live data).
+  - `src/data/routes.ts` — sample routes tagged by mode.
+  - `src/main.ts` — scene: globe, camera, OrbitControls, arcs for
+    physical modes, pulsing rings for the non-physical "instructions"
+    mode, legend overlay.
+- `README.md` and `docs/VISION.md` written (mission, modalities table,
+  explicit "what this is not" section, loose roadmap).
+- `npm run build` and `npm run dev` both verified working. Dev server was
+  visually unverified by the agent (no browser automation tool was
+  available in that session) — user should eyeball it in an actual
+  browser before trusting the render is correct.
+
+## Open items for next session
+
+1. Visually verify the globe actually renders correctly in a real browser
+   (arcs, rings, colors, legend) — not yet confirmed by a human or by
+   agent screenshot.
+2. Everything in `docs/VISION.md`'s "Next candidates" roadmap section is
+   still just ideas, nothing started: time-based simulation, click-through
+   detail panel, pluggable/real data source, capacity modeling, cost
+   scoring per mode.
+3. Bundle size warning from `npm run build` (~1.8MB main chunk, mostly
+   three.js) — not addressed, noted but not blocking.

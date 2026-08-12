@@ -28,9 +28,10 @@ camera.position.set(0, 0, 350);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.08;
-controls.minDistance = 150;
+controls.minDistance = 104;
 controls.maxDistance = 800;
 controls.rotateSpeed = 0.4;
+controls.zoomSpeed = 0.7;
 
 // --- Globe -----------------------------------------------------------
 
@@ -104,6 +105,87 @@ const globe = new ThreeGlobe()
 
 scene.add(globe);
 
+// --- Moving delivery objects --------------------------------------------
+// One mesh per physical route, traveling repeatedly along a curve that
+// mirrors the arc's start/end/altitude. Shape distinguishes the mode;
+// non-directional geometry is used deliberately since it reads correctly
+// from any camera angle without per-frame orientation logic.
+
+const GLOBE_RADIUS = globe.getGlobeRadius();
+
+function buildArcCurve(
+  startLat: number,
+  startLng: number,
+  endLat: number,
+  endLng: number,
+  altitudeFrac: number,
+): THREE.QuadraticBezierCurve3 {
+  const s = globe.getCoords(startLat, startLng, 0);
+  const e = globe.getCoords(endLat, endLng, 0);
+  const start = new THREE.Vector3(s.x, s.y, s.z);
+  const end = new THREE.Vector3(e.x, e.y, e.z);
+  const mid = start
+    .clone()
+    .add(end)
+    .multiplyScalar(0.5)
+    .normalize()
+    .multiplyScalar(GLOBE_RADIUS * (1 + altitudeFrac));
+  return new THREE.QuadraticBezierCurve3(start, mid, end);
+}
+
+function makeModeMesh(mode: DeliveryMode): THREE.Object3D {
+  const style = MODE_STYLES[mode];
+  const color = new THREE.Color(style.color[0]);
+  const material = new THREE.MeshStandardMaterial({
+    color,
+    emissive: color,
+    emissiveIntensity: 0.8,
+    roughness: 0.35,
+    metalness: 0.1,
+  });
+  const size = 2.2;
+  let geometry: THREE.BufferGeometry;
+  switch (mode) {
+    case "space":
+      geometry = new THREE.IcosahedronGeometry(size * 0.7, 0);
+      break;
+    case "plane":
+      geometry = new THREE.OctahedronGeometry(size * 0.75, 0);
+      break;
+    case "ship":
+      geometry = new THREE.BoxGeometry(size, size * 0.55, size);
+      break;
+    case "catapult":
+      geometry = new THREE.TetrahedronGeometry(size * 0.85, 0);
+      break;
+    default:
+      geometry = new THREE.SphereGeometry(size * 0.55, 8, 8);
+  }
+  return new THREE.Mesh(geometry, material);
+}
+
+interface MovingObject {
+  curve: THREE.QuadraticBezierCurve3;
+  mesh: THREE.Object3D;
+  durationMs: number;
+  offsetMs: number;
+}
+
+const movingObjects: MovingObject[] = physicalRoutes.map((r, i) => {
+  const from = nodeById.get(r.from)!;
+  const to = nodeById.get(r.to)!;
+  const style = MODE_STYLES[r.mode];
+  const curve = buildArcCurve(from.lat, from.lng, to.lat, to.lng, style.altitude);
+  const mesh = makeModeMesh(r.mode);
+  globe.add(mesh);
+  return {
+    curve,
+    mesh,
+    durationMs: style.dashDuration,
+    offsetMs: (i / physicalRoutes.length) * style.dashDuration,
+  };
+});
+
 // --- Resize + render loop ---------------------------------------------
 
 window.addEventListener("resize", () => {
@@ -112,7 +194,14 @@ window.addEventListener("resize", () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
+const clock = new THREE.Clock();
+
 renderer.setAnimationLoop(() => {
+  const elapsedMs = clock.getElapsedTime() * 1000;
+  for (const obj of movingObjects) {
+    const t = ((elapsedMs + obj.offsetMs) % obj.durationMs) / obj.durationMs;
+    obj.mesh.position.copy(obj.curve.getPoint(t));
+  }
   controls.update();
   renderer.render(scene, camera);
 });
