@@ -9,7 +9,9 @@ This is a **visualization/simulation project**, not real-world logistics
 infrastructure. See [`docs/VISION.md`](docs/VISION.md) for the product
 concept, [`docs/GLOBAL_FOOD_SYSTEM.md`](docs/GLOBAL_FOOD_SYSTEM.md) for the
 full strategic design (production layers, technology tradeoffs, phased
-rollout), and [`SPEC.md`](SPEC.md) for build history and decisions.
+rollout), [`docs/SPACE_DELIVERY.md`](docs/SPACE_DELIVERY.md) for the
+orbital automated growing/delivery subsystem design, and
+[`SPEC.md`](SPEC.md) for build history and decisions.
 
 ## Stack
 

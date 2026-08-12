@@ -527,3 +527,7 @@ if wanted, is extending `DeliveryNode` with a `zoneArchetype` and/or
 `productionLayer` field and a `modules` dataset so the simulation can start
 to *represent* this design instead of only the transportation layer on top
 of it — but that's a separate decision, not assumed here.
+
+The "space" mode specifically now has its own dedicated subsystem design:
+see [`docs/SPACE_DELIVERY.md`](SPACE_DELIVERY.md) for the orbital
+automated growing-and-deorbit-delivery architecture.

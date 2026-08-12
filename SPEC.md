@@ -48,6 +48,22 @@ Status as of 2026-08-12. Written so a new session can pick this up cold.
 > layers, the module spec table). Read that doc before doing further
 > design work on this project; it's the reference framework everything
 > else should be checked against.
+>
+> **Update (same day, further session)**: user asked me to disregard and
+> restart — clarified via AskUserQuestion this meant "rewrite
+> GLOBAL_FOOD_SYSTEM.md without hedging/caveats, commit to concrete
+> numbers" (not wipe the repo). Before that rewrite happened, user
+> redirected mid-turn to focus specifically on the "space" delivery mode:
+> automated orbital units that grow food and drop it. Wrote
+> **`docs/SPACE_DELIVERY.md`** — decisive, concrete design for the
+> orbital growing/delivery subsystem (why orbit at all, growing tech
+> choice, orbital architecture, per-unit subsystems, the deorbit capsule,
+> what must be resupplied from Earth and why, autonomy/failure handling,
+> a per-unit spec table), applying the "no hedging, commit to numbers"
+> style from the clarification. **The broader hedging-removal rewrite of
+> `GLOBAL_FOOD_SYSTEM.md` itself has NOT been done yet** — that request
+> is still open, just deprioritized by the space-focus redirect. Do that
+> next if the user returns to it.
 
 ## Mission
 
