@@ -44,11 +44,17 @@ delivered.
 
 ## Status
 
-The globe now renders a real hub network — actual sea ports, air cargo
-hubs, orbital launch sites, and UN humanitarian depot locations (WFP's
-UNHRD network), alongside a set of widely-reported food-insecure regions.
+The globe renders a real hub network — actual sea ports, air cargo hubs,
+orbital launch sites, and UN humanitarian depot locations (WFP's UNHRD
+network), alongside a set of widely-reported food-insecure regions.
 Node/hub coordinates are real; need-region severity levels are illustrative
-approximations, not sourced from a live feed. Distribution routes (arcs,
-moving delivery objects, knowledge-broadcast rings) exist in the code but
-are currently toggled off — see `SHOW_DISTRIBUTION_ROUTES` in
-`src/main.ts` and `SPEC.md`.
+approximations, not sourced from a live feed.
+
+Distribution routes are **active** (`SHOW_DISTRIBUTION_ROUTES = true` in
+`src/main.ts` — flip to `false` to go back to a bare hub-network globe):
+ship/plane/catapult routes render as animated arcs with a moving object per
+route; the "instructions" (knowledge-broadcast) mode renders as pulsing
+rings; and the "space" mode is its own subsystem — an orbiting satellite
+constellation that periodically launches deorbit capsules down to target
+need-regions, implementing [`docs/SPACE_DELIVERY.md`](docs/SPACE_DELIVERY.md).
+See `SPEC.md` for full implementation detail.

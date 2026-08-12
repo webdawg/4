@@ -64,6 +64,26 @@ Status as of 2026-08-12. Written so a new session can pick this up cold.
 > `GLOBAL_FOOD_SYSTEM.md` itself has NOT been done yet** — that request
 > is still open, just deprioritized by the space-focus redirect. Do that
 > next if the user returns to it.
+>
+> **Update (same day, further session)**: user said "build this all into
+> the running simulation and activate it." Implemented in `src/main.ts`:
+> **`SHOW_DISTRIBUTION_ROUTES` flipped to `true`** (routes are on by
+> default now — see updated "Distribution routes toggle" section), and
+> the "space" delivery mode was rebuilt to actually represent
+> `docs/SPACE_DELIVERY.md` instead of reusing the generic hub→need arc:
+> an 8-satellite orbital constellation (simplified circular orbits —
+> inclination/RAAN/phase, not real ephemerides) continuously circles the
+> globe at the same altitude as `MODE_STYLES.space.altitude`; faint
+> "resupply beam" lines run from each space hub straight up to orbit;
+> and small cone-shaped capsules periodically launch from whichever
+> satellite is currently nearest a `space`-route's target `need` node and
+> fly a deorbit curve down to it, repeating on a set cadence. Ship/plane/
+> catapult/instructions modes are unchanged (generic arcs/moving-objects/
+> rings, now visible again since the toggle is on). See "Orbital
+> constellation + deorbit capsules" section near the bottom for
+> implementation detail. Build/typecheck pass; **not yet visually
+> confirmed by the user** in this session — no browser tool available to
+> the agent, same limitation as every prior session.
 
 ## Mission
 
@@ -203,26 +223,26 @@ As of writing this spec, `/home/neoweb/DATA/CODE/4` contained only this
 
 ## Distribution routes toggle
 
-The sample routes (arcs, moving delivery-object meshes, and the
-knowledge-broadcast pulsing rings for the "instructions" mode) are
-**currently turned off**, but the code and data behind them are untouched
-— nothing was deleted.
+The distribution routes (arcs, moving delivery-object meshes,
+knowledge-broadcast pulsing rings, and the orbital constellation/deorbit
+capsules) are **currently turned ON** (`SHOW_DISTRIBUTION_ROUTES = true`
+in `src/main.ts`). This was off for a stretch of earlier sessions and is
+now on again per the user's "build this all into the running simulation
+and activate it" — see the update banner at the top.
 
 - Single switch: `SHOW_DISTRIBUTION_ROUTES` constant near the top of
-  `src/main.ts` (currently `false`).
-- When `false`: `physicalRoutes` and `instructionRoutes` both resolve to
-  `[]`, which cascades to empty `arcsData`/`ringsData` and an empty
-  `movingObjects` array (the `.map()` over `physicalRoutes` just produces
-  nothing) — so nothing route-related gets created or added to the scene.
-  The globe still renders with all the hub/need-region points.
-  The legend also drops its per-mode rows when the flag is off, showing
-  just the title/tagline.
-- **To turn routes back on**: flip `SHOW_DISTRIBUTION_ROUTES` to `true` in
-  `src/main.ts` — no other changes needed, everything downstream reacts to
-  the flag automatically.
-- Why it's off: user's call after seeing it — routes/objects "seem cool"
-  and are being kept, just not part of what's shown right now. Treat this
-  as a deliberate, reversible product decision, not a bug or cleanup.
+  `src/main.ts`.
+- When `false`: `physicalRoutes` and `instructionRoutes` resolve to `[]`,
+  cascading to empty `arcsData`/`ringsData`, an empty `movingObjects`
+  array, an empty `satellites` array, no resupply beams, and no
+  `capsuleSpawners` — nothing route- or orbit-related gets created or
+  added to the scene. The globe still renders with all the hub/need-region
+  points. The legend also drops its per-mode rows when the flag is off.
+- **To turn routes back off**: flip `SHOW_DISTRIBUTION_ROUTES` to `false`
+  in `src/main.ts` — no other changes needed, everything downstream reacts
+  to the flag automatically, same as before.
+- This is a deliberate, reversible product toggle either direction, not a
+  bug or cleanup concern.
 
 ## Real hub/need-region dataset
 
@@ -280,3 +300,58 @@ placeholder names) to a real, hand-authored dataset:
 4. `needLevel` values across all 13 need-regions are the author's rough
    illustrative estimates, not derived from any dataset — flag this
    clearly if the project ever moves toward presenting this as real/live.
+
+## Orbital constellation + deorbit capsules
+
+Implements `docs/SPACE_DELIVERY.md` inside `src/main.ts`, replacing the
+generic arc treatment for the "space" mode specifically (ship/plane/
+catapult/instructions are untouched and still use the original generic
+arc/moving-object/ring code).
+
+- `physicalRoutes` is split into `surfaceRoutes` (mode !== "space", feeds
+  the existing generic `arcsData`/`movingObjects` pipeline unchanged) and
+  `spaceRoutes` (mode === "space", feeds the orbital system below). This
+  split happens right after `physicalRoutes` is computed.
+- **`Satellite` / `satellites`**: 8 satellites (`SATELLITE_COUNT`), each a
+  small `THREE.Group` (box body + two panel meshes) added directly to
+  `globe`. Position each frame comes from `satellitePosition(sat,
+  elapsedMs)` — a simplified circular-orbit parametrization using
+  inclination, RAAN, and phase (NOT a real orbital ephemeris, explicitly
+  noted in the code comment). Orbit radius is
+  `GLOBE_RADIUS * (1 + MODE_STYLES.space.altitude)`, i.e. the same
+  altitude the old space arcs peaked at, so it's visually consistent with
+  the rest of the "space" mode's color/altitude language.
+- **Resupply beams**: one faint purple `THREE.Line` per space-hub node
+  (`hubType === "space"`), straight up from the hub's surface coordinate
+  to orbital altitude. Static, not animated — represents the
+  nutrient/water/propellant resupply flights from `docs/SPACE_DELIVERY.md`,
+  doesn't need to move to communicate that.
+- **`CapsuleSpawner` / `capsuleSpawners`**: one per `spaceRoutes` entry
+  (currently 2: `r-space-afghanistan`, `r-space-pacific` from
+  `src/data/routes.ts` — unchanged data, only the rendering changed).
+  Each spawner has a `cadenceMs` (9000ms) and fires repeatedly.
+- **`spawnCapsule`**: on each fire, finds whichever satellite is currently
+  nearest the target (`nearestSatellitePosition`, brute-force distance
+  check over 8 satellites — trivial cost) and builds a
+  `QuadraticBezierCurve3` from that satellite's *current* position to the
+  target's surface coordinate. This is why capsules can't reuse the
+  static `movingObjects` pattern (which precomputes one fixed curve at
+  startup) — the launch point moves every time, so the curve has to be
+  built fresh per launch, in `spawnCapsule`, not once at module load.
+- **`activeCapsules`**: a mutable array (unlike `movingObjects`, which is
+  static once built) because capsules are transient — created on launch,
+  advanced each frame via `capsule.curve.getPoint(t)`, and removed
+  (`globe.remove(capsule.mesh)` + `.splice()`) once `t >= 1`, i.e. once
+  delivered. This is the one place in `src/main.ts` doing per-frame
+  scene-graph mutation rather than just repositioning a fixed set of
+  meshes.
+- Not yet done: no visual "impact" effect when a capsule lands (could
+  reuse the existing `ringsData` ring-pulse mechanism at the landing
+  point); no distinction drawn between "capsule in flight" and "capsule
+  delivered" beyond removal; satellite orbital parameters are tuned for
+  a reasonable-looking spread and speed, not derived from anything.
+- **Still not visually confirmed by the user** as of this write-up — same
+  caveat as everything else added without a browser tool available to the
+  agent. Check the constellation is actually visible/reasonable-looking at
+  the default camera distance (350, per `camera.position.set` near the top
+  of `src/main.ts`) before trusting this description further.
