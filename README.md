@@ -6,8 +6,10 @@ take to end starvation: sea, air, orbital drop, extreme short-range
 ("catapult"), and non-physical delivery of food-production knowledge.
 
 This is a **visualization/simulation project**, not real-world logistics
-infrastructure. See [`docs/VISION.md`](docs/VISION.md) for the full concept
-and [`SPEC.md`](SPEC.md) for build history and decisions.
+infrastructure. See [`docs/VISION.md`](docs/VISION.md) for the product
+concept, [`docs/GLOBAL_FOOD_SYSTEM.md`](docs/GLOBAL_FOOD_SYSTEM.md) for the
+full strategic design (production layers, technology tradeoffs, phased
+rollout), and [`SPEC.md`](SPEC.md) for build history and decisions.
 
 ## Stack
 

@@ -33,6 +33,21 @@ Status as of 2026-08-12. Written so a new session can pick this up cold.
 > / air / space / depot) since routes are off and points are the whole
 > visual story right now. See "Real hub/need-region dataset" section near
 > the bottom for the full rationale and what's still a placeholder.
+>
+> **Update (same day, further session)**: user issued a full strategic
+> design brief for the actual global food system this project simulates —
+> production layers, technology tradeoffs, water/energy economics,
+> distribution, waste, economic access, open standards, AI monitoring,
+> phased rollout, success metrics. This was written up as
+> **`docs/GLOBAL_FOOD_SYSTEM.md`**, not implemented as code — it's the
+> strategic design layer that the simulation currently only partially
+> represents (see that doc's closing "Relationship to the simulation"
+> section for exactly what's already aligned — e.g. `hubType: "depot"`
+> already mirrors the real WFP UNHRD network described there — and what
+> the data model doesn't capture yet, e.g. zone archetypes, production
+> layers, the module spec table). Read that doc before doing further
+> design work on this project; it's the reference framework everything
+> else should be checked against.
 
 ## Mission
 
