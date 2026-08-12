@@ -19,6 +19,20 @@ Status as of 2026-08-12. Written so a new session can pick this up cold.
 > deleting them**, since they look cool and may come back. See
 > "Distribution routes toggle" section near the bottom for how this
 > works and how to re-enable.
+>
+> **Update (same day, further session)**: user re-confirmed routes should
+> stay off ("toggle all routes off and lets start to build the network")
+> — `SHOW_DISTRIBUTION_ROUTES` was already `false`, verified still is.
+> Asked what "build the network" means next; user chose **"real
+> hub/need-region dataset"** (not an editor UI, not simulation logic —
+> just replace/expand the illustrative sample data with a bigger,
+> realistic, still-hand-authored dataset). Implemented: `src/data/nodes.ts`
+> now has real sea port / air cargo hub / orbital launch site / UNHRD
+> humanitarian depot locations (24 hubs) plus 13 widely-reported
+> food-insecure regions. Hub points are now color-coded by `hubType` (port
+> / air / space / depot) since routes are off and points are the whole
+> visual story right now. See "Real hub/need-region dataset" section near
+> the bottom for the full rationale and what's still a placeholder.
 
 ## Mission
 
@@ -179,6 +193,47 @@ knowledge-broadcast pulsing rings for the "instructions" mode) are
   and are being kept, just not part of what's shown right now. Treat this
   as a deliberate, reversible product decision, not a bug or cleanup.
 
+## Real hub/need-region dataset
+
+`src/data/nodes.ts` was expanded from 7 hubs / 7 need-regions (illustrative
+placeholder names) to a real, hand-authored dataset:
+
+- **24 hubs**, each tagged with a `hubType` (`"port" | "air" | "space" |
+  "depot"`), coordinates are real public locations:
+  - 7 sea ports (Rotterdam, Singapore, Shanghai, LA/Long Beach, Santos,
+    Mumbai/JNPT, Durban)
+  - 6 air cargo hubs (Miami, Dubai, Memphis, Hong Kong, Frankfurt, Addis
+    Ababa)
+  - 5 orbital launch sites (Kourou, Baikonur, Kennedy Space Center,
+    Jiuquan, Sriharikota)
+  - 6 humanitarian logistics depots, matching WFP's real UNHRD network
+    (Nairobi, Brindisi, Accra, Panama City, Subang, Las Palmas)
+- **13 need-regions**: widely-reported food-insecurity contexts (Sahel,
+  Horn of Africa, Yemen, South Sudan, Sudan/Darfur, Gaza, Haiti,
+  Afghanistan, Eastern DRC, Northwest Syria, Rakhine/Myanmar, Southern
+  Madagascar, Remote Pacific). `needLevel` (0-1) is a rough illustrative
+  approximation, **not** a precise or sourced severity ranking — no live
+  IPC/FEWS NET/WFP feed is wired in. Some of these are active
+  conflict-affected regions (Gaza, Sudan, Syria, Myanmar) — names/framing
+  were kept neutral and factual (matching how these are broadly,
+  non-politically referred to in public UN/humanitarian reporting), no
+  political commentary was added.
+- Original 7 hub / 7 need-region IDs were **kept unchanged** (same
+  `id`/`lat`/`lng`) so `src/data/routes.ts` (currently unused while routes
+  are toggled off) still resolves correctly if/when routes come back. New
+  nodes aren't yet wired into any routes.
+- Hub points are now color-coded by `hubType`
+  (`HUB_TYPE_COLORS`/`HUB_TYPE_LABELS` in `src/main.ts`: port=cyan,
+  air=amber, space=violet, depot=teal) with a matching legend section that
+  always shows (unlike the route-mode legend rows, which only show when
+  `SHOW_DISTRIBUTION_ROUTES` is `true`). This was added specifically
+  because with routes off, the hub network's points are the entire visual
+  — differentiating them by type gives the globe meaning on its own.
+- `buildLegend()`'s call site was moved from the top of `src/main.ts`
+  (right after the canvas is created) to the bottom, after `HUB_TYPE_COLORS`
+  is declared — it references that const, and calling it at the old
+  location would hit the temporal-dead-zone before the const existed.
+
 ## Open items for next session
 
 1. Everything in `docs/VISION.md`'s "Next candidates" roadmap section is
@@ -187,5 +242,10 @@ knowledge-broadcast pulsing rings for the "instructions" mode) are
    scoring per mode.
 2. Bundle size warning from `npm run build` (~1.8MB main chunk, mostly
    three.js) — not addressed, noted but not blocking.
-3. No decision yet on what (if anything) replaces the routes visually
-   while they're off — currently it's just the bare globe + points.
+3. New hubs/need-regions aren't wired into any routes yet (routes are off
+   anyway) — if routes come back on, `src/data/routes.ts` will need new
+   entries to make use of the expanded node set, otherwise most of the new
+   nodes will just sit there unconnected.
+4. `needLevel` values across all 13 need-regions are the author's rough
+   illustrative estimates, not derived from any dataset — flag this
+   clearly if the project ever moves toward presenting this as real/live.

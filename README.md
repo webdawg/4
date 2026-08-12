@@ -40,6 +40,11 @@ delivered.
 
 ## Status
 
-Early scaffold: a sample dataset of hubs, need-regions, and routes across
-all five delivery modes rendered on an interactive globe. Not connected to
-any live data source.
+The globe now renders a real hub network — actual sea ports, air cargo
+hubs, orbital launch sites, and UN humanitarian depot locations (WFP's
+UNHRD network), alongside a set of widely-reported food-insecure regions.
+Node/hub coordinates are real; need-region severity levels are illustrative
+approximations, not sourced from a live feed. Distribution routes (arcs,
+moving delivery objects, knowledge-broadcast rings) exist in the code but
+are currently toggled off — see `SHOW_DISTRIBUTION_ROUTES` in
+`src/main.ts` and `SPEC.md`.

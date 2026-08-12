@@ -14,7 +14,6 @@ const SHOW_DISTRIBUTION_ROUTES = false;
 
 const app = document.querySelector<HTMLDivElement>("#app")!;
 app.innerHTML = `<canvas id="globe-canvas"></canvas>`;
-buildLegend();
 
 const canvas = document.querySelector<HTMLCanvasElement>("#globe-canvas")!;
 
@@ -74,8 +73,15 @@ const ringsData = [...instructionTargets.entries()].map(([nodeId, mode]) => {
   };
 });
 
+const HUB_TYPE_COLORS: Record<string, string> = {
+  port: "#38bdf8",
+  air: "#fbbf24",
+  space: "#a78bfa",
+  depot: "#2dd4bf",
+};
+
 function getPointColor(node: DeliveryNode): string {
-  if (node.kind === "hub") return "#38bdf8";
+  if (node.kind === "hub") return HUB_TYPE_COLORS[node.hubType ?? "port"];
   const level = node.needLevel ?? 0.5;
   // Interpolate amber -> red as need severity rises.
   return level > 0.8 ? "#ef4444" : level > 0.6 ? "#f97316" : "#f59e0b";
@@ -212,12 +218,29 @@ renderer.setAnimationLoop(() => {
   renderer.render(scene, camera);
 });
 
+buildLegend();
+
 // --- Legend overlay -----------------------------------------------------
+
+const HUB_TYPE_LABELS: Record<string, string> = {
+  port: "Sea Port",
+  air: "Air Cargo Hub",
+  space: "Launch Site",
+  depot: "Humanitarian Depot",
+};
 
 function buildLegend() {
   const legend = document.createElement("div");
   legend.id = "legend";
-  const rows = SHOW_DISTRIBUTION_ROUTES
+
+  const hubRows = Object.entries(HUB_TYPE_LABELS)
+    .map(
+      ([type, label]) =>
+        `<div class="legend-row"><span class="swatch" style="background:${HUB_TYPE_COLORS[type]}"></span>${label}</div>`,
+    )
+    .join("");
+
+  const routeRows = SHOW_DISTRIBUTION_ROUTES
     ? Object.entries(MODE_STYLES)
         .map(
           ([, style]) =>
@@ -225,10 +248,12 @@ function buildLegend() {
         )
         .join("")
     : "";
+
   legend.innerHTML = `
     <h1>Food Relief Network</h1>
-    <p class="tagline">Simulated global delivery — every modality on the table.</p>
-    ${rows}
+    <p class="tagline">Global hub network — routes off for now.</p>
+    ${hubRows}
+    ${routeRows}
   `;
   document.body.appendChild(legend);
 }
