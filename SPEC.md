@@ -99,6 +99,181 @@ Status as of 2026-08-12. Written so a new session can pick this up cold.
 > point/arc/ring rendering from scratch just to make them clickable.
 > Build/typecheck pass; **not yet visually confirmed by the user**.
 
+> **Update (2026-08-12, further session)**: user asked to convert every
+> sprite in the scene to **line-intersection shapes** — sets of line
+> segments radiating from a shared center point (crosses, stars, X's) —
+> instead of solid meshes, framed explicitly as "we can only do the math
+> for points in space at this time" (i.e. everything reduced to points +
+> lines, not solid volumes). Also asked for **ground-level zoom**. New
+> `src/lineShapes.ts` defines four reusable shape families, each a named
+> set of vertex directions from a regular polyhedron, all sharing one
+> `buildLineShape(kind, size, color)` builder:
+> - `cross6` — 6 arms (octahedron vertices, +/-X/Y/Z) — a 3D "+"
+> - `tetraX` — 4 arms (tetrahedron vertices) — a sharp X
+> - `cubeStar` — 8 arms (cube vertices) — a denser diamond lattice
+> - `star12` — 12 arms (icosahedron vertices) — a dense spiky burst
+>
+> Applied everywhere a sprite previously used a solid `THREE.Mesh`:
+> - **Hub markers** (replacing three-globe's built-in `.pointsData()` solid
+>   dots — `pointsData`/`pointLat`/`pointLng`/`pointColor`/`pointAltitude`/
+>   `pointRadius` removed from the globe chain entirely): port = `cross6`,
+>   air = `tetraX`, space = `star12`, depot = `cubeStar`. Built as plain
+>   `THREE.Object3D`s added directly to `globe`, positioned via
+>   `globe.getCoords`, tagged with `userData.selectableType = "node"` so
+>   the existing click-to-inspect system needed no changes.
+> - **Need-region markers**: `star12`, color amber→red by severity (as
+>   before), arm length scales with `needLevel`.
+> - **Moving delivery objects** (`makeModeMesh`): ship = `cross6`,
+>   plane = `cubeStar`, catapult = `tetraX`, space = `star12` (still
+>   unreachable in practice — see note below).
+> - **Satellites** (`makeSatelliteMesh`): the old box body + two panel
+>   meshes became a single `star12` shape. Since line shapes are
+>   symmetric in every direction, the per-frame `sat.mesh.lookAt(0,0,0)`
+>   call was dead weight and was removed.
+> - **Deorbit capsules** (`spawnCapsule`): the solid cone became `tetraX`.
+> - Resupply beams were already plain `THREE.Line`s — unchanged, they
+>   already fit the "line intersection" idea.
+>
+> **Pre-existing bug noticed, not fixed**: `makeModeMesh`/`MODE_SHAPES`
+> for `"space"` is still unreachable — `surfaceRoutes` (which feeds
+> `movingObjects`) explicitly excludes `mode === "space"` (space routes go
+> through the satellite/capsule system instead). Left as-is since it
+> predates this session and wasn't part of what was asked.
+>
+> **Ground-level zoom**: `controls.minDistance` dropped from 104 to 101
+> (globe radius is 100) — camera can now get right down to the surface.
+>
+> **Deferred, explicitly not done this session**: the "mechanism inside
+> each object" — what a satellite, capsule, or hub is actually made of/how
+> it works, visible when zoomed in close. User confirmed this is a
+> separate follow-up task, to start from general assumptions based on each
+> object's existing attributes (hub type, mode, severity, etc.) rather
+> than being designed from scratch.
+>
+> **Not yet visually confirmed by the user** — build/typecheck pass
+> (`npm run build`), dev server responds, but no browser tool is available
+> to the agent, same limitation as every prior session's additions.
+
+> **Update (2026-08-12, further session)**: user asked to "replace the skin
+> of the earth with all the geographical information and boundaries."
+> Removed the photographic `globeImageUrl`/`bumpImageUrl` texture entirely
+> (`earth-night.jpg` + `earth-topology.png`) — replaced with `.globeMaterial()`
+> set to a plain dark `MeshPhongMaterial` (`GLOBE_SURFACE_COLOR = 0x0b1220`),
+> and a new **country boundaries layer** via three-globe's `.polygonsData()`:
+> real political borders from the Natural Earth 110m admin-0 countries
+> dataset, copied from `three-globe`'s own bundled example data into
+> `public/data/ne_110m_admin_0_countries.geojson` (so it's committed and
+> loads from this app with no external runtime dependency — fetched via
+> plain `fetch("/data/...")`, same origin, no CDN). Styled as
+> near-transparent fill (`polygonCapColor` ~2.5% opacity) with a bright cyan
+> stroke (`COUNTRY_BORDER_COLOR = "#38bdf8"`) — the boundary *lines* are
+> what read, not solid country shapes, matching the line-intersection
+> aesthetic used everywhere else in the scene (see previous update on
+> `src/lineShapes.ts`). Polygon fetch is async and doesn't block anything
+> else in `main.ts` — markers/routes/etc. render immediately, boundaries
+> populate onto the globe a moment later once the GeoJSON loads.
+>
+> **Not yet visually confirmed by the user** — build/typecheck pass, the
+> geojson file confirmed served (200) by the dev server at
+> `/data/ne_110m_admin_0_countries.geojson`, but no browser tool available
+> to the agent.
+
+> **Update (2026-08-12, further session)**: user asked to "put the names
+> of all the countries inside too." Added a `.labelsData()` layer to
+> `globe` (three-globe's built-in text-sprite labels), populated from the
+> same `ne_110m_admin_0_countries.geojson` used for boundaries — one label
+> per country (177 total), text from the `NAME` property. The dataset has
+> no pre-supplied label point, so `main.ts` computes one: `ringCentroid()`
+> is a shoelace-formula centroid+area over a ring's `[lng, lat]` points,
+> and `countryCentroid()` picks the **largest-area ring** across a
+> country's polygon(s) — needed for MultiPolygon countries (archipelagos,
+> countries with overseas territories) so the label lands on the main
+> landmass instead of averaging out to empty ocean between disconnected
+> parts. This is a planar (lng/lat-space) centroid approximation, not
+> spherical — good enough for label placement at this globe's scale, not
+> claimed to be geometrically exact. Styling: `labelSize(0.42)`,
+> `labelColor` a soft light-blue (`rgba(148, 197, 232, 0.85)`, dimmer than
+> the boundary-line cyan so borders still read as the primary layer),
+> `labelIncludeDot(false)` (no dot marker — would clutter against the
+> line-shape hub/need markers already on the globe), `labelAltitude(0.008)`
+> (above both the globe surface and the polygon boundary layer's `0.003`).
+> Computed and set together with the boundaries in the same
+> `fetch(...).then(...)` callback, once the GeoJSON loads.
+>
+> **Not yet visually confirmed by the user** — build/typecheck pass, same
+> no-browser-tool limitation as everything else this session. Worth
+> checking in-browser whether 177 simultaneous labels at world-view zoom
+> is legible or too dense — no density/zoom-based filtering was added,
+> since that wasn't asked for and would be premature without seeing it
+> render first.
+
+> **Update (2026-08-12, further session)**: user dropped a real dataset
+> into `source_data/hdx_hapi_food_security_global.csv` — HDX HAPI's
+> Food Security, Nutrition & Poverty: Food Security export
+> (https://data.humdata.org/dataset/hdx-hapi-food-security, ~78MB, ~425k
+> rows, IPC/CH phase classifications by country/admin1/admin2, current +
+> projected periods) — and asked for a heatmap of it with click-through
+> detail on "the mapped out areas" (i.e. the country boundary polygons
+> already on the globe, see the "replace the skin of the earth" update
+> above).
+>
+> **Data pipeline**: new `scripts/build_food_security_data.py` (re-run
+> whenever the source CSV is refreshed) filters the raw CSV down to
+> `admin_level == 0` (country), `ipc_type == "current"` (not projections)
+> rows, keeps only the single most recent `reference_period_start` per
+> country, and writes a compact ~50-country JSON — full phase 1-5
+> population/fraction breakdown plus the combined phase-3+ ("Crisis or
+> worse") figure — to `public/data/food_security_current.json` (~40KB,
+> used at runtime). The 78MB source CSV was initially gitignored, then
+> user asked to commit it anyway for provenance/reproducibility — it's
+> tracked in the repo at `source_data/hdx_hapi_food_security_global.csv`
+> (under GitHub's 100MB hard limit, though over its 50MB warning
+> threshold).
+> **Admin1/admin2 rows in the source data (419k of the 425k rows) are not
+> used** — no sub-national boundary geometry is bundled in this project
+> (only country-level, from the Natural Earth layer), so there's nothing
+> to draw them against yet. Doing that would need a separate admin1/2
+> boundary dataset, not a small addition — flagged as a future option, not
+> started.
+>
+> **Heatmap**: `src/main.ts` fetches `food_security_current.json`
+> alongside the boundary geojson (`Promise.all`, one combined `.then`).
+> `polygonCapColor` now looks up each country's ISO3 in the loaded data and
+> colors its fill via `foodSecurityFillColor()` — an IPC-style green →
+> yellow → orange → red → maroon ramp (`HEATMAP_COLOR_STOPS`) keyed on the
+> phase-3+ population fraction, with fill opacity also rising with
+> severity. Countries with no data in the dataset (most of the world — HDX
+> HAPI only covers ~50 countries with active IPC/CH monitoring) keep the
+> original faint default fill (`NO_DATA_FILL`). Border stroke color is
+> unchanged (still the neutral cyan boundary line) — heat is a fill-color
+> signal layered on top of, not replacing, the boundary layer from the
+> previous update.
+>
+> **Click-through detail**: `SelectableHit` gained a `"country"` variant;
+> `resolveSelectable` now also matches three-globe's `__globeObjType ===
+> "polygon"` tag (previously only `"arc"`/`"ring"` were handled — `"point"`
+> was removed in an earlier update when hub/need markers went custom).
+> Clicking a country's fill/boundary opens the same info panel used for
+> everything else, showing population analyzed, the phase 3+ figure, a
+> full IPC Phase 1-5 breakdown (population + %), the reference period, and
+> a source attribution — or a "not available in the loaded HDX dataset"
+> message for the ~120+ countries this dataset doesn't cover.
+>
+> **Legend**: added a 5-swatch food-insecurity severity key (Low →
+> Catastrophic), reusing `HEATMAP_COLOR_STOPS` as the single source of
+> truth for both the map fill and the legend swatches.
+>
+> **Known gap**: Cape Verde (`CPV`) is present in the HDX data but missing
+> from the Natural Earth 110m country boundary set entirely (too small at
+> this resolution) — its data is in `food_security_current.json` but has
+> no polygon to color or click. Not fixed; would need a finer boundary
+> dataset.
+>
+> **Not yet visually confirmed by the user** — build/typecheck pass, both
+> `/data/ne_110m_admin_0_countries.geojson` and
+> `/data/food_security_current.json` confirmed served (200) by the dev
+> server, but no browser tool available to the agent.
+
 ## Mission
 
 Build a **3D, web-browser-viewable simulation of a global automated food

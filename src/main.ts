@@ -4,6 +4,7 @@ import ThreeGlobe from "three-globe";
 import { nodes, nodeById, type DeliveryNode } from "./data/nodes";
 import { routes } from "./data/routes";
 import { MODE_STYLES, type DeliveryMode } from "./data/modes";
+import { buildLineShape, type LineShapeKind } from "./lineShapes";
 import "./style.css";
 
 // Toggle: show/hide the distribution routes (arcs, moving delivery
@@ -33,7 +34,7 @@ camera.position.set(0, 0, 350);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.08;
-controls.minDistance = 104;
+controls.minDistance = 101; // globe radius is 100 — lets the camera get down to ground level
 controls.maxDistance = 800;
 controls.rotateSpeed = 0.4;
 controls.zoomSpeed = 0.7;
@@ -122,6 +123,16 @@ const HUB_TYPE_LABELS: Record<string, string> = {
   depot: "Humanitarian Depot",
 };
 
+// Every hub type gets its own line-intersection shape family (see
+// src/lineShapes.ts); need-regions all use star12, distinguished by color
+// and arm length (severity) instead of a separate shape.
+const HUB_TYPE_SHAPES: Record<string, LineShapeKind> = {
+  port: "cross6",
+  air: "tetraX",
+  space: "star12",
+  depot: "cubeStar",
+};
+
 function getPointColor(node: DeliveryNode): string {
   if (node.kind === "hub") return HUB_TYPE_COLORS[node.hubType ?? "port"];
   const level = node.needLevel ?? 0.5;
@@ -129,18 +140,25 @@ function getPointColor(node: DeliveryNode): string {
   return level > 0.8 ? "#ef4444" : level > 0.6 ? "#f97316" : "#f59e0b";
 }
 
+// No photographic texture — the globe surface itself follows the
+// line-intersection aesthetic: a plain dark sphere with real country
+// boundaries drawn as vector lines (see COUNTRY_BORDER_COLOR below),
+// not a raster "skin".
+const GLOBE_SURFACE_COLOR = 0x0b1220;
+const COUNTRY_BORDER_COLOR = "#38bdf8";
+
 const globe = new ThreeGlobe()
-  .globeImageUrl("https://unpkg.com/three-globe/example/img/earth-night.jpg")
-  .bumpImageUrl("https://unpkg.com/three-globe/example/img/earth-topology.png")
+  .globeMaterial(
+    new THREE.MeshPhongMaterial({
+      color: GLOBE_SURFACE_COLOR,
+      emissive: GLOBE_SURFACE_COLOR,
+      emissiveIntensity: 0.25,
+      shininess: 4,
+    }),
+  )
   .showAtmosphere(true)
   .atmosphereColor("#60a5fa")
   .atmosphereAltitude(0.18)
-  .pointsData(nodes)
-  .pointLat("lat")
-  .pointLng("lng")
-  .pointColor((d) => getPointColor(d as DeliveryNode))
-  .pointAltitude((d) => ((d as DeliveryNode).kind === "hub" ? 0.012 : 0.02))
-  .pointRadius((d) => ((d as DeliveryNode).kind === "hub" ? 0.35 : 0.3 + ((d as DeliveryNode).needLevel ?? 0.5) * 0.4))
   .arcsData(arcsData)
   .arcColor("color")
   .arcAltitude("altitude")
@@ -158,6 +176,190 @@ const globe = new ThreeGlobe()
   .ringRepeatPeriod(1400);
 
 scene.add(globe);
+
+// --- Country boundaries + names -------------------------------------------
+// Real political boundaries (Natural Earth 110m admin-0 countries,
+// bundled in public/data/ so it loads with no external dependency at
+// runtime), rendered as vector outlines rather than baked into a texture —
+// fill is nearly transparent so the boundary lines are what read, not solid
+// country shapes. Country names are placed at each country's largest-ring
+// centroid.
+
+type GeoRing = number[][]; // [lng, lat] points
+type GeoPolygon = GeoRing[]; // outer ring + hole rings
+
+interface CountryFeature {
+  properties: { NAME: string; ISO_A3: string };
+  geometry: { type: "Polygon" | "MultiPolygon"; coordinates: GeoPolygon | GeoPolygon[] };
+}
+
+interface CountryFeatureCollection {
+  features: CountryFeature[];
+}
+
+interface CountryLabelDatum {
+  lat: number;
+  lng: number;
+  name: string;
+}
+
+// --- Food security heatmap ------------------------------------------------
+// Derived from HDX HAPI's Food Security dataset
+// (https://data.humdata.org/dataset/hdx-hapi-food-security), via
+// scripts/build_food_security_data.py — see that script for how the raw
+// ~425k-row CSV in source_data/ becomes this ~50-country, latest-period-only
+// snapshot. Keyed by ISO3, matching the boundary geojson's ISO_A3 property.
+
+interface FoodSecurityPhase {
+  label: string;
+  population: number;
+  fraction: number;
+}
+
+interface FoodSecurityRecord {
+  periodStart: string;
+  periodEnd: string;
+  populationAnalyzed: number;
+  phase3PlusFraction: number | null;
+  phase3PlusPopulation: number | null;
+  phases: Record<string, FoodSecurityPhase>;
+}
+
+interface FoodSecurityDataset {
+  source: string;
+  sourceUrl: string;
+  countries: Record<string, FoodSecurityRecord>;
+}
+
+// Populated once /data/food_security_current.json loads; describeSelection
+// (defined further down) reads this by closing over the variable, not the
+// value, so it sees the populated map once the fetch resolves.
+let foodSecurityByIso3 = new Map<string, FoodSecurityRecord>();
+
+const NO_DATA_FILL = "rgba(56, 189, 248, 0.025)";
+
+// IPC-style severity ramp (green -> yellow -> orange -> red -> maroon),
+// keyed on the Phase-3-or-worse ("Crisis or worse") population fraction.
+// Fill opacity rises with severity too, so untouched/no-data countries
+// stay closest to the original near-transparent boundary look.
+const HEATMAP_COLOR_STOPS: Array<[number, THREE.Color]> = [
+  [0, new THREE.Color(0x16a34a)],
+  [0.15, new THREE.Color(0xeab308)],
+  [0.3, new THREE.Color(0xf97316)],
+  [0.5, new THREE.Color(0xdc2626)],
+  [0.75, new THREE.Color(0x7f1d1d)],
+];
+
+function foodSecurityFillColor(fraction: number): string {
+  const t = Math.min(1, Math.max(0, fraction));
+  let lower = HEATMAP_COLOR_STOPS[0];
+  let upper = HEATMAP_COLOR_STOPS[HEATMAP_COLOR_STOPS.length - 1];
+  for (let i = 0; i < HEATMAP_COLOR_STOPS.length - 1; i++) {
+    if (t >= HEATMAP_COLOR_STOPS[i][0] && t <= HEATMAP_COLOR_STOPS[i + 1][0]) {
+      lower = HEATMAP_COLOR_STOPS[i];
+      upper = HEATMAP_COLOR_STOPS[i + 1];
+      break;
+    }
+  }
+  const span = upper[0] - lower[0] || 1;
+  const localT = (t - lower[0]) / span;
+  const color = lower[1].clone().lerp(upper[1], localT);
+  const opacity = 0.18 + t * 0.55;
+  return `rgba(${Math.round(color.r * 255)}, ${Math.round(color.g * 255)}, ${Math.round(color.b * 255)}, ${opacity.toFixed(3)})`;
+}
+
+// Shoelace-formula centroid + area of a single ring, in lng/lat space —
+// approximate (doesn't account for spherical curvature), fine for label
+// placement at this globe's scale.
+function ringCentroid(ring: GeoRing): { lat: number; lng: number; area: number } {
+  let signedArea = 0;
+  let cx = 0;
+  let cy = 0;
+  for (let i = 0; i < ring.length - 1; i++) {
+    const [x0, y0] = ring[i];
+    const [x1, y1] = ring[i + 1];
+    const cross = x0 * y1 - x1 * y0;
+    signedArea += cross;
+    cx += (x0 + x1) * cross;
+    cy += (y0 + y1) * cross;
+  }
+  signedArea *= 0.5;
+  if (signedArea === 0) {
+    const [lng, lat] = ring[0];
+    return { lat, lng, area: 0 };
+  }
+  cx /= 6 * signedArea;
+  cy /= 6 * signedArea;
+  return { lat: cy, lng: cx, area: Math.abs(signedArea) };
+}
+
+// For MultiPolygon countries (e.g. archipelagos, countries with overseas
+// territories), use the centroid of the largest landmass rather than
+// averaging every part — otherwise the label lands in open ocean between
+// disconnected pieces.
+function countryCentroid(geometry: CountryFeature["geometry"]): { lat: number; lng: number } {
+  const polygons: GeoPolygon[] = geometry.type === "Polygon" ? [geometry.coordinates as GeoPolygon] : (geometry.coordinates as GeoPolygon[]);
+  let best: { lat: number; lng: number; area: number } | null = null;
+  for (const polygon of polygons) {
+    const centroid = ringCentroid(polygon[0]);
+    if (!best || centroid.area > best.area) best = centroid;
+  }
+  return best ?? { lat: 0, lng: 0 };
+}
+
+Promise.all([
+  fetch("/data/ne_110m_admin_0_countries.geojson").then((res) => res.json() as Promise<CountryFeatureCollection>),
+  fetch("/data/food_security_current.json").then((res) => res.json() as Promise<FoodSecurityDataset>),
+]).then(([countries, foodSecurity]) => {
+  foodSecurityByIso3 = new Map(Object.entries(foodSecurity.countries));
+
+  const labelsData: CountryLabelDatum[] = countries.features.map((feature) => {
+    const { lat, lng } = countryCentroid(feature.geometry);
+    return { lat, lng, name: feature.properties.NAME };
+  });
+
+  globe
+    .polygonsData(countries.features)
+    .polygonCapColor((d) => {
+      const record = foodSecurityByIso3.get((d as CountryFeature).properties.ISO_A3);
+      return record?.phase3PlusFraction != null ? foodSecurityFillColor(record.phase3PlusFraction) : NO_DATA_FILL;
+    })
+    .polygonSideColor(() => "rgba(0, 0, 0, 0)")
+    .polygonStrokeColor(() => COUNTRY_BORDER_COLOR)
+    .polygonAltitude(0.003)
+    .labelsData(labelsData)
+    .labelLat("lat")
+    .labelLng("lng")
+    .labelText("name")
+    .labelSize(0.42)
+    .labelColor(() => "rgba(148, 197, 232, 0.85)")
+    .labelIncludeDot(false)
+    .labelAltitude(0.008)
+    .labelResolution(2);
+});
+
+// --- Hub / need-region markers ------------------------------------------
+// Rendered as custom line-intersection shapes (src/lineShapes.ts) rather
+// than three-globe's built-in solid point dots — every sprite in this scene
+// is a set of lines radiating from a single point in space.
+
+function buildNodeMarker(node: DeliveryNode): THREE.Object3D {
+  const isHub = node.kind === "hub";
+  const shape: LineShapeKind = isHub ? HUB_TYPE_SHAPES[node.hubType ?? "port"] : "star12";
+  const size = isHub ? 1.8 : 1.6 + (node.needLevel ?? 0.5) * 2.4;
+  const marker = buildLineShape(shape, size, getPointColor(node));
+  marker.userData.selectableType = "node";
+  marker.userData.selectableData = node;
+  return marker;
+}
+
+for (const node of nodes) {
+  const altitudeFrac = node.kind === "hub" ? 0.012 : 0.02;
+  const coords = globe.getCoords(node.lat, node.lng, altitudeFrac);
+  const marker = buildNodeMarker(node);
+  marker.position.set(coords.x, coords.y, coords.z);
+  globe.add(marker);
+}
 
 // --- Moving delivery objects --------------------------------------------
 // One mesh per physical route, traveling repeatedly along a curve that
@@ -187,35 +389,21 @@ function buildArcCurve(
   return new THREE.QuadraticBezierCurve3(start, mid, end);
 }
 
+// Each delivery mode gets its own line-shape family (src/lineShapes.ts):
+// ship = 3D cross, plane = 8-arm diamond spread, catapult = sharp 4-arm X,
+// space = dense 12-arm star. Non-directional by construction, so it reads
+// correctly from any camera angle with no per-frame orientation logic.
+const MODE_SHAPES: Record<DeliveryMode, LineShapeKind> = {
+  ship: "cross6",
+  plane: "cubeStar",
+  catapult: "tetraX",
+  space: "star12",
+  instructions: "cross6", // unused: instructions is non-physical, renders as rings only
+};
+
 function makeModeMesh(mode: DeliveryMode): THREE.Object3D {
   const style = MODE_STYLES[mode];
-  const color = new THREE.Color(style.color[0]);
-  const material = new THREE.MeshStandardMaterial({
-    color,
-    emissive: color,
-    emissiveIntensity: 0.8,
-    roughness: 0.35,
-    metalness: 0.1,
-  });
-  const size = 2.2;
-  let geometry: THREE.BufferGeometry;
-  switch (mode) {
-    case "space":
-      geometry = new THREE.IcosahedronGeometry(size * 0.7, 0);
-      break;
-    case "plane":
-      geometry = new THREE.OctahedronGeometry(size * 0.75, 0);
-      break;
-    case "ship":
-      geometry = new THREE.BoxGeometry(size, size * 0.55, size);
-      break;
-    case "catapult":
-      geometry = new THREE.TetrahedronGeometry(size * 0.85, 0);
-      break;
-    default:
-      geometry = new THREE.SphereGeometry(size * 0.55, 8, 8);
-  }
-  return new THREE.Mesh(geometry, material);
+  return buildLineShape(MODE_SHAPES[mode], 2.2, style.color[0]);
 }
 
 interface MovingObject {
@@ -262,24 +450,7 @@ interface Satellite {
 }
 
 function makeSatelliteMesh(): THREE.Object3D {
-  const group = new THREE.Group();
-  const bodyMat = new THREE.MeshStandardMaterial({ color: 0xcbd5e1, metalness: 0.6, roughness: 0.4 });
-  const panelMat = new THREE.MeshStandardMaterial({
-    color: 0x1d4ed8,
-    metalness: 0.2,
-    roughness: 0.5,
-    emissive: 0x1d4ed8,
-    emissiveIntensity: 0.15,
-  });
-  const body = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.2, 2.2), bodyMat);
-  group.add(body);
-  const panelGeometry = new THREE.BoxGeometry(4, 0.08, 1.4);
-  const panelLeft = new THREE.Mesh(panelGeometry, panelMat);
-  panelLeft.position.x = -3;
-  const panelRight = new THREE.Mesh(panelGeometry, panelMat);
-  panelRight.position.x = 3;
-  group.add(panelLeft, panelRight);
-  return group;
+  return buildLineShape("star12", 2.6, 0xcbd5e1);
 }
 
 function satellitePosition(sat: Satellite, elapsedMs: number): THREE.Vector3 {
@@ -384,13 +555,7 @@ function spawnCapsule(spawner: CapsuleSpawner, elapsedMs: number) {
   const launch = nearestSatellitePosition(target, elapsedMs);
   const mid = launch.clone().add(target).multiplyScalar(0.5);
   const curve = new THREE.QuadraticBezierCurve3(launch, mid, target);
-  const material = new THREE.MeshStandardMaterial({
-    color: 0xe0f2fe,
-    emissive: 0x7dd3fc,
-    emissiveIntensity: 0.7,
-    roughness: 0.3,
-  });
-  const mesh = new THREE.Mesh(new THREE.ConeGeometry(1.1, 2.6, 6), material);
+  const mesh = buildLineShape("tetraX", 1.6, 0x7dd3fc);
   mesh.userData.selectableType = "capsule";
   mesh.userData.selectableData = {
     targetName: spawner.targetName,
@@ -425,7 +590,6 @@ renderer.setAnimationLoop(() => {
 
   for (const sat of satellites) {
     sat.mesh.position.copy(satellitePosition(sat, elapsedMs));
-    sat.mesh.lookAt(0, 0, 0);
   }
 
   for (const spawner of capsuleSpawners) {
@@ -474,11 +638,19 @@ function buildLegend() {
         .join("")
     : "";
 
+  const foodSecurityLabels = ["Low", "Elevated", "High", "Severe", "Catastrophic"];
+  const foodSecurityRows = HEATMAP_COLOR_STOPS.map(
+    ([, color], i) =>
+      `<div class="legend-row"><span class="swatch" style="background:#${color.getHexString()}"></span>${foodSecurityLabels[i] ?? ""}</div>`,
+  ).join("");
+
   legend.innerHTML = `
     <h1>Food Relief Network</h1>
     <p class="tagline">Click anything on the globe to inspect it.</p>
     ${hubRows}
     ${routeRows}
+    <div class="legend-heading">Food insecurity (Crisis+ share)</div>
+    ${foodSecurityRows}
   `;
   document.body.appendChild(legend);
 }
@@ -513,7 +685,8 @@ type SelectableHit =
       type: "capsule";
       data: { targetName: string; targetLat: number; targetLng: number; startMs: number; durationMs: number };
     }
-  | { type: "beam"; data: { hubName: string } };
+  | { type: "beam"; data: { hubName: string } }
+  | { type: "country"; data: CountryFeature };
 
 function resolveSelectable(object: THREE.Object3D): SelectableHit | null {
   let obj: THREE.Object3D | null = object;
@@ -524,9 +697,9 @@ function resolveSelectable(object: THREE.Object3D): SelectableHit | null {
     }
     const extras = obj as unknown as GlobeObjectExtras;
     if (extras.__data !== undefined) {
-      if (extras.__globeObjType === "point") return { type: "node", data: extras.__data as DeliveryNode };
       if (extras.__globeObjType === "arc") return { type: "arc", data: extras.__data as ArcDatum };
       if (extras.__globeObjType === "ring") return { type: "ring", data: extras.__data as RingDatum };
+      if (extras.__globeObjType === "polygon") return { type: "country", data: extras.__data as CountryFeature };
     }
     obj = obj.parent;
   }
@@ -620,6 +793,39 @@ function describeSelection(hit: SelectableHit): SelectionInfo {
         rows: [
           ["From", hubName],
           ["Carries", "Nutrient salts, water, seed culture, propellant, spares"],
+        ],
+      };
+    }
+    case "country": {
+      const { NAME, ISO_A3 } = hit.data.properties;
+      const record = foodSecurityByIso3.get(ISO_A3);
+      if (!record) {
+        return {
+          title: NAME,
+          subtitle: "Food security",
+          rows: [["Data", "Not available in the loaded HDX dataset"]],
+        };
+      }
+      const phaseOrder = ["1", "2", "3", "4", "5"];
+      const phaseRows: Array<[string, string]> = phaseOrder
+        .filter((phaseNum) => record.phases[phaseNum])
+        .map((phaseNum) => {
+          const phase = record.phases[phaseNum];
+          return [`IPC Phase ${phaseNum} — ${phase.label}`, `${phase.population.toLocaleString()} (${Math.round(phase.fraction * 100)}%)`];
+        });
+      return {
+        title: NAME,
+        subtitle: `Food insecurity — ${record.periodStart} to ${record.periodEnd}`,
+        rows: [
+          ["Population analyzed", record.populationAnalyzed.toLocaleString()],
+          [
+            "Crisis or worse (Phase 3+)",
+            record.phase3PlusFraction != null
+              ? `${(record.phase3PlusPopulation ?? 0).toLocaleString()} (${Math.round(record.phase3PlusFraction * 100)}%)`
+              : "—",
+          ],
+          ...phaseRows,
+          ["Source", "HDX HAPI Food Security"],
         ],
       };
     }

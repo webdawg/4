@@ -1,0 +1,1706 @@
+{
+  "source": "HDX HAPI - Food Security, Nutrition & Poverty: Food Security",
+  "sourceUrl": "https://data.humdata.org/dataset/hdx-hapi-food-security",
+  "countries": {
+    "AFG": {
+      "periodStart": "2025-09-01",
+      "periodEnd": "2025-10-31",
+      "populationAnalyzed": 48595631,
+      "phase3PlusFraction": 0.28,
+      "phase3PlusPopulation": 13775635,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 14693763,
+          "fraction": 0.3
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 20126236,
+          "fraction": 0.41
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 10910077,
+          "fraction": 0.22
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 2865558,
+          "fraction": 0.06
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "AGO": {
+      "periodStart": "2021-06-01",
+      "periodEnd": "2021-09-30",
+      "populationAnalyzed": 2667790,
+      "phase3PlusFraction": 0.49,
+      "phase3PlusPopulation": 1315532,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 531260,
+          "fraction": 0.2
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 820998,
+          "fraction": 0.31
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 1008245,
+          "fraction": 0.38
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 307288,
+          "fraction": 0.12
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "BDI": {
+      "periodStart": "2026-04-01",
+      "periodEnd": "2026-05-31",
+      "populationAnalyzed": 12864685,
+      "phase3PlusFraction": 0.14,
+      "phase3PlusPopulation": 1765517,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 4506294,
+          "fraction": 0.35
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 6592877,
+          "fraction": 0.51
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 1545176,
+          "fraction": 0.12
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 220341,
+          "fraction": 0.02
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "BEN": {
+      "periodStart": "2025-10-01",
+      "periodEnd": "2025-12-31",
+      "populationAnalyzed": 2771518,
+      "phase3PlusFraction": 0.07,
+      "phase3PlusPopulation": 191108,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 2133087,
+          "fraction": 0.77
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 447323,
+          "fraction": 0.16
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 188147,
+          "fraction": 0.07
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 2960,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "BFA": {
+      "periodStart": "2024-03-01",
+      "periodEnd": "2024-05-31",
+      "populationAnalyzed": 22969083,
+      "phase3PlusFraction": 0.07,
+      "phase3PlusPopulation": 1749437,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 17064478,
+          "fraction": 0.74
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 4155168,
+          "fraction": 0.18
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 1673313,
+          "fraction": 0.07
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 76124,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "BGD": {
+      "periodStart": "2026-05-01",
+      "periodEnd": "2026-08-31",
+      "populationAnalyzed": 99213141,
+      "phase3PlusFraction": 0.15,
+      "phase3PlusPopulation": 15270914,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 48458566,
+          "fraction": 0.49
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 35483662,
+          "fraction": 0.36
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 14787879,
+          "fraction": 0.15
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 483035,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "CAF": {
+      "periodStart": "2025-09-01",
+      "periodEnd": "2026-03-31",
+      "populationAnalyzed": 6567377,
+      "phase3PlusFraction": 0.29,
+      "phase3PlusPopulation": 1928733,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 1997502,
+          "fraction": 0.3
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 2641160,
+          "fraction": 0.4
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 1659522,
+          "fraction": 0.25
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 269211,
+          "fraction": 0.04
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "CIV": {
+      "periodStart": "2025-10-01",
+      "periodEnd": "2025-12-31",
+      "populationAnalyzed": 24801516,
+      "phase3PlusFraction": 0.04,
+      "phase3PlusPopulation": 1033335,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 20438045,
+          "fraction": 0.82
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 3330136,
+          "fraction": 0.13
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 1023636,
+          "fraction": 0.04
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 9699,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "CMR": {
+      "periodStart": "2025-10-01",
+      "periodEnd": "2025-12-31",
+      "populationAnalyzed": 29414764,
+      "phase3PlusFraction": 0.11,
+      "phase3PlusPopulation": 3120294,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 20100391,
+          "fraction": 0.68
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 6194078,
+          "fraction": 0.21
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 2870988,
+          "fraction": 0.1
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 249306,
+          "fraction": 0.01
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "COD": {
+      "periodStart": "2025-09-01",
+      "periodEnd": "2025-12-31",
+      "populationAnalyzed": 116917366,
+      "phase3PlusFraction": 0.21,
+      "phase3PlusPopulation": 24812776,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 38613182,
+          "fraction": 0.33
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 53491444,
+          "fraction": 0.46
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 21583110,
+          "fraction": 0.18
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 3229666,
+          "fraction": 0.03
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "CPV": {
+      "periodStart": "2025-10-01",
+      "periodEnd": "2025-12-31",
+      "populationAnalyzed": 513997,
+      "phase3PlusFraction": 0.07,
+      "phase3PlusPopulation": 37752,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 394204,
+          "fraction": 0.77
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 82042,
+          "fraction": 0.16
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 37752,
+          "fraction": 0.07
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 0,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "DJI": {
+      "periodStart": "2026-05-01",
+      "periodEnd": "2026-06-30",
+      "populationAnalyzed": 1029661,
+      "phase3PlusFraction": 0.16,
+      "phase3PlusPopulation": 165896,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 353653,
+          "fraction": 0.34
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 510115,
+          "fraction": 0.5
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 148700,
+          "fraction": 0.14
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 17196,
+          "fraction": 0.02
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "DOM": {
+      "periodStart": "2024-10-01",
+      "periodEnd": "2025-01-31",
+      "populationAnalyzed": 10795677,
+      "phase3PlusFraction": 0.09,
+      "phase3PlusPopulation": 924905,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 7926163,
+          "fraction": 0.73
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 1944609,
+          "fraction": 0.18
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 919837,
+          "fraction": 0.09
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 5068,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "ECU": {
+      "periodStart": "2025-12-01",
+      "periodEnd": "2026-04-30",
+      "populationAnalyzed": 18416440,
+      "phase3PlusFraction": 0.14,
+      "phase3PlusPopulation": 2541934,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 10738093,
+          "fraction": 0.58
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 5136418,
+          "fraction": 0.28
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 2446747,
+          "fraction": 0.13
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 95187,
+          "fraction": 0.01
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "ETH": {
+      "periodStart": "2021-05-01",
+      "periodEnd": "2021-06-30",
+      "populationAnalyzed": 8980967,
+      "phase3PlusFraction": 0.61,
+      "phase3PlusPopulation": 5522943,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 1462694,
+          "fraction": 0.17
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 1995331,
+          "fraction": 0.22
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 3091605,
+          "fraction": 0.34
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 2078442,
+          "fraction": 0.23
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 352896,
+          "fraction": 0.04
+        }
+      }
+    },
+    "GHA": {
+      "periodStart": "2025-10-01",
+      "periodEnd": "2025-12-31",
+      "populationAnalyzed": 34378759,
+      "phase3PlusFraction": 0.04,
+      "phase3PlusPopulation": 1561223,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 27884956,
+          "fraction": 0.81
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 4932580,
+          "fraction": 0.14
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 1489038,
+          "fraction": 0.04
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 72185,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "GIN": {
+      "periodStart": "2025-10-01",
+      "periodEnd": "2025-12-31",
+      "populationAnalyzed": 12414765,
+      "phase3PlusFraction": 0.11,
+      "phase3PlusPopulation": 1480656,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 8295152,
+          "fraction": 0.67
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 2638957,
+          "fraction": 0.21
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 1426708,
+          "fraction": 0.11
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 53948,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "GMB": {
+      "periodStart": "2025-03-01",
+      "periodEnd": "2025-05-31",
+      "populationAnalyzed": 0,
+      "phase3PlusFraction": 0.0,
+      "phase3PlusPopulation": 0,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 0,
+          "fraction": 0.0
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 0,
+          "fraction": 0.0
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 0,
+          "fraction": 0.0
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 0,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "GNB": {
+      "periodStart": "2025-03-01",
+      "periodEnd": "2025-05-31",
+      "populationAnalyzed": 1816450,
+      "phase3PlusFraction": 0.07,
+      "phase3PlusPopulation": 121695,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 1360149,
+          "fraction": 0.75
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 334606,
+          "fraction": 0.18
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 121695,
+          "fraction": 0.07
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 0,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "GTM": {
+      "periodStart": "2026-04-01",
+      "periodEnd": "2026-06-30",
+      "populationAnalyzed": 18312373,
+      "phase3PlusFraction": 0.14,
+      "phase3PlusPopulation": 2453907,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 7800971,
+          "fraction": 0.43
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 8057497,
+          "fraction": 0.44
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 2334280,
+          "fraction": 0.13
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 119627,
+          "fraction": 0.01
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "HND": {
+      "periodStart": "2025-11-01",
+      "periodEnd": "2026-03-31",
+      "populationAnalyzed": 10186738,
+      "phase3PlusFraction": 0.13,
+      "phase3PlusPopulation": 1387086,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 5161373,
+          "fraction": 0.51
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 3638286,
+          "fraction": 0.36
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 1351637,
+          "fraction": 0.13
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 35449,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "HTI": {
+      "periodStart": "2025-09-01",
+      "periodEnd": "2026-02-28",
+      "populationAnalyzed": 11293795,
+      "phase3PlusFraction": 0.51,
+      "phase3PlusPopulation": 5697628,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 2536622,
+          "fraction": 0.22
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 3059549,
+          "fraction": 0.27
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 3802136,
+          "fraction": 0.34
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 1895492,
+          "fraction": 0.17
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "KEN": {
+      "periodStart": "2026-01-01",
+      "periodEnd": "2026-03-31",
+      "populationAnalyzed": 18351021,
+      "phase3PlusFraction": 0.2,
+      "phase3PlusPopulation": 3702706,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 8257794,
+          "fraction": 0.45
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 6390522,
+          "fraction": 0.35
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 3116400,
+          "fraction": 0.17
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 586306,
+          "fraction": 0.03
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "LBN": {
+      "periodStart": "2025-11-01",
+      "periodEnd": "2026-03-31",
+      "populationAnalyzed": 5191667,
+      "phase3PlusFraction": 0.17,
+      "phase3PlusPopulation": 873739,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 2213430,
+          "fraction": 0.43
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 2104498,
+          "fraction": 0.41
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 851243,
+          "fraction": 0.17
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 22497,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "LBR": {
+      "periodStart": "2025-10-01",
+      "periodEnd": "2025-12-31",
+      "populationAnalyzed": 5625874,
+      "phase3PlusFraction": 0.07,
+      "phase3PlusPopulation": 418213,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 3950954,
+          "fraction": 0.7
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 1256707,
+          "fraction": 0.22
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 418213,
+          "fraction": 0.07
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 0,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "LSO": {
+      "periodStart": "2026-05-01",
+      "periodEnd": "2026-09-30",
+      "populationAnalyzed": 1525954,
+      "phase3PlusFraction": 0.15,
+      "phase3PlusPopulation": 234468,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 681234,
+          "fraction": 0.45
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 610254,
+          "fraction": 0.4
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 234468,
+          "fraction": 0.15
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 0,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "MDG": {
+      "periodStart": "2026-03-01",
+      "periodEnd": "2026-05-31",
+      "populationAnalyzed": 32683605,
+      "phase3PlusFraction": 0.08,
+      "phase3PlusPopulation": 2572569,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 19002476,
+          "fraction": 0.58
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 11108577,
+          "fraction": 0.34
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 2547878,
+          "fraction": 0.08
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 24691,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "MLI": {
+      "periodStart": "2025-10-01",
+      "periodEnd": "2025-12-31",
+      "populationAnalyzed": 25568962,
+      "phase3PlusFraction": 0.03,
+      "phase3PlusPopulation": 855640,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 22075035,
+          "fraction": 0.86
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 2638287,
+          "fraction": 0.1
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 824823,
+          "fraction": 0.03
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 30817,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "MOZ": {
+      "periodStart": "2025-10-01",
+      "periodEnd": "2026-03-31",
+      "populationAnalyzed": 9623782,
+      "phase3PlusFraction": 0.12,
+      "phase3PlusPopulation": 1204836,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 5838601,
+          "fraction": 0.61
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 2580351,
+          "fraction": 0.27
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 1079135,
+          "fraction": 0.11
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 125701,
+          "fraction": 0.01
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "MRT": {
+      "periodStart": "2025-10-01",
+      "periodEnd": "2025-12-31",
+      "populationAnalyzed": 5323969,
+      "phase3PlusFraction": 0.06,
+      "phase3PlusPopulation": 295561,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 4085189,
+          "fraction": 0.77
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 943219,
+          "fraction": 0.18
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 295561,
+          "fraction": 0.06
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 0,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "MWI": {
+      "periodStart": "2026-04-01",
+      "periodEnd": "2026-09-30",
+      "populationAnalyzed": 19085563,
+      "phase3PlusFraction": 0.1,
+      "phase3PlusPopulation": 1935075,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 12715282,
+          "fraction": 0.67
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 4435213,
+          "fraction": 0.23
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 1935075,
+          "fraction": 0.1
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 0,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "NAM": {
+      "periodStart": "2025-07-01",
+      "periodEnd": "2025-09-30",
+      "populationAnalyzed": 3022401,
+      "phase3PlusFraction": 0.15,
+      "phase3PlusPopulation": 455668,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 1432894,
+          "fraction": 0.47
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 1133841,
+          "fraction": 0.38
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 455668,
+          "fraction": 0.15
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 0,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "NER": {
+      "periodStart": "2025-10-01",
+      "periodEnd": "2025-12-31",
+      "populationAnalyzed": 28095488,
+      "phase3PlusFraction": 0.07,
+      "phase3PlusPopulation": 1855774,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 20824065,
+          "fraction": 0.74
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 5415649,
+          "fraction": 0.19
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 1841258,
+          "fraction": 0.07
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 14516,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "NGA": {
+      "periodStart": "2025-10-01",
+      "periodEnd": "2025-12-31",
+      "populationAnalyzed": 217933704,
+      "phase3PlusFraction": 0.12,
+      "phase3PlusPopulation": 27212933,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 104204933,
+          "fraction": 0.48
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 86515838,
+          "fraction": 0.4
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 26355367,
+          "fraction": 0.12
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 857567,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "PAK": {
+      "periodStart": "2026-03-01",
+      "periodEnd": "2026-03-31",
+      "populationAnalyzed": 53441149,
+      "phase3PlusFraction": 0.2,
+      "phase3PlusPopulation": 10553872,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 24712280,
+          "fraction": 0.46
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 18174997,
+          "fraction": 0.34
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 9168262,
+          "fraction": 0.17
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 1385610,
+          "fraction": 0.03
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "PSE": {
+      "periodStart": "2026-04-01",
+      "periodEnd": "2026-06-30",
+      "populationAnalyzed": 2118215,
+      "phase3PlusFraction": 0.59,
+      "phase3PlusPopulation": 1239657,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 0,
+          "fraction": 0.0
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 878559,
+          "fraction": 0.41
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 1027836,
+          "fraction": 0.49
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 211821,
+          "fraction": 0.1
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "SDN": {
+      "periodStart": "2026-02-01",
+      "periodEnd": "2026-05-31",
+      "populationAnalyzed": 47535794,
+      "phase3PlusFraction": 0.41,
+      "phase3PlusPopulation": 19466533,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 12069469,
+          "fraction": 0.25
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 15999822,
+          "fraction": 0.34
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 14316494,
+          "fraction": 0.3
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 5015231,
+          "fraction": 0.11
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 134808,
+          "fraction": 0.0
+        }
+      }
+    },
+    "SEN": {
+      "periodStart": "2025-10-01",
+      "periodEnd": "2025-12-31",
+      "populationAnalyzed": 19573989,
+      "phase3PlusFraction": 0.03,
+      "phase3PlusPopulation": 504386,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 16639064,
+          "fraction": 0.85
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 2430539,
+          "fraction": 0.12
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 491101,
+          "fraction": 0.03
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 13285,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "SLE": {
+      "periodStart": "2025-10-01",
+      "periodEnd": "2025-12-31",
+      "populationAnalyzed": 9077691,
+      "phase3PlusFraction": 0.11,
+      "phase3PlusPopulation": 998608,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 5340030,
+          "fraction": 0.59
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 2739053,
+          "fraction": 0.3
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 933530,
+          "fraction": 0.1
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 65078,
+          "fraction": 0.01
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "SLV": {
+      "periodStart": "2021-07-01",
+      "periodEnd": "2021-08-31",
+      "populationAnalyzed": 6325827,
+      "phase3PlusFraction": 0.13,
+      "phase3PlusPopulation": 841190,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 2359805,
+          "fraction": 0.37
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 3124833,
+          "fraction": 0.49
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 780311,
+          "fraction": 0.12
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 60879,
+          "fraction": 0.01
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "SOM": {
+      "periodStart": "2026-04-01",
+      "periodEnd": "2026-06-30",
+      "populationAnalyzed": 19442156,
+      "phase3PlusFraction": 0.31,
+      "phase3PlusPopulation": 6030282,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 5686108,
+          "fraction": 0.29
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 7725794,
+          "fraction": 0.4
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 4154332,
+          "fraction": 0.21
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 1875950,
+          "fraction": 0.1
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "SSD": {
+      "periodStart": "2025-09-01",
+      "periodEnd": "2025-11-30",
+      "populationAnalyzed": 14203031,
+      "phase3PlusFraction": 0.42,
+      "phase3PlusPopulation": 5972144,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 3317998,
+          "fraction": 0.23
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 4912889,
+          "fraction": 0.35
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 4649202,
+          "fraction": 0.33
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 1295086,
+          "fraction": 0.09
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 27856,
+          "fraction": 0.0
+        }
+      }
+    },
+    "SWZ": {
+      "periodStart": "2026-06-01",
+      "periodEnd": "2026-09-30",
+      "populationAnalyzed": 1236356,
+      "phase3PlusFraction": 0.18,
+      "phase3PlusPopulation": 222251,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 558754,
+          "fraction": 0.45
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 455353,
+          "fraction": 0.37
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 222251,
+          "fraction": 0.18
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 0,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "TCD": {
+      "periodStart": "2025-10-01",
+      "periodEnd": "2025-12-31",
+      "populationAnalyzed": 18070731,
+      "phase3PlusFraction": 0.11,
+      "phase3PlusPopulation": 1927580,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 12227264,
+          "fraction": 0.68
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 3915887,
+          "fraction": 0.22
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 1831960,
+          "fraction": 0.1
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 95621,
+          "fraction": 0.01
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "TGO": {
+      "periodStart": "2025-10-01",
+      "periodEnd": "2025-12-31",
+      "populationAnalyzed": 6469612,
+      "phase3PlusFraction": 0.04,
+      "phase3PlusPopulation": 288383,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 5009261,
+          "fraction": 0.77
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 1171968,
+          "fraction": 0.18
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 288383,
+          "fraction": 0.04
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 0,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "TLS": {
+      "periodStart": "2023-11-01",
+      "periodEnd": "2024-04-30",
+      "populationAnalyzed": 1340434,
+      "phase3PlusFraction": 0.27,
+      "phase3PlusPopulation": 360097,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 501542,
+          "fraction": 0.37
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 478795,
+          "fraction": 0.36
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 341505,
+          "fraction": 0.26
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 18592,
+          "fraction": 0.01
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "TZA": {
+      "periodStart": "2026-02-01",
+      "periodEnd": "2026-05-31",
+      "populationAnalyzed": 9929218,
+      "phase3PlusFraction": 0.1,
+      "phase3PlusPopulation": 1028267,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 6041365,
+          "fraction": 0.61
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 2859593,
+          "fraction": 0.29
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 1028267,
+          "fraction": 0.1
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 0,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "UGA": {
+      "periodStart": "2026-03-01",
+      "periodEnd": "2026-07-31",
+      "populationAnalyzed": 1496117,
+      "phase3PlusFraction": 0.32,
+      "phase3PlusPopulation": 473368,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 441735,
+          "fraction": 0.3
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 581016,
+          "fraction": 0.39
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 432109,
+          "fraction": 0.29
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 41259,
+          "fraction": 0.03
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "YEM": {
+      "periodStart": "2026-03-01",
+      "periodEnd": "2026-05-31",
+      "populationAnalyzed": 10479422,
+      "phase3PlusFraction": 0.47,
+      "phase3PlusPopulation": 4980505,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 2242768,
+          "fraction": 0.22
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 3256168,
+          "fraction": 0.31
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 3577291,
+          "fraction": 0.34
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 1403214,
+          "fraction": 0.13
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "ZMB": {
+      "periodStart": "2025-04-01",
+      "periodEnd": "2025-09-30",
+      "populationAnalyzed": 10073915,
+      "phase3PlusFraction": 0.12,
+      "phase3PlusPopulation": 1203693,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 3675165,
+          "fraction": 0.37
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 5195065,
+          "fraction": 0.52
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 1203693,
+          "fraction": 0.12
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 0,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    }
+  }
+}

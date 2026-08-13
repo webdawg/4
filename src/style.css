@@ -67,6 +67,14 @@ body {
   flex-shrink: 0;
 }
 
+.legend-heading {
+  margin: 0.6rem 0 0.15rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #94a3b8;
+}
+
 #info-panel {
   position: fixed;
   top: 1.5rem;
