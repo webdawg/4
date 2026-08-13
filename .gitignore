@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Raw geoBoundaries downloads cached by scripts/build_food_security_data.py
+# — re-derivable by re-running the script, not worth committing (the CSV in
+# source_data/ itself IS committed, for provenance, per user request).
+source_data/admin1_raw
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

@@ -274,6 +274,256 @@ Status as of 2026-08-12. Written so a new session can pick this up cold.
 > `/data/food_security_current.json` confirmed served (200) by the dev
 > server, but no browser tool available to the agent.
 
+> **Update (2026-08-12, further session)**: user said the delivery
+> animations were "moving way too fast and not real" and initially asked
+> to slow them to real time — then, mid-message, redirected: don't tune
+> the speed, **halt all deliveries** instead ("we do not need to trace
+> with lines for now"), and shift focus to **building out the space-based
+> facilities that can grow food infinitely**. Two changes in
+> `src/main.ts`:
+>
+> 1. **Renamed `SHOW_DISTRIBUTION_ROUTES` → `SHOW_DELIVERIES`, set to
+>    `false`.** Halts arcs, ship/plane/catapult moving objects,
+>    instruction rings, resupply beams, and deorbit capsules (capsules
+>    halt as a side effect of `spaceRoutes` resolving to `[]`, no separate
+>    gate needed). **Satellites were deliberately un-gated from this
+>    flag** — they used to turn off with everything else; now they render
+>    unconditionally, because the user's framing was explicit that the
+>    orbital facilities are infrastructure, not a "delivery." See
+>    "Deliveries toggle" section (renamed from "Distribution routes
+>    toggle") for full detail.
+> 2. **Built out the orbital growing facilities** — see new "Orbital
+>    growing facilities" section below for detail. Short version:
+>    `makeSatelliteMesh` is now a compound shape (a `star12` bioreactor
+>    core + a `cross6` solar-array overlay) instead of a bare `star12`,
+>    and each facility now has a production model taken directly from
+>    `docs/SPACE_DELIVERY.md`'s per-unit spec table ("tens of kg
+>    dehydrated protein product per week per unit") — a deliberately
+>    uncapped, continuously-accumulating "food grown so far" figure shown
+>    in the click panel, computed at the *real* wall-clock rate (grams
+>    per real minute, not sim-accelerated), directly answering "grow food
+>    infinitely" with an actual unbounded counter rather than a static
+>    description.
+>
+> **Not yet visually confirmed by the user** — build/typecheck pass, same
+> no-browser-tool limitation as everything else this session.
+
+> **Update (2026-08-12, further session)**: user reported the orbital
+> facilities were "circling the planet like once every 3-6 seconds... not
+> to a NASA standard." Correct — `satellitePosition`'s `angularSpeed` was
+> still using the arbitrary `(Math.PI * 2) / (20000 + (i % 3) * 4000)`
+> tuning (a 20-32 **second** loop) left over from before this session's
+> "build out the facilities" work, i.e. it was never actually fixed when
+> the rest of the facility model went real. Replaced with a genuine
+> Kepler's-third-law orbital period: new `orbitalPeriodMs(altitudeKm)` in
+> `src/main.ts` computes `T = 2π√(r³/μ)` using Earth's real radius
+> (6371 km) and standard gravitational parameter (μ = 398600.4418
+> km³/s²), for each satellite's assigned altitude spread evenly across
+> the 600-800 km range already specified in `docs/SPACE_DELIVERY.md`.
+> Verified output: 96.5 min at 600 km up to 100.7 min at 800 km — in the
+> right ballpark against a known reference (ISS at ~400 km is ~92.7 min
+> real-world). The `Satellite` interface gained `altitudeKm`/`periodMs`
+> fields; the click panel's "Altitude" row now shows the real km value
+> instead of the stylized render-placement percentage, and a new
+> "Orbital period" row shows the real minutes. **Important consequence,
+> not a bug**: at real orbital speed, satellites will look essentially
+> motionless over a normal few-minute browsing session — 97 minutes per
+> revolution means only a tiny fraction of the orbit completes while
+> anyone's actually watching. This is the same real-time-over-fake-motion
+> tradeoff already made for the food-production counter in the previous
+> update, applied consistently here rather than picking a faster "more
+> watchable" fake number again.
+>
+> **Not yet visually confirmed by the user** — build/typecheck pass, math
+> spot-checked against ISS as a reference point, but no browser tool
+> available to the agent to confirm it actually reads as "barely moving"
+> rather than "broken/frozen" in practice.
+
+> **Update (2026-08-13, further session)**: user asked to (1) add more
+> data and implement real granularity — "you have this huge file of
+> data" (the source CSV had always had admin1/admin2-level rows, only
+> admin0/country was ever used), and (2) stop using sprites for "need" —
+> the whole need-severity concept should be a heatmap, not points. Two
+> substantial pieces of work, both in service of the same goal (a real
+> "need map"):
+>
+> **1. Admin1 (state/province) granularity, new boundary source.** The
+> HDX CSV's `admin1_code` doesn't correspond to any bundled or
+> easily-joinable boundary dataset (checked: it's each country's own
+> COD/OCHA p-code scheme, e.g. `KE033`, which doesn't match Natural
+> Earth, geoBoundaries, or ISO 3166-2 codes). `scripts/build_food_security_data.py`
+> was rewritten to also: fetch real admin1 boundary polygons per-country
+> from [geoBoundaries.org](https://www.geoboundaries.org/) (open license,
+> simplified geometry, cached in `source_data/admin1_raw/` — gitignored,
+> re-derivable), and join HDX's `admin1_name` (falling back to
+> `provider_admin1_name`) to geoBoundaries' `shapeName` by **normalized
+> string match within the same country** — there is no shared ID space
+> between the two datasets, so this is the only available join key.
+> **Match rate: 509/816 HDX admin1 regions (62.4%)** — see the script's
+> console output for the full per-country breakdown and every unmatched
+> region name. The shortfall isn't random: several countries' HDX rows
+> are FEWS NET livelihood zones or ethnic/cultural sub-regions rather
+> than official administrative units (Eswatini's "Dry middleveld",
+> Uganda's "Karamoja"/"Lango"/"Tooro", Kenya's "Marsabit - moyale" style
+> sub-county breakdowns) — those were never going to match an
+> administrative boundary dataset by name, match or no match. A handful
+> of countries matched 0 admin1 regions entirely (Burundi, Gambia,
+> Tanzania, Uganda) — those countries fall back to their country-level
+> heat fill instead (see layering below), not to nothing.
+>
+> Outputs: `public/data/admin1_boundaries.geojson` (509 matched features,
+> ~8.8MB — lean properties, only `shapeID`/`shapeName`/`locationCode` +
+> geometry) and `public/data/food_security_admin1.json` (~443KB, keyed by
+> `shapeID`).
+>
+> **2. Need sprites removed entirely, data model cleaned up.** The
+> hand-authored "need" node kind — 13 illustrative points with a fake
+> 0-1 `needLevel`, rendered as `star12` sprites — is gone from
+> `src/data/nodes.ts`. `DeliveryNode` is now hub-only (`kind` field
+> dropped, `hubType` is required not optional). Since `src/data/routes.ts`
+> used those need-node ids as delivery destinations, routes were changed
+> to carry inline `toLat`/`toLng`/`toName` instead of a `to: string` node
+> reference — the same 7 destination coordinates that were actually used
+> by a route carried forward; the other 6 illustrative need points that
+> no route ever targeted were dropped outright (they had no purpose left
+> once the sprite was gone). Every place in `src/main.ts` that branched on
+> `node.kind` (marker builder, `getPointColor`, `describeSelection`'s
+> `"node"` case, the `spaceHubs` filter) was simplified to hub-only.
+>
+> **Heatmap layering**: `globe.polygonsData()` now takes one merged array
+> of country features (from the existing Natural Earth layer) *and*
+> admin1 features together — three-globe only supports a single named
+> polygon layer, so `isAdmin1Feature()` (checks for a `shapeID` property)
+> discriminates between the two feature shapes inside the shared
+> `polygonCapColor`/`polygonStrokeColor`/`polygonAltitude` accessor
+> functions. Admin1 polygons render at a slightly higher altitude (0.004
+> vs country's 0.003) with a distinct border color (`ADMIN1_BORDER_COLOR`,
+> pink, vs the country layer's cyan) so the two are visually
+> distinguishable. **Country-level heat fill was deliberately kept, not
+> replaced** — it's the fallback for the ~38% of HDX regions with no
+> admin1 match and the 4 countries with zero matches, so those places
+> still show real (if coarser) data instead of nothing. Clicking either
+> layer opens the same info panel shape (`foodSecurityDetailRows()`,
+> factored out of the old country-only code since both cases needed
+> identical phase-breakdown rendering) — `SelectableHit` gained an
+> `"admin1"` variant alongside `"country"`.
+>
+> **Not yet visually confirmed by the user** — build/typecheck pass, all
+> four data files (`ne_110m_admin_0_countries.geojson`,
+> `food_security_current.json`, `admin1_boundaries.geojson`,
+> `food_security_admin1.json`) confirmed served (200) by the dev server,
+> but no browser tool available to the agent — worth checking in
+> particular whether the two-layer altitude/color separation actually
+> reads clearly rather than looking like rendering noise where admin1
+> regions are small relative to their country.
+
+> **Update (2026-08-13, further session)**: user reported "Chrome is
+> pegged at 100 percent - it cannot process it" trying to view the
+> above. Root-caused via `journalctl`: Chromium was actually
+> **crash-looping** — "trap invalid opcode" (SIGILL), at the *identical*
+> instruction pointer both times it happened, i.e. a deterministic crash,
+> not random OOM. Each crash triggers `systemd-coredump` to write a full
+> memory dump (one attempt alone had a 6.3GB memory peak) — that's what
+> was actually filling the disk to 0 bytes free mid-session (not
+> anything this app writes to disk itself; it's a pure client-side WebGL
+> page with zero file I/O). The machine's GPU is an old 2012-era Intel HD
+> Graphics 4000 (Ivy Bridge) — plausible that the admin1 heatmap's ~700
+> polygon meshes (added the same session) pushed its driver stack past
+> what it handles.
+>
+> Three perf fixes in `src/main.ts`, all aimed at reducing that load
+> without changing what's visible:
+> 1. **Pointermove hover raycast was uncapped** — every raw mousemove
+>    event (100+/sec on a fast mouse) triggered a full
+>    `raycaster.intersectObject(globe, true)` against all ~700 polygon
+>    meshes just to update the cursor. Now coalesced to at most one
+>    raycast per rendered frame via `requestAnimationFrame` — extra
+>    events between frames just update `latestHoverEvent` and return.
+>    This was almost certainly the single biggest offender.
+> 2. **`renderer.setPixelRatio` was uncapped** at `window.devicePixelRatio`
+>    — on a high-DPI display this can be 2-3x, which is 4-9x the
+>    fragment-shader/pixel workload for marginal visual benefit past 2x.
+>    Now `Math.min(window.devicePixelRatio, 2)`.
+> 3. **Polygon layer defaults were untouched from three-globe's generic
+>    defaults**, which don't account for having ~700 polygons at once:
+>    `polygonCapCurvatureResolution` (default 5°, how finely each polygon
+>    edge is subdivided to follow the globe's curvature) raised to 20° —
+>    not visually meaningful except at extreme close-up zoom, meaningfully
+>    cheaper on weak GPUs. `polygonsTransitionDuration` (default 1000ms,
+>    animates in new polygon geometry on data change) set to 0 — with
+>    this many polygons, animating the initial load in over a second was
+>    itself real work happening right at page load.
+>
+> **Not a complete fix, a mitigation** — none of this reduces the actual
+> polygon/vertex count, just the per-frame and per-event overhead around
+> it. If the crash recurs, the next lever is reducing admin1 geometry
+> complexity itself (the geoBoundaries "simplified" files are still fairly
+> detailed) or dropping polygon count for the smallest/least-visually-
+> significant admin1 regions. **Not yet confirmed by the user whether this
+> actually stops the crash** — no browser tool available to the agent to
+> reproduce/verify; build/typecheck pass and the dev server is confirmed
+> serving again after the disk was freed.
+
+> **Update (2026-08-13, further session): move heatmap rendering to a
+> baked texture.** The mitigations above didn't fix it — user reported
+> Chrome still frozen/pegged. Asked "should we move some processing
+> server side?" — yes, and specifically: the crash signature (SIGILL,
+> deterministic instruction pointer, not OOM) reads like a GPU driver
+> crash from the ~700 live `ConicPolygonGeometry` meshes (one per country/
+> admin1 region), not a plain CPU-bound perf problem — the prior fixes
+> reduced overhead *around* that rendering path without removing the path
+> itself. This update removes it entirely.
+>
+> **What changed**: `scripts/build_food_security_data.py` now also
+> rasterizes the whole heatmap — country fills, admin1 fills, both
+> boundary-line layers — into one equirectangular PNG
+> (`public/data/heatmap_texture.png`, 4096x2048, ~0.2MB, via Pillow — new
+> dependency, `pip install pillow`) using the same color ramp
+> (`HEATMAP_COLOR_STOPS`) and opacity-over-base-color compositing the old
+> live `polygonCapColor` accessor used, just computed once at build time
+> instead of every frame. `src/main.ts` applies this as
+> `globeMaterial.map` via `THREE.TextureLoader`, and **`.polygonsData()`
+> is gone entirely** — along with `polygonCapColor`/`polygonStrokeColor`/
+> `polygonAltitude`/`polygonCapCurvatureResolution`/
+> `polygonsTransitionDuration` and the `foodSecurityFillColor`/
+> `NO_DATA_FILL`/`COUNTRY_BORDER_COLOR`/`ADMIN1_BORDER_COLOR` constants
+> that fed it (all now Python-side only, in the build script;
+> `HEATMAP_COLOR_STOPS` stays in `main.ts` too, but only for the legend
+> swatches now, not for coloring anything on the globe).
+>
+> **Click-to-inspect had to be redesigned**, since there's no mesh per
+> region to raycast against anymore: country + admin1 GeoJSON is still
+> fetched client-side (needed for country name labels and now for this),
+> kept in module-level `countryFeatures`/`admin1Features` arrays. On
+> click, `pickClickTarget()` first tries the existing mesh-only pick
+> (hubs/satellites/capsules/beams/arcs/rings, unchanged); if that misses
+> and the ray hit the bare globe sphere (three-globe tags it
+> `__globeObjType === "globe"`), the click's lat/lng is read via
+> `globe.toGeoCoords(intersect.point)` and resolved with a plain
+> point-in-polygon test (`resolveRegionAt` → `pointInPolygon` →
+> `ringContains`, standard crossing-number algorithm, holes ignored, same
+> simplification already used for centroid math) against the admin1 array
+> first, then the country array. **Deliberately click-only, not
+> hover** — `pickAt()` (used by the throttled pointermove hover handler)
+> stays mesh-only on purpose, so hover doesn't pay the point-in-polygon
+> cost on every frame; only an actual click does the extra work, which is
+> negligible run once.
+>
+> **Known limitation, not fixed**: the equirectangular texture bake has
+> the standard antimeridian-crossing artifact — countries whose polygon
+> crosses ±180° longitude (Russia, Fiji, a few Pacific nations) draw a
+> spurious near-full-width band at the projection's wrap edge. Documented
+> in the bake script, not corrected (would need to split those polygons
+> at the antimeridian before rasterizing).
+>
+> **Visually confirmed by the agent this time** (not the user) — the
+> baked texture was read back and inspected: country/admin1 boundaries
+> and heat fills align correctly with real geography, colors match the
+> intended ramp. Build/typecheck pass, dev server confirmed serving
+> `heatmap_texture.png` (200) alongside the other four data files. What's
+> *not* yet confirmed: whether this actually stops the Chromium crash on
+> the user's machine — that can only be confirmed by trying it there.
+
 ## Mission
 
 Build a **3D, web-browser-viewable simulation of a global automated food
@@ -410,30 +660,45 @@ As of writing this spec, `/home/neoweb/DATA/CODE/4` contained only this
   (`server.port` / `preview.port`, both `strictPort: true`). `npm run dev`
   and `npm run preview` always use this port now — don't let it drift.
 
-## Distribution routes toggle
+## Deliveries toggle (renamed from "distribution routes toggle")
 
-The distribution routes (arcs, moving delivery-object meshes,
-knowledge-broadcast pulsing rings, and the orbital constellation/deorbit
-capsules) are **currently turned ON** (`SHOW_DISTRIBUTION_ROUTES = true`
-in `src/main.ts`). This was off for a stretch of earlier sessions and is
-now on again per the user's "build this all into the running simulation
-and activate it" — see the update banner at the top.
+**Renamed and re-scoped in the 2026-08-12 "halt deliveries" session** (see
+update banner near the top): `SHOW_DISTRIBUTION_ROUTES` is now
+`SHOW_DELIVERIES`, currently **`false`**. User feedback was that the arc/
+moving-object animation speeds were arbitrary — "moving way too fast and
+not real" — and rather than guess at real-world transit speeds, the
+decision was to halt delivery motion entirely for now, not tune it.
 
-- Single switch: `SHOW_DISTRIBUTION_ROUTES` constant near the top of
-  `src/main.ts`.
+- Single switch: `SHOW_DELIVERIES` constant near the top of `src/main.ts`.
 - When `false`: `physicalRoutes` and `instructionRoutes` resolve to `[]`,
-  cascading to empty `arcsData`/`ringsData`, an empty `movingObjects`
-  array, an empty `satellites` array, no resupply beams, and no
-  `capsuleSpawners` — nothing route- or orbit-related gets created or
-  added to the scene. The globe still renders with all the hub/need-region
-  points. The legend also drops its per-mode rows when the flag is off.
-- **To turn routes back off**: flip `SHOW_DISTRIBUTION_ROUTES` to `false`
-  in `src/main.ts` — no other changes needed, everything downstream reacts
-  to the flag automatically, same as before.
-- This is a deliberate, reversible product toggle either direction, not a
-  bug or cleanup concern.
+  cascading to empty `arcsData`/`ringsData`/`movingObjects`, and (since
+  `spaceRoutes` also resolves to `[]`) an empty `capsuleSpawners` — no
+  arcs, no ship/plane/catapult objects, no instruction rings, no deorbit
+  capsules. Resupply beams are also gated on this flag now (a line trace,
+  same as everything else halted). The legend drops its per-mode rows
+  when the flag is off.
+- **Satellites are the one exception, and this is a deliberate change from
+  before**: the orbital growing facilities used to be gated on this same
+  flag (when it was `SHOW_DISTRIBUTION_ROUTES`) — they no longer are.
+  `satellites` now renders **unconditionally**, regardless of
+  `SHOW_DELIVERIES`, because the user's framing was explicit: the
+  satellites are persistent infrastructure ("space based facilities"),
+  not a "delivery" — halting deliveries should not also remove them. See
+  "Orbital growing facilities" section below for what was built out on
+  top of them in the same session.
+- **To resume deliveries**: flip `SHOW_DELIVERIES` back to `true` — no
+  other changes needed. Revisiting *how fast* things move (the original
+  complaint) is still open; this session halted motion rather than tuning
+  it, see the update banner for why.
 
 ## Real hub/need-region dataset
+
+**Historical — the "need-regions" part of this section is superseded.**
+See the 2026-08-13 "add more data... implement granularity" update banner
+near the top: the hand-authored need-region points and `needLevel`
+described below were removed entirely (no more sprites for need at all),
+replaced by the real HDX admin1/admin0 heatmap. The **hub** dataset
+described below is still accurate and current.
 
 `src/data/nodes.ts` was expanded from 7 hubs / 7 need-regions (illustrative
 placeholder names) to a real, hand-authored dataset:
@@ -537,13 +802,66 @@ arc/moving-object/ring code).
 - Not yet done: no visual "impact" effect when a capsule lands (could
   reuse the existing `ringsData` ring-pulse mechanism at the landing
   point); no distinction drawn between "capsule in flight" and "capsule
-  delivered" beyond removal; satellite orbital parameters are tuned for
-  a reasonable-looking spread and speed, not derived from anything.
+  delivered" beyond removal. **Orbital speed is no longer an arbitrary
+  tuning** — see the "circling every 3-6 seconds... not to a NASA
+  standard" update further up, `angularSpeed` is now a real Kepler's-third-
+  law period. Inclination/RAAN/phase spread across the 8 satellites is
+  still aesthetic tuning, not derived from anything — only the speed was
+  fixed, not the constellation geometry.
 - **Still not visually confirmed by the user** as of this write-up — same
   caveat as everything else added without a browser tool available to the
   agent. Check the constellation is actually visible/reasonable-looking at
   the default camera distance (350, per `camera.position.set` near the top
   of `src/main.ts`) before trusting this description further.
+
+## Orbital growing facilities
+
+Added in the same "halt deliveries, build out the space facilities"
+session as the deliveries toggle rename above. Two independent changes,
+both in `src/main.ts` near the `Satellite` interface:
+
+- **Compound facility shape**: `makeSatelliteMesh()` used to return one
+  bare `star12` line shape. It's now a `THREE.Group` with two parts, both
+  still built from `src/lineShapes.ts` primitives (no new geometry
+  system): a smaller `star12` (`size 1.6`) standing in for the
+  bioreactor/fermenter cluster, plus a larger `cross6` (`size 3.2`,
+  cyan) standing in for the solar array booms. Reads as a facility with
+  distinct parts rather than one generic point marker.
+- **Production model**: `FOOD_OUTPUT_KG_PER_WEEK = 40` and
+  `foodGrownGrams(elapsedMs)` are taken directly from
+  `docs/SPACE_DELIVERY.md`'s per-unit spec table ("Food output: Tens of
+  kg dehydrated protein product per week per unit — baseline for pilot
+  testing, not a delivered fact") — 40 is the chosen midpoint of "tens of
+  kg." `foodGrownGrams` is a pure function of elapsed wall-clock time
+  (`FOOD_OUTPUT_KG_PER_WEEK * 1000 * elapsedMs / WEEK_MS`) — no per-unit
+  state to track, every facility produces at the same rate starting from
+  sim load. Deliberately uncapped: there's no ceiling in the formula, so
+  the number only ever grows, for as long as the page stays open — this
+  is the literal implementation of "grow food infinitely," not just a
+  descriptive label.
+- Clicking a satellite (`describeSelection`'s `"satellite"` case) now
+  shows `Bioreactor` (`BIOREACTOR_TYPE`, quoting the "Spirulina/algae
+  photobioreactor + gas-fermentation microbial protein" growing-tech
+  decision from `docs/SPACE_DELIVERY.md`), `Output rate`, and `Grown so
+  far (real time, unbounded)` in grams (2 decimal places — at the
+  real-world weekly rate, a typical browsing session only accumulates a
+  few grams, which is the point: this is real-time production, not the
+  fast/fake motion the user objected to elsewhere in the scene) —
+  computed live at click time from `latestElapsedMs`, same established
+  pattern as satellite position and capsule reentry progress (see
+  "Selection / info panel" below — values aren't continuously refreshed
+  while the panel is open, only recomputed on click, consistent with how
+  every other live value in this system already works).
+- Title changed from "Orbital Platform N" to "Orbital Growing Platform N";
+  subtitle from "Autonomous food-growing satellite" to "Autonomous
+  closed-loop food-growing facility" — matches the "facility" framing
+  used everywhere else in this update.
+- Not yet done: satellite count is still fixed at 8
+  (`SATELLITE_COUNT`), unrelated to production capacity — growing the
+  fleet and growing per-unit output are two different levers, only the
+  latter has a model right now. No visual differentiation between a
+  freshly-"launched" facility and a long-running one (no per-unit start
+  time, all facilities are assumed operational since sim load).
 
 ## Selection / info panel
 

@@ -1,17 +1,22 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import ThreeGlobe from "three-globe";
-import { nodes, nodeById, type DeliveryNode } from "./data/nodes";
+import { nodes, nodeById, type DeliveryNode, type HubType } from "./data/nodes";
 import { routes } from "./data/routes";
 import { MODE_STYLES, type DeliveryMode } from "./data/modes";
 import { buildLineShape, type LineShapeKind } from "./lineShapes";
 import "./style.css";
 
-// Toggle: show/hide the distribution routes (arcs, moving delivery
-// objects, knowledge-broadcast rings, orbital constellation + deorbit
-// capsules). Flip to `false` to go back to a bare hub-network globe. See
+// Toggle: show/hide active deliveries (arcs, moving ship/plane/catapult
+// objects, knowledge-broadcast rings, resupply beams, deorbit capsules).
+// Halted for now — the previous arc/moving-object animation speeds were
+// arbitrary ("not real"), not modeling real transit time, so rather than
+// guess at real-world speeds this turns delivery motion off entirely while
+// the orbital growing facilities (satellites — NOT gated by this flag,
+// they're the persistent infrastructure, not a "delivery") get built out.
+// Flip back to `true` once delivery timing is worth revisiting. See
 // SPEC.md "Distribution routes toggle" for details.
-const SHOW_DISTRIBUTION_ROUTES = true;
+const SHOW_DELIVERIES = false;
 
 const app = document.querySelector<HTMLDivElement>("#app")!;
 app.innerHTML = `<canvas id="globe-canvas"></canvas>`;
@@ -19,7 +24,11 @@ app.innerHTML = `<canvas id="globe-canvas"></canvas>`;
 const canvas = document.querySelector<HTMLCanvasElement>("#globe-canvas")!;
 
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-renderer.setPixelRatio(window.devicePixelRatio);
+// Cap pixel ratio — device pixel ratio of 2-3 on a high-DPI display
+// quadruples/nonuples the fragment-shader workload for no visible benefit
+// beyond ~2x, and this scene has gotten heavy (country + admin1 boundary
+// polygon layers, ~700 meshes). Meaningful on older/integrated GPUs.
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
 
 const scene = new THREE.Scene();
@@ -41,8 +50,8 @@ controls.zoomSpeed = 0.7;
 
 // --- Globe -----------------------------------------------------------
 
-const physicalRoutes = SHOW_DISTRIBUTION_ROUTES ? routes.filter((r) => MODE_STYLES[r.mode].isPhysical) : [];
-const instructionRoutes = SHOW_DISTRIBUTION_ROUTES ? routes.filter((r) => !MODE_STYLES[r.mode].isPhysical) : [];
+const physicalRoutes = SHOW_DELIVERIES ? routes.filter((r) => MODE_STYLES[r.mode].isPhysical) : [];
+const instructionRoutes = SHOW_DELIVERIES ? routes.filter((r) => !MODE_STYLES[r.mode].isPhysical) : [];
 
 // "space" routes get a dedicated orbital-constellation + deorbit-capsule
 // visualization (see below, per docs/SPACE_DELIVERY.md) instead of a
@@ -68,20 +77,19 @@ interface ArcDatum {
 
 const arcsData: ArcDatum[] = surfaceRoutes.map((r) => {
   const from = nodeById.get(r.from)!;
-  const to = nodeById.get(r.to)!;
   const style = MODE_STYLES[r.mode];
   return {
     startLat: from.lat,
     startLng: from.lng,
-    endLat: to.lat,
-    endLng: to.lng,
+    endLat: r.toLat,
+    endLng: r.toLng,
     color: style.color,
     altitude: style.altitude,
     stroke: style.stroke,
     dashDuration: style.dashDuration,
     mode: r.mode,
     fromName: from.name,
-    toName: to.name,
+    toName: r.toName,
   };
 });
 
@@ -94,29 +102,30 @@ interface RingDatum {
 }
 
 // Knowledge-broadcast routes render as pulsing rings on the destination
-// (non-physical delivery has no path to draw).
-const instructionTargets = new Map<string, DeliveryMode>();
-for (const r of instructionRoutes) instructionTargets.set(r.to, r.mode);
-const ringsData: RingDatum[] = [...instructionTargets.entries()].map(([nodeId, mode]) => {
-  const node = nodeById.get(nodeId)!;
+// (non-physical delivery has no path to draw). Keyed by lat/lng (not a
+// node id — destinations are inline coordinates now, see routes.ts) so
+// two routes landing on the same spot still dedupe to one ring.
+const instructionTargets = new Map<string, { lat: number; lng: number; name: string; mode: DeliveryMode }>();
+for (const r of instructionRoutes) instructionTargets.set(`${r.toLat},${r.toLng}`, { lat: r.toLat, lng: r.toLng, name: r.toName, mode: r.mode });
+const ringsData: RingDatum[] = [...instructionTargets.values()].map(({ lat, lng, name, mode }) => {
   const style = MODE_STYLES[mode];
   return {
-    lat: node.lat,
-    lng: node.lng,
+    lat,
+    lng,
     color: style.color[0],
     mode,
-    nodeName: node.name,
+    nodeName: name,
   };
 });
 
-const HUB_TYPE_COLORS: Record<string, string> = {
+const HUB_TYPE_COLORS: Record<HubType, string> = {
   port: "#38bdf8",
   air: "#fbbf24",
   space: "#a78bfa",
   depot: "#2dd4bf",
 };
 
-const HUB_TYPE_LABELS: Record<string, string> = {
+const HUB_TYPE_LABELS: Record<HubType, string> = {
   port: "Sea Port",
   air: "Air Cargo Hub",
   space: "Launch Site",
@@ -124,9 +133,8 @@ const HUB_TYPE_LABELS: Record<string, string> = {
 };
 
 // Every hub type gets its own line-intersection shape family (see
-// src/lineShapes.ts); need-regions all use star12, distinguished by color
-// and arm length (severity) instead of a separate shape.
-const HUB_TYPE_SHAPES: Record<string, LineShapeKind> = {
+// src/lineShapes.ts).
+const HUB_TYPE_SHAPES: Record<HubType, LineShapeKind> = {
   port: "cross6",
   air: "tetraX",
   space: "star12",
@@ -134,28 +142,29 @@ const HUB_TYPE_SHAPES: Record<string, LineShapeKind> = {
 };
 
 function getPointColor(node: DeliveryNode): string {
-  if (node.kind === "hub") return HUB_TYPE_COLORS[node.hubType ?? "port"];
-  const level = node.needLevel ?? 0.5;
-  // Interpolate amber -> red as need severity rises.
-  return level > 0.8 ? "#ef4444" : level > 0.6 ? "#f97316" : "#f59e0b";
+  return HUB_TYPE_COLORS[node.hubType];
 }
 
-// No photographic texture — the globe surface itself follows the
-// line-intersection aesthetic: a plain dark sphere with real country
-// boundaries drawn as vector lines (see COUNTRY_BORDER_COLOR below),
-// not a raster "skin".
+// No photographic texture — instead a single baked heatmap texture
+// (country + admin1 boundaries and food-insecurity fill, generated by
+// scripts/build_food_security_data.py from the same GeoJSON/HDX data used
+// elsewhere in this file). This used to be ~700 live 3D polygon meshes
+// (one per country/admin1 region) rendered directly by three-globe's
+// .polygonsData() — that turned out to crash Chromium on at least one
+// machine with older integrated graphics. Baking to one texture collapses
+// ~700 draw calls into 1; see the "move heatmap rendering to a baked
+// texture" update in SPEC.md for the full incident.
 const GLOBE_SURFACE_COLOR = 0x0b1220;
-const COUNTRY_BORDER_COLOR = "#38bdf8";
+
+const globeMaterial = new THREE.MeshPhongMaterial({
+  color: GLOBE_SURFACE_COLOR,
+  emissive: GLOBE_SURFACE_COLOR,
+  emissiveIntensity: 0.25,
+  shininess: 4,
+});
 
 const globe = new ThreeGlobe()
-  .globeMaterial(
-    new THREE.MeshPhongMaterial({
-      color: GLOBE_SURFACE_COLOR,
-      emissive: GLOBE_SURFACE_COLOR,
-      emissiveIntensity: 0.25,
-      shininess: 4,
-    }),
-  )
+  .globeMaterial(globeMaterial)
   .showAtmosphere(true)
   .atmosphereColor("#60a5fa")
   .atmosphereAltitude(0.18)
@@ -203,6 +212,19 @@ interface CountryLabelDatum {
   name: string;
 }
 
+// Admin1 (state/province) boundary polygons — see the "Admin1 granularity"
+// comment further down. Deliberately lean properties (only what's needed
+// to render + look up food security data), built by
+// scripts/build_food_security_data.py from geoBoundaries.org geometry.
+interface Admin1Feature {
+  properties: { shapeID: string; shapeName: string; locationCode: string };
+  geometry: { type: "Polygon" | "MultiPolygon"; coordinates: GeoPolygon | GeoPolygon[] };
+}
+
+interface Admin1FeatureCollection {
+  features: Admin1Feature[];
+}
+
 // --- Food security heatmap ------------------------------------------------
 // Derived from HDX HAPI's Food Security dataset
 // (https://data.humdata.org/dataset/hdx-hapi-food-security), via
@@ -231,17 +253,45 @@ interface FoodSecurityDataset {
   countries: Record<string, FoodSecurityRecord>;
 }
 
-// Populated once /data/food_security_current.json loads; describeSelection
-// (defined further down) reads this by closing over the variable, not the
-// value, so it sees the populated map once the fetch resolves.
-let foodSecurityByIso3 = new Map<string, FoodSecurityRecord>();
+// Admin1 (state/province) granularity — see scripts/build_food_security_data.py.
+// HDX's admin1_code doesn't line up with any bundled or easily-joinable
+// boundary dataset, so the build script joins by normalized region name
+// against geoBoundaries.org polygons instead — approximate, not exact,
+// and not every HDX region has a match (~62% do, see SPEC.md for the
+// coverage breakdown). Only matched regions exist in these files at all.
+interface Admin1Record extends FoodSecurityRecord {
+  locationCode: string;
+  name: string;
+}
 
-const NO_DATA_FILL = "rgba(56, 189, 248, 0.025)";
+interface Admin1Dataset {
+  source: string;
+  sourceUrl: string;
+  boundarySource: string;
+  matchNote: string;
+  regions: Record<string, Admin1Record>; // keyed by geoBoundaries shapeID
+}
+
+// Populated once /data/food_security_current.json and
+// /data/food_security_admin1.json load; describeSelection (defined
+// further down) reads these by closing over the variables, not the
+// value, so it sees the populated maps once the fetches resolve.
+let foodSecurityByIso3 = new Map<string, FoodSecurityRecord>();
+let foodSecurityByAdmin1Id = new Map<string, Admin1Record>();
+
+// Kept client-side even though the heatmap itself is a baked texture now —
+// still needed for click-to-inspect (point-in-polygon lookup against the
+// click coordinate, see resolveRegionAt further down) since there's no
+// mesh per region to raycast against anymore.
+let countryFeatures: CountryFeature[] = [];
+let admin1Features: Admin1Feature[] = [];
 
 // IPC-style severity ramp (green -> yellow -> orange -> red -> maroon),
 // keyed on the Phase-3-or-worse ("Crisis or worse") population fraction.
-// Fill opacity rises with severity too, so untouched/no-data countries
-// stay closest to the original near-transparent boundary look.
+// The heatmap fill itself is baked into the texture now (Python-side copy
+// of this same ramp — see scripts/build_food_security_data.py's
+// HEATMAP_COLOR_STOPS, kept in sync by hand); this copy is only used for
+// the legend swatches.
 const HEATMAP_COLOR_STOPS: Array<[number, THREE.Color]> = [
   [0, new THREE.Color(0x16a34a)],
   [0.15, new THREE.Color(0xeab308)],
@@ -249,24 +299,6 @@ const HEATMAP_COLOR_STOPS: Array<[number, THREE.Color]> = [
   [0.5, new THREE.Color(0xdc2626)],
   [0.75, new THREE.Color(0x7f1d1d)],
 ];
-
-function foodSecurityFillColor(fraction: number): string {
-  const t = Math.min(1, Math.max(0, fraction));
-  let lower = HEATMAP_COLOR_STOPS[0];
-  let upper = HEATMAP_COLOR_STOPS[HEATMAP_COLOR_STOPS.length - 1];
-  for (let i = 0; i < HEATMAP_COLOR_STOPS.length - 1; i++) {
-    if (t >= HEATMAP_COLOR_STOPS[i][0] && t <= HEATMAP_COLOR_STOPS[i + 1][0]) {
-      lower = HEATMAP_COLOR_STOPS[i];
-      upper = HEATMAP_COLOR_STOPS[i + 1];
-      break;
-    }
-  }
-  const span = upper[0] - lower[0] || 1;
-  const localT = (t - lower[0]) / span;
-  const color = lower[1].clone().lerp(upper[1], localT);
-  const opacity = 0.18 + t * 0.55;
-  return `rgba(${Math.round(color.r * 255)}, ${Math.round(color.g * 255)}, ${Math.round(color.b * 255)}, ${opacity.toFixed(3)})`;
-}
 
 // Shoelace-formula centroid + area of a single ring, in lng/lat space —
 // approximate (doesn't account for spherical curvature), fine for label
@@ -310,8 +342,13 @@ function countryCentroid(geometry: CountryFeature["geometry"]): { lat: number; l
 Promise.all([
   fetch("/data/ne_110m_admin_0_countries.geojson").then((res) => res.json() as Promise<CountryFeatureCollection>),
   fetch("/data/food_security_current.json").then((res) => res.json() as Promise<FoodSecurityDataset>),
-]).then(([countries, foodSecurity]) => {
+  fetch("/data/admin1_boundaries.geojson").then((res) => res.json() as Promise<Admin1FeatureCollection>),
+  fetch("/data/food_security_admin1.json").then((res) => res.json() as Promise<Admin1Dataset>),
+]).then(([countries, foodSecurity, admin1, admin1FoodSecurity]) => {
   foodSecurityByIso3 = new Map(Object.entries(foodSecurity.countries));
+  foodSecurityByAdmin1Id = new Map(Object.entries(admin1FoodSecurity.regions));
+  countryFeatures = countries.features;
+  admin1Features = admin1.features;
 
   const labelsData: CountryLabelDatum[] = countries.features.map((feature) => {
     const { lat, lng } = countryCentroid(feature.geometry);
@@ -319,14 +356,6 @@ Promise.all([
   });
 
   globe
-    .polygonsData(countries.features)
-    .polygonCapColor((d) => {
-      const record = foodSecurityByIso3.get((d as CountryFeature).properties.ISO_A3);
-      return record?.phase3PlusFraction != null ? foodSecurityFillColor(record.phase3PlusFraction) : NO_DATA_FILL;
-    })
-    .polygonSideColor(() => "rgba(0, 0, 0, 0)")
-    .polygonStrokeColor(() => COUNTRY_BORDER_COLOR)
-    .polygonAltitude(0.003)
     .labelsData(labelsData)
     .labelLat("lat")
     .labelLng("lng")
@@ -338,24 +367,34 @@ Promise.all([
     .labelResolution(2);
 });
 
-// --- Hub / need-region markers ------------------------------------------
+// Baked heatmap texture (country + admin1 boundaries and fill — see
+// scripts/build_food_security_data.py) applied as the globe's diffuse
+// map. Loaded independently of the Promise.all above — it's a static
+// asset, not derived from those fetches — so it can start decoding as
+// soon as possible rather than waiting on 4 other requests.
+new THREE.TextureLoader().load("/data/heatmap_texture.png", (texture) => {
+  texture.colorSpace = THREE.SRGBColorSpace;
+  globeMaterial.map = texture;
+  globeMaterial.needsUpdate = true;
+});
+
+// --- Hub markers ---------------------------------------------------------
 // Rendered as custom line-intersection shapes (src/lineShapes.ts) rather
 // than three-globe's built-in solid point dots — every sprite in this scene
-// is a set of lines radiating from a single point in space.
+// is a set of lines radiating from a single point in space. Need/severity
+// no longer gets a sprite at all — see the "Granular need heatmap" update
+// in SPEC.md — it's carried entirely by the country/admin1 boundary
+// polygon heatmap further down instead.
 
 function buildNodeMarker(node: DeliveryNode): THREE.Object3D {
-  const isHub = node.kind === "hub";
-  const shape: LineShapeKind = isHub ? HUB_TYPE_SHAPES[node.hubType ?? "port"] : "star12";
-  const size = isHub ? 1.8 : 1.6 + (node.needLevel ?? 0.5) * 2.4;
-  const marker = buildLineShape(shape, size, getPointColor(node));
+  const marker = buildLineShape(HUB_TYPE_SHAPES[node.hubType], 1.8, getPointColor(node));
   marker.userData.selectableType = "node";
   marker.userData.selectableData = node;
   return marker;
 }
 
 for (const node of nodes) {
-  const altitudeFrac = node.kind === "hub" ? 0.012 : 0.02;
-  const coords = globe.getCoords(node.lat, node.lng, altitudeFrac);
+  const coords = globe.getCoords(node.lat, node.lng, 0.012);
   const marker = buildNodeMarker(node);
   marker.position.set(coords.x, coords.y, coords.z);
   globe.add(marker);
@@ -415,12 +454,11 @@ interface MovingObject {
 
 const movingObjects: MovingObject[] = surfaceRoutes.map((r, i) => {
   const from = nodeById.get(r.from)!;
-  const to = nodeById.get(r.to)!;
   const style = MODE_STYLES[r.mode];
-  const curve = buildArcCurve(from.lat, from.lng, to.lat, to.lng, style.altitude);
+  const curve = buildArcCurve(from.lat, from.lng, r.toLat, r.toLng, style.altitude);
   const mesh = makeModeMesh(r.mode);
   mesh.userData.selectableType = "moving";
-  mesh.userData.selectableData = { mode: r.mode, fromName: from.name, toName: to.name };
+  mesh.userData.selectableData = { mode: r.mode, fromName: from.name, toName: r.toName };
   globe.add(mesh);
   return {
     curve,
@@ -441,16 +479,61 @@ const ORBIT_ALTITUDE = MODE_STYLES.space.altitude;
 const ORBIT_RADIUS = GLOBE_RADIUS * (1 + ORBIT_ALTITUDE);
 const SATELLITE_COUNT = 8;
 
+// Growing-facility production model, per docs/SPACE_DELIVERY.md's per-unit
+// spec table: "tens of kg dehydrated protein product per week per unit —
+// baseline for pilot testing, not a delivered fact." 40 is the chosen
+// midpoint. Production accumulates continuously at this real rate (real
+// minutes/hours of wall-clock time, not sim-accelerated) — deliberately
+// unbounded: there's no cap, the facility just keeps growing food for as
+// long as it exists, which is the literal "grow food infinitely" ask.
+const FOOD_OUTPUT_KG_PER_WEEK = 40;
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+const BIOREACTOR_TYPE = "Spirulina/algae photobioreactor + gas-fermentation microbial protein";
+
+function foodGrownGrams(elapsedMs: number): number {
+  return (FOOD_OUTPUT_KG_PER_WEEK * 1000 * elapsedMs) / WEEK_MS;
+}
+
+// Real orbital period via Kepler's third law — NOT tied to
+// MODE_STYLES.space.altitude/ORBIT_RADIUS, which is a stylized render
+// placement fraction, unrelated to physical altitude. Altitude range and
+// orbit type are per docs/SPACE_DELIVERY.md: "dawn-dusk sun-synchronous
+// LEO, ~600-800 km." Previously this used an arbitrary 20-32 second loop
+// tuned to be watchable, which the user correctly flagged as "not to a
+// NASA standard" — a real satellite at this altitude takes ~97-101
+// minutes per orbit, not seconds.
+const EARTH_RADIUS_KM = 6371;
+const EARTH_GM_KM3_PER_S2 = 398600.4418; // standard gravitational parameter, μ
+const REAL_ORBIT_ALTITUDE_KM_MIN = 600;
+const REAL_ORBIT_ALTITUDE_KM_MAX = 800;
+
+function orbitalPeriodMs(altitudeKm: number): number {
+  const radiusKm = EARTH_RADIUS_KM + altitudeKm;
+  const periodSeconds = 2 * Math.PI * Math.sqrt(radiusKm ** 3 / EARTH_GM_KM3_PER_S2);
+  return periodSeconds * 1000;
+}
+
 interface Satellite {
   mesh: THREE.Object3D;
   inclination: number;
   raan: number;
   phase0: number;
+  altitudeKm: number;
+  periodMs: number;
   angularSpeed: number; // radians per ms
 }
 
+// A compound shape rather than one bare primitive: a dense `star12` core
+// (the bioreactor/fermenter cluster) plus a wider `cross6` overlay (solar
+// array booms) — reads as a facility with distinct parts, not a generic
+// point marker, while staying inside the same line-intersection vocabulary
+// as every other sprite.
 function makeSatelliteMesh(): THREE.Object3D {
-  return buildLineShape("star12", 2.6, 0xcbd5e1);
+  const group = new THREE.Group();
+  const core = buildLineShape("star12", 1.6, 0xcbd5e1);
+  const solarArray = buildLineShape("cross6", 3.2, 0x38bdf8);
+  group.add(core, solarArray);
+  return group;
 }
 
 function satellitePosition(sat: Satellite, elapsedMs: number): THREE.Vector3 {
@@ -471,27 +554,34 @@ function satellitePosition(sat: Satellite, elapsedMs: number): THREE.Vector3 {
   return new THREE.Vector3(x, y1, z).multiplyScalar(ORBIT_RADIUS);
 }
 
-const satellites: Satellite[] = SHOW_DISTRIBUTION_ROUTES
-  ? Array.from({ length: SATELLITE_COUNT }, (_, i) => {
-      const mesh = makeSatelliteMesh();
-      mesh.userData.selectableType = "satellite";
-      mesh.userData.selectableData = { index: i };
-      globe.add(mesh);
-      return {
-        mesh,
-        inclination: Math.PI / 6 + (i % 4) * (Math.PI / 8),
-        raan: (i / SATELLITE_COUNT) * Math.PI * 2,
-        phase0: (i / SATELLITE_COUNT) * Math.PI * 2 * 1.618,
-        angularSpeed: (Math.PI * 2) / (20000 + (i % 3) * 4000),
-      };
-    })
-  : [];
+// Satellites are the orbital growing facilities themselves — persistent
+// infrastructure, not a "delivery" — so they render unconditionally,
+// independent of SHOW_DELIVERIES.
+const satellites: Satellite[] = Array.from({ length: SATELLITE_COUNT }, (_, i) => {
+  const mesh = makeSatelliteMesh();
+  mesh.userData.selectableType = "satellite";
+  mesh.userData.selectableData = { index: i };
+  globe.add(mesh);
+  const altitudeKm =
+    REAL_ORBIT_ALTITUDE_KM_MIN +
+    (i / (SATELLITE_COUNT - 1)) * (REAL_ORBIT_ALTITUDE_KM_MAX - REAL_ORBIT_ALTITUDE_KM_MIN);
+  const periodMs = orbitalPeriodMs(altitudeKm);
+  return {
+    mesh,
+    inclination: Math.PI / 6 + (i % 4) * (Math.PI / 8),
+    raan: (i / SATELLITE_COUNT) * Math.PI * 2,
+    phase0: (i / SATELLITE_COUNT) * Math.PI * 2 * 1.618,
+    altitudeKm,
+    periodMs,
+    angularSpeed: (Math.PI * 2) / periodMs,
+  };
+});
 
-// Resupply beams: a faint line from each space-hub launch site straight up
-// to orbital altitude, representing the nutrient/water/propellant/spare-part
-// resupply flights described in docs/SPACE_DELIVERY.md.
-const spaceHubs = nodes.filter((n) => n.kind === "hub" && n.hubType === "space");
-if (SHOW_DISTRIBUTION_ROUTES) {
+// Resupply beams (nutrient/water/propellant lines from space hubs to
+// orbit) are a line trace, same as arcs/capsules — halted along with
+// deliveries per SHOW_DELIVERIES rather than treated as an exception.
+const spaceHubs = nodes.filter((n) => n.hubType === "space");
+if (SHOW_DELIVERIES) {
   for (const hub of spaceHubs) {
     const g = globe.getCoords(hub.lat, hub.lng, 0);
     const ground = new THREE.Vector3(g.x, g.y, g.z);
@@ -515,11 +605,10 @@ interface CapsuleSpawner {
 }
 
 const capsuleSpawners: CapsuleSpawner[] = spaceRoutes.map((r, i) => {
-  const to = nodeById.get(r.to)!;
   return {
-    targetLat: to.lat,
-    targetLng: to.lng,
-    targetName: to.name,
+    targetLat: r.toLat,
+    targetLng: r.toLng,
+    targetName: r.toName,
     cadenceMs: 9000,
     nextLaunchMs: 2000 + i * 3000,
     durationMs: 3000,
@@ -622,14 +711,14 @@ function buildLegend() {
   const legend = document.createElement("div");
   legend.id = "legend";
 
-  const hubRows = Object.entries(HUB_TYPE_LABELS)
+  const hubRows = (Object.entries(HUB_TYPE_LABELS) as Array<[HubType, string]>)
     .map(
       ([type, label]) =>
         `<div class="legend-row"><span class="swatch" style="background:${HUB_TYPE_COLORS[type]}"></span>${label}</div>`,
     )
     .join("");
 
-  const routeRows = SHOW_DISTRIBUTION_ROUTES
+  const routeRows = SHOW_DELIVERIES
     ? Object.entries(MODE_STYLES)
         .map(
           ([, style]) =>
@@ -651,6 +740,7 @@ function buildLegend() {
     ${routeRows}
     <div class="legend-heading">Food insecurity (Crisis+ share)</div>
     ${foodSecurityRows}
+    <p class="tagline">Admin1 (state/province) detail where available, country-level otherwise.</p>
   `;
   document.body.appendChild(legend);
 }
@@ -686,7 +776,8 @@ type SelectableHit =
       data: { targetName: string; targetLat: number; targetLng: number; startMs: number; durationMs: number };
     }
   | { type: "beam"; data: { hubName: string } }
-  | { type: "country"; data: CountryFeature };
+  | { type: "country"; data: CountryFeature }
+  | { type: "admin1"; data: Admin1Feature };
 
 function resolveSelectable(object: THREE.Object3D): SelectableHit | null {
   let obj: THREE.Object3D | null = object;
@@ -699,33 +790,82 @@ function resolveSelectable(object: THREE.Object3D): SelectableHit | null {
     if (extras.__data !== undefined) {
       if (extras.__globeObjType === "arc") return { type: "arc", data: extras.__data as ArcDatum };
       if (extras.__globeObjType === "ring") return { type: "ring", data: extras.__data as RingDatum };
-      if (extras.__globeObjType === "polygon") return { type: "country", data: extras.__data as CountryFeature };
     }
     obj = obj.parent;
   }
   return null;
 }
 
+// Country/admin1 selection used to resolve via mesh raycasting (one mesh
+// per region, tagged by three-globe's polygon layer). That layer is gone
+// — see the "move heatmap rendering to a baked texture" update in
+// SPEC.md — so a click that lands on the bare globe surface (not a hub
+// marker, satellite, etc.) instead gets its lat/lng and is resolved
+// against the same GeoJSON via plain point-in-polygon math. This only
+// runs once per click, not per frame or per pointermove, so the cost of
+// testing up to ~700 polygons is negligible in practice.
+
+// Standard ray-casting point-in-polygon test (crossing number), ignoring
+// holes — same simplification already used for centroid math above.
+function ringContains(ring: GeoRing, lng: number, lat: number): boolean {
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [xi, yi] = ring[i];
+    const [xj, yj] = ring[j];
+    const crosses = yi > lat !== yj > lat && lng < ((xj - xi) * (lat - yi)) / (yj - yi) + xi;
+    if (crosses) inside = !inside;
+  }
+  return inside;
+}
+
+function pointInPolygon(lat: number, lng: number, geometry: CountryFeature["geometry"]): boolean {
+  const polygons: GeoPolygon[] = geometry.type === "Polygon" ? [geometry.coordinates as GeoPolygon] : (geometry.coordinates as GeoPolygon[]);
+  return polygons.some((polygon) => ringContains(polygon[0], lng, lat));
+}
+
+function resolveRegionAt(lat: number, lng: number): SelectableHit | null {
+  for (const feature of admin1Features) {
+    if (pointInPolygon(lat, lng, feature.geometry)) return { type: "admin1", data: feature };
+  }
+  for (const feature of countryFeatures) {
+    if (pointInPolygon(lat, lng, feature.geometry)) return { type: "country", data: feature };
+  }
+  return null;
+}
+
+// Shared by the "country" and "admin1" cases below — same IPC phase
+// breakdown rendering regardless of which granularity was clicked.
+function foodSecurityDetailRows(record: FoodSecurityRecord): Array<[string, string]> {
+  const phaseOrder = ["1", "2", "3", "4", "5"];
+  const phaseRows: Array<[string, string]> = phaseOrder
+    .filter((phaseNum) => record.phases[phaseNum])
+    .map((phaseNum) => {
+      const phase = record.phases[phaseNum];
+      return [`IPC Phase ${phaseNum} — ${phase.label}`, `${phase.population.toLocaleString()} (${Math.round(phase.fraction * 100)}%)`];
+    });
+  return [
+    ["Population analyzed", record.populationAnalyzed.toLocaleString()],
+    [
+      "Crisis or worse (Phase 3+)",
+      record.phase3PlusFraction != null
+        ? `${(record.phase3PlusPopulation ?? 0).toLocaleString()} (${Math.round(record.phase3PlusFraction * 100)}%)`
+        : "—",
+    ],
+    ...phaseRows,
+    ["Source", "HDX HAPI Food Security"],
+  ];
+}
+
 function describeSelection(hit: SelectableHit): SelectionInfo {
   switch (hit.type) {
     case "node": {
       const node = hit.data;
-      if (node.kind === "hub") {
-        const typeLabel = HUB_TYPE_LABELS[node.hubType ?? "port"];
-        return {
-          title: node.name,
-          subtitle: typeLabel,
-          rows: [
-            ["Type", typeLabel],
-            ["Coordinates", `${node.lat.toFixed(2)}, ${node.lng.toFixed(2)}`],
-          ],
-        };
-      }
+      const typeLabel = HUB_TYPE_LABELS[node.hubType];
       return {
         title: node.name,
-        subtitle: "Need region",
+        subtitle: typeLabel,
         rows: [
-          ["Need severity", `${Math.round((node.needLevel ?? 0.5) * 100)}%`],
+          ["Type", typeLabel],
           ["Coordinates", `${node.lat.toFixed(2)}, ${node.lng.toFixed(2)}`],
         ],
       };
@@ -761,12 +901,16 @@ function describeSelection(hit: SelectableHit): SelectionInfo {
       const sat = satellites[hit.data.index];
       const pos = sat ? satellitePosition(sat, latestElapsedMs) : new THREE.Vector3();
       return {
-        title: `Orbital Platform ${hit.data.index + 1}`,
-        subtitle: "Autonomous food-growing satellite",
+        title: `Orbital Growing Platform ${hit.data.index + 1}`,
+        subtitle: "Autonomous closed-loop food-growing facility",
         rows: [
           ["Orbit", "Dawn-dusk sun-synchronous LEO"],
-          ["Altitude", `${(ORBIT_ALTITUDE * 100).toFixed(0)}% of globe radius (sim scale)`],
+          ["Altitude", sat ? `${sat.altitudeKm.toFixed(0)} km (real)` : "—"],
+          ["Orbital period", sat ? `${(sat.periodMs / 60000).toFixed(1)} min (real, Kepler's 3rd law)` : "—"],
           ["Inclination", sat ? `${(sat.inclination * (180 / Math.PI)).toFixed(0)}°` : "—"],
+          ["Bioreactor", BIOREACTOR_TYPE],
+          ["Output rate", `~${FOOD_OUTPUT_KG_PER_WEEK} kg dehydrated product / week`],
+          ["Grown so far (real time, unbounded)", `${foodGrownGrams(latestElapsedMs).toFixed(2)} g`],
           ["Position (sim coords)", `${pos.x.toFixed(0)}, ${pos.y.toFixed(0)}, ${pos.z.toFixed(0)}`],
           ["Design reference", "docs/SPACE_DELIVERY.md"],
         ],
@@ -806,27 +950,26 @@ function describeSelection(hit: SelectableHit): SelectionInfo {
           rows: [["Data", "Not available in the loaded HDX dataset"]],
         };
       }
-      const phaseOrder = ["1", "2", "3", "4", "5"];
-      const phaseRows: Array<[string, string]> = phaseOrder
-        .filter((phaseNum) => record.phases[phaseNum])
-        .map((phaseNum) => {
-          const phase = record.phases[phaseNum];
-          return [`IPC Phase ${phaseNum} — ${phase.label}`, `${phase.population.toLocaleString()} (${Math.round(phase.fraction * 100)}%)`];
-        });
       return {
         title: NAME,
-        subtitle: `Food insecurity — ${record.periodStart} to ${record.periodEnd}`,
-        rows: [
-          ["Population analyzed", record.populationAnalyzed.toLocaleString()],
-          [
-            "Crisis or worse (Phase 3+)",
-            record.phase3PlusFraction != null
-              ? `${(record.phase3PlusPopulation ?? 0).toLocaleString()} (${Math.round(record.phase3PlusFraction * 100)}%)`
-              : "—",
-          ],
-          ...phaseRows,
-          ["Source", "HDX HAPI Food Security"],
-        ],
+        subtitle: `Country-level food insecurity — ${record.periodStart} to ${record.periodEnd}`,
+        rows: foodSecurityDetailRows(record),
+      };
+    }
+    case "admin1": {
+      const { shapeName, locationCode } = hit.data.properties;
+      const record = foodSecurityByAdmin1Id.get(hit.data.properties.shapeID);
+      if (!record) {
+        return {
+          title: shapeName,
+          subtitle: locationCode,
+          rows: [["Data", "Not available in the loaded HDX dataset"]],
+        };
+      }
+      return {
+        title: shapeName,
+        subtitle: `${locationCode} — ${record.periodStart} to ${record.periodEnd}`,
+        rows: foodSecurityDetailRows(record),
       };
     }
   }
@@ -875,12 +1018,36 @@ function pointerToNDC(e: PointerEvent): THREE.Vector2 {
   );
 }
 
+// Mesh-only pick: hub markers, satellites, capsules, resupply beams,
+// arcs/rings. Cheap — this is what pointermove hover uses every frame, so
+// it deliberately does NOT fall through to the country/admin1
+// point-in-polygon lookup (see pickClickTarget below for that).
 function pickAt(e: PointerEvent): SelectableHit | null {
   raycaster.setFromCamera(pointerToNDC(e), camera);
   const intersects = raycaster.intersectObject(globe, true);
   for (const intersect of intersects) {
     const resolved = resolveSelectable(intersect.object);
     if (resolved) return resolved;
+  }
+  return null;
+}
+
+// Click-only: mesh pick first, then falls through to a point-in-polygon
+// lookup against the click's lat/lng if the ray hit the bare globe
+// surface (three-globe tags its own sphere mesh __globeObjType ===
+// "globe"). Only runs on an actual click (pointerup, not every
+// pointermove), so the extra point-in-polygon cost doesn't matter.
+function pickClickTarget(e: PointerEvent): SelectableHit | null {
+  raycaster.setFromCamera(pointerToNDC(e), camera);
+  const intersects = raycaster.intersectObject(globe, true);
+  for (const intersect of intersects) {
+    const resolved = resolveSelectable(intersect.object);
+    if (resolved) return resolved;
+    const extras = intersect.object as unknown as GlobeObjectExtras;
+    if (extras.__globeObjType === "globe") {
+      const { lat, lng } = globe.toGeoCoords(intersect.point);
+      return resolveRegionAt(lat, lng);
+    }
   }
   return null;
 }
@@ -898,7 +1065,7 @@ canvas.addEventListener("pointerup", (e) => {
   pointerDownPos = null;
   if (Math.hypot(dx, dy) > 5) return; // was a drag/rotate gesture, not a click
 
-  const hit = pickAt(e);
+  const hit = pickClickTarget(e);
   if (hit) {
     infoPanel.show(describeSelection(hit));
   } else {
@@ -906,6 +1073,21 @@ canvas.addEventListener("pointerup", (e) => {
   }
 });
 
+// Raw pointermove fires far more often than the display can redraw —
+// often 100+ times/sec on a fast mouse. Each pickAt() is a raycast against
+// every polygon mesh on the globe (country + admin1 boundary layers, ~700
+// meshes combined since the admin1 heatmap was added), so doing this on
+// every raw event pegs the CPU. Coalesce to at most one raycast per
+// rendered frame instead — only the latest pointer position matters, the
+// intermediate ones were never going to be seen anyway.
+let hoverRaf: number | null = null;
+let latestHoverEvent: PointerEvent | null = null;
+
 canvas.addEventListener("pointermove", (e) => {
-  canvas.style.cursor = pickAt(e) ? "pointer" : "";
+  latestHoverEvent = e;
+  if (hoverRaf !== null) return;
+  hoverRaf = requestAnimationFrame(() => {
+    hoverRaf = null;
+    if (latestHoverEvent) canvas.style.cursor = pickAt(latestHoverEvent) ? "pointer" : "";
+  });
 });
