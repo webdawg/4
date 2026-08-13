@@ -78,17 +78,13 @@ OUTPUT_ADMIN1_GEOJSON = ROOT / "public" / "data" / "admin1_boundaries.geojson"
 OUTPUT_ADMIN1_JSON = ROOT / "public" / "data" / "food_security_admin1.json"
 OUTPUT_TEXTURE = ROOT / "public" / "data" / "heatmap_texture.png"
 
-# Mirrors the color constants that used to live in src/main.ts as
-# THREE.Color/rgba values for the live polygon layer — kept in sync by
-# hand, not shared code (different languages). If you change one, change
-# the other (and the legend swatches in main.ts, which still reference
-# HEATMAP_COLOR_STOPS directly since the legend itself wasn't part of what
-# crashed).
+# Mirrors HEATMAP_COLOR_STOPS in src/main.ts (kept in sync by hand, not
+# shared code — different languages). Boundary colors (cyan for country,
+# pink for admin1) live only in main.ts now — this script no longer draws
+# lines at all, see bake_heatmap_texture's docstring.
 TEXTURE_WIDTH = 4096
 TEXTURE_HEIGHT = 2048
 GLOBE_SURFACE_COLOR = (11, 18, 32)  # 0x0b1220
-COUNTRY_BORDER_COLOR = (56, 189, 248)  # 0x38bdf8
-ADMIN1_BORDER_COLOR = (244, 114, 182)  # 0xf472b6
 HEATMAP_COLOR_STOPS = [
     (0.0, (22, 163, 74)),  # 0x16a34a
     (0.15, (234, 179, 8)),  # 0xeab308
@@ -367,18 +363,20 @@ def draw_fill(draw: ImageDraw.ImageDraw, geometry: dict, color: tuple[int, int, 
         draw.polygon(points, fill=color)
 
 
-def draw_stroke(draw: ImageDraw.ImageDraw, geometry: dict, color: tuple[int, int, int]) -> None:
-    for ring in polygon_rings(geometry):
-        points = [lnglat_to_px(lng, lat) for lng, lat in ring]
-        draw.line(points, fill=color, width=1, joint="curve")
-
-
 def bake_heatmap_texture(
     country_features: list[dict],
     countries: dict[str, dict],
     admin1_features: list[dict],
     admin1_records: dict[str, dict],
 ) -> None:
+    """Fill color only — no boundary lines. Lines used to be baked in here
+    too, but a rasterized 1px line at 4096x2048 reads as blurry once
+    texture-filtered onto a sphere ("SVG-like crispness" was explicitly
+    asked for). Boundaries are rendered as actual vector line geometry in
+    src/main.ts instead (plain THREE.Line, not the extruded
+    ConicPolygonGeometry that caused the Chromium crash — see SPEC.md).
+    Both the texture here and the vector lines in main.ts read from the
+    exact same GeoJSON files, so they can't drift out of alignment."""
     print(f"\nBaking heatmap texture ({TEXTURE_WIDTH}x{TEXTURE_HEIGHT})...")
     image = Image.new("RGB", (TEXTURE_WIDTH, TEXTURE_HEIGHT), GLOBE_SURFACE_COLOR)
     draw = ImageDraw.Draw(image)
@@ -394,16 +392,11 @@ def bake_heatmap_texture(
         record = countries.get(feature["properties"]["ISO_A3"])
         if record and record.get("phase3PlusFraction") is not None:
             draw_fill(draw, feature["geometry"], heat_color(record["phase3PlusFraction"]))
-    # ...admin1 fills on top (finer, wherever matched)...
+    # ...admin1 fills on top (finer, wherever matched).
     for feature in admin1_features:
         record = admin1_records.get(feature["properties"]["shapeID"])
         if record and record.get("phase3PlusFraction") is not None:
             draw_fill(draw, feature["geometry"], heat_color(record["phase3PlusFraction"]))
-    # ...then boundary strokes on top of all fills, country under admin1.
-    for feature in country_features:
-        draw_stroke(draw, feature["geometry"], COUNTRY_BORDER_COLOR)
-    for feature in admin1_features:
-        draw_stroke(draw, feature["geometry"], ADMIN1_BORDER_COLOR)
 
     OUTPUT_TEXTURE.parent.mkdir(parents=True, exist_ok=True)
     image.save(OUTPUT_TEXTURE, optimize=True)

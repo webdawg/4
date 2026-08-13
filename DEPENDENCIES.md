@@ -66,15 +66,19 @@ already in the repo), and writes:
   to the boundary polygons by normalized region name (HDX and
   geoBoundaries don't share an ID scheme — see the script's docstring and
   SPEC.md for match-rate detail and why coverage isn't 100%).
-- `public/data/heatmap_texture.png` — the country + admin1 heatmap, baked
-  into a single equirectangular raster image (country/admin1 fills +
-  boundary lines) applied to the globe as a texture. This used to be
-  rendered as ~700 live 3D polygon meshes directly in the browser, which
-  turned out to crash Chromium on at least one machine with older
-  integrated graphics — see SPEC.md's "move heatmap rendering to a baked
-  texture" update. The app still fetches the raw GeoJSON at runtime for
-  click-to-inspect (a point-in-polygon lookup against the click
-  coordinate), just doesn't render it as geometry anymore.
+- `public/data/heatmap_texture.png` — the country + admin1 heatmap **fill
+  color only** (no boundary lines — a rasterized line blurs once
+  texture-filtered onto a sphere), a single equirectangular raster image
+  applied to the globe as a texture. This used to be rendered as ~700
+  live 3D polygon meshes directly in the browser, which turned out to
+  crash Chromium on at least one machine with older integrated graphics —
+  see SPEC.md's "move heatmap rendering to a baked texture" update.
+  Boundary lines are real vector geometry now (`addBoundaryLines()` in
+  `src/main.ts`, plain `THREE.LineSegments`, not the mesh approach that
+  crashed) built from the same GeoJSON this script outputs. The app also
+  fetches that GeoJSON at runtime for click-to-inspect (a point-in-polygon
+  lookup against the click coordinate) — see SPEC.md's "Heatmap rendering
+  architecture" section for the full current-state picture.
 
 Re-run whenever `source_data/hdx_hapi_food_security_global.csv` is
 refreshed with a newer HDX export. Safe to re-run at any time — boundary

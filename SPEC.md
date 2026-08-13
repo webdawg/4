@@ -524,6 +524,55 @@ Status as of 2026-08-12. Written so a new session can pick this up cold.
 > *not* yet confirmed: whether this actually stops the Chromium crash on
 > the user's machine — that can only be confirmed by trying it there.
 
+> **Update (2026-08-13, further session): confirmed fixed, then lines
+> restored as vector geometry.** User confirmed the crash is gone. Then:
+> "the lines of the countries are blurred - we want them to be svg like
+> lines again, and all you need to render is the colors" — right
+> diagnosis. The previous update baked *both* fill color and boundary
+> lines into the raster texture; a 1px rasterized line texture-filtered
+> onto a sphere reads as soft/blurry, which is what was noticed. The fix
+> is exactly what the user described: **texture carries fill color only
+> now** (`bake_heatmap_texture` no longer calls `draw_stroke` at all —
+> that function and the now-unused `COUNTRY_BORDER_COLOR`/
+> `ADMIN1_BORDER_COLOR` Python constants were deleted), and boundary
+> lines came back as real vector geometry client-side — but NOT
+> three-globe's `.polygonsData()` (the `ConicPolygonGeometry`-per-region
+> approach that caused the crash in the first place). Instead: plain
+> `THREE.LineSegments`, built directly from the same GeoJSON already
+> being fetched for labels and click detection. New `addBoundaryLines()`
+> in `src/main.ts` walks every polygon ring, converts each `[lng,lat]`
+> point to a 3D position via `globe.getCoords()`, and pushes consecutive
+> point-pairs into one shared vertex buffer — **one `LineSegments` object
+> per layer (country, admin1), i.e. 2 draw calls total**, not one line
+> object per region (~700 would still have been fine, since lines are
+> cheap regardless, but merging costs nothing extra to do and is strictly
+> more headroom). Each line's `.raycast` is overridden to a no-op so
+> these ~700 combined regions add zero cost to hover/click picking.
+> Rendered at `LINE_ALTITUDE = 0.0015` (just above the texture surface,
+> avoids z-fighting).
+>
+> **"we keep everything aligned through code"**: both the texture bake
+> (Python) and these vector lines (TypeScript) — plus the point-in-polygon
+> click lookup — all read the *same* GeoJSON files
+> (`ne_110m_admin_0_countries.geojson`, `admin1_boundaries.geojson`).
+> There's no second copy of boundary geometry anywhere to drift out of
+> sync; a `geometryPolygons()` helper was factored out (previously
+> duplicated inline in `countryCentroid`/`pointInPolygon`) so all three
+> consumers normalize Polygon/MultiPolygon the same way.
+>
+> **Verified without the user this time**: read the regenerated
+> fill-only texture back and confirmed it has *no* lines and — more
+> importantly — that countries with no HDX food-security data are now
+> **completely invisible** in the texture (no fill, and formerly relied
+> on the baked line for any shape at all). This confirms restoring the
+> vector line layer isn't just a crispness fix, it's required for the
+> rest of the world's country shapes to be visible at all now that the
+> texture doesn't carry them. Build/typecheck pass, dev server confirmed
+> serving. See the new "Heatmap rendering architecture" section below for
+> the consolidated current-state description (the update banners above
+> are the chronological history of how it got here; that section is the
+> "how it actually works right now" reference).
+
 ## Mission
 
 Build a **3D, web-browser-viewable simulation of a global automated food
@@ -862,6 +911,66 @@ both in `src/main.ts` near the `Satellite` interface:
   latter has a model right now. No visual differentiation between a
   freshly-"launched" facility and a long-running one (no per-unit start
   time, all facilities are assumed operational since sim load).
+
+## Heatmap rendering architecture
+
+This is the *current-state* reference for how the food-security heatmap
+actually renders — the update banners near the top of this file are the
+chronological history of how it got here (three different rendering
+approaches, in order: live `.polygonsData()` meshes → everything baked
+into one texture including lines → this). Read this section for "how
+does it work right now"; read the banners for "why does it work this
+way."
+
+**Three pieces, two languages, one source of truth:**
+
+1. **Fill color — baked raster texture.**
+   `scripts/build_food_security_data.py`'s `bake_heatmap_texture()`
+   rasterizes country and admin1 polygon fills (only fills, no lines)
+   into `public/data/heatmap_texture.png` — a 4096x2048 equirectangular
+   PNG, `heat_color()` computing the same green→yellow→orange→red→maroon
+   ramp (`HEATMAP_COLOR_STOPS`, mirrored by hand in both the Python
+   script and `src/main.ts`) the old live renderer used, pre-composited
+   over the dark base color since there's no separate transparent sphere
+   for it to blend against anymore. `src/main.ts` loads this via
+   `THREE.TextureLoader` and assigns it to `globeMaterial.map` — one
+   texture, applied to the globe's existing base sphere. This is the
+   *only* thing the raster texture is responsible for: color, nothing
+   else.
+2. **Boundary lines — vector geometry, not baked.**
+   `addBoundaryLines()` in `src/main.ts` builds one `THREE.LineSegments`
+   per layer (country, admin1 — 2 draw calls total) directly from the
+   GeoJSON, positioned via `globe.getCoords()` at `LINE_ALTITUDE`
+   (0.0015, just above the surface). Crisp at any zoom because it's real
+   line geometry, not a sampled texture. Not baked into the texture
+   because a 1px rasterized line reads as blurry once texture-filtered
+   onto a sphere — tried that first, it didn't work. Each line's
+   `.raycast` is a no-op so this costs nothing in hover/click picking.
+3. **Click-to-inspect — point-in-polygon, not raycasting either layer.**
+   Neither the texture nor the boundary lines are individually
+   clickable. A click that doesn't hit a real mesh (hub marker,
+   satellite, etc.) gets resolved by raycasting the bare globe sphere for
+   a surface point, converting to lat/lng via `globe.toGeoCoords()`, and
+   testing that point against the same GeoJSON with plain point-in-polygon
+   math (`resolveRegionAt` → `pointInPolygon` → `ringContains`). Admin1
+   checked before country, so finer data wins when both exist for a spot.
+
+**The "single source of truth" part**: both the Python texture bake and
+the TypeScript vector lines/click detection read the *same* GeoJSON
+files — `public/data/ne_110m_admin_0_countries.geojson` and
+`public/data/admin1_boundaries.geojson`. There's no second, independent
+copy of boundary geometry anywhere. Regenerate the texture
+(`python3 scripts/build_food_security_data.py`) and the fill colors
+change; the lines and click detection automatically still line up
+because they were never a separate dataset to begin with.
+
+**Why not three-globe's `.polygonsData()` for any of this** — that was
+the original approach (one `ConicPolygonGeometry` mesh per country/admin1
+region, ~700 total: extruded cap + side + stroke, curvature-subdivided).
+It crashed Chromium (SIGILL, confirmed via `journalctl`, on a machine
+with older integrated graphics) — see the "move heatmap rendering to a
+baked texture" update. Nothing in the current design uses that API at
+all anymore for the heatmap.
 
 ## Selection / info panel
 
