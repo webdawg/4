@@ -573,6 +573,157 @@ Status as of 2026-08-12. Written so a new session can pick this up cold.
 > are the chronological history of how it got here; that section is the
 > "how it actually works right now" reference).
 
+> **Update (2026-08-13, further session): standardized IPC colors,
+> per-region boundary lines, and a new "starvation zones" marker layer.**
+> User: "we still do not seem to have starvation mapped out correctly...
+> fix the lines for all countries, and standardize the food insecurity
+> color codes and descriptions, and then search the 80mb file for the
+> rest of the data you need to create starvation zones." Three changes:
+>
+> 1. **Discrete IPC classification, not a continuous fraction ramp.**
+>    Country/admin1 fill and line color used to be a green→maroon
+>    gradient keyed on the raw Phase-3+ population fraction
+>    (`HEATMAP_COLOR_STOPS`, an invented ramp). Replaced with the actual
+>    IPC/CH convention: `classify_area_phase()` (Python) assigns each area
+>    a single discrete phase 1-5 — the highest phase P where ≥20% of the
+>    analyzed population is in phase P or worse (the standard IPC "20%
+>    threshold" rule) — stored as `areaPhase` in
+>    `food_security_current.json` / `food_security_admin1.json`. Colored
+>    with the actual IPC cartographic standard 5-color palette
+>    (`IPC_PHASE_COLORS`, `#cdfacd`→`#fae61e`→`#e67800`→`#c80000`→`#640000`
+>    for Minimal→Stressed→Crisis→Emergency→Catastrophe/Famine), mirrored
+>    by hand in both `scripts/build_food_security_data.py` and
+>    `src/main.ts` (same pattern this file already used for the old ramp).
+> 2. **Boundary lines now colored by each region's own classification.**
+>    Previously a flat cyan (country) / pink (admin1) regardless of data —
+>    despite already having a fill-color heatmap, the lines themselves
+>    carried no severity information, which is what read as "starvation
+>    not mapped out correctly." `addBoundaryLines()` in `src/main.ts` now
+>    takes a per-feature color function instead of one flat color, using a
+>    vertex-color buffer attribute so it's still 2 draw calls total (not 2
+>    per region) — a country/admin1 with no HDX data gets a neutral gray
+>    (`NO_DATA_COLOR`) outline instead of disappearing.
+> 3. **New "starvation zones" layer, from admin2 (district) rows.** The
+>    source CSV has ~154k admin2-level "current" rows that were never
+>    used (only admin_level 0/1 were processed before) — the "rest of the
+>    data" the user pointed at. `build_admin2_zones()` classifies every
+>    admin2 row the same way (`classify_area_phase`) and keeps the ones at
+>    Phase 4 (Emergency) or 5 (Catastrophe/Famine): 315 zones across 14
+>    countries (AGO, BFA, COD, DJI, ETH, HTI, LBN, MOZ, NGA, PSE, SDN, SOM,
+>    SSD, YEM) as of this HDX export — includes e.g. Gaza governorates and
+>    Zamzam IDP Camp (Darfur), both real declared-famine areas. Many admin2
+>    names in this dataset are informal (IDP camps, named operational
+>    clusters, "X Urban"/"X Rural" splits) rather than real administrative
+>    units, so most won't match a geoBoundaries polygon — each zone still
+>    gets *a* point via a 3-tier fallback (matched ADM2 boundary centroid →
+>    parent admin1 centroid → country centroid, recorded per-zone as
+>    `locationSource`); of 315, 202 matched an actual district boundary, 64
+>    fell back to admin1, 49 to country. Written to the new
+>    `public/data/starvation_zones.json`. Rendered client-side as small
+>    pulsing `tetraX` markers (`buildZoneMarker` in `src/main.ts`, size by
+>    phase, color from the same `IPC_PHASE_COLORS` table), fully
+>    click-to-inspect (new `"zone"` `SelectableHit` case).
+>
+> **A real bug found and fixed along the way**: `latest_current_rows()`
+> deduped "keep only the most recent period per region" by the *raw*
+> region name string. The source CSV spells the same region inconsistently
+> across export periods (e.g. `"Deir al-balah & khan younis governorates"`
+> vs `"Deir al Balah & Khan Younis Governorates"`), so two capitalization
+> variants of Gaza were being treated as different locations and BOTH kept
+> — a stale Feb-2024 famine record sitting right next to the current
+> Sept-2024 one, as if they were two separate places. Fixed by grouping on
+> a light case/punctuation-normalized key (`normalize_key_name`) while
+> still storing the real display name from whichever period wins
+> (`display_names` return value) — deliberately a *lighter* normalization
+> than `normalize_name()`'s admin-unit-suffix stripping (used only for
+> matching against geoBoundaries), since that stripping would have
+> incorrectly merged genuinely distinct rows like "X Urban" vs "X Rural"
+> into one. Dropped the zone count from 330 candidates to 315 (net of the
+> Gaza-type duplicates); admin1 matched-feature count went 509→511 (a few
+> regions that previously lost a duplicate-shapeID race now resolve to the
+> correct period's data instead).
+>
+> Verified: `npm run build` (tsc + vite build) passes clean, all 5
+> `public/data/*.json`/`.geojson`/`.png` outputs regenerated and served
+> (200) by the dev server, `starvation_zones.json` spot-checked (Gaza no
+> longer duplicated, phase breakdowns sum sensibly). **Not yet confirmed
+> by the user visually** — dev server was already running in the user's
+> own browser when this session started; not independently screenshotted
+> by the agent this time (no headless browser tool available in this
+> environment — `chromium-cli` and `playwright` were both absent, and
+> installing Playwright's browser binary was judged not worth the
+> download for a data/color change verifiable by direct JSON/pixel
+> inspection instead).
+
+> **Update (2026-08-13, same session): starvation zones became a flat
+> baked "highlighter" fill, not a 3D marker.** User: "we need new 2D
+> shapes for food starvation — we need to get rid of the line
+> intersection requirement here — let's just turn it into a flat
+> selection of the area like we are using a highlighter." The previous
+> update rendered each zone as a client-side `tetraX` line-shape sprite
+> (this project's shared "line intersections radiating from a point"
+> visual vocabulary, `src/lineShapes.ts` — used everywhere else: hubs,
+> satellites, moving objects, capsules). That's exactly what the user
+> wanted removed for this layer specifically — a starvation zone isn't a
+> point facility, it's an *area*, and should read as one.
+>
+> **What changed**: zone highlights are now baked directly into
+> `public/data/heatmap_texture.png` as a third layer (country fill ->
+> admin1 fill -> zone highlight, in that order, so zones always draw on
+> top) — `draw_zone_highlight()` in `scripts/build_food_security_data.py`,
+> a bold near-opaque fill (`ZONE_HIGHLIGHT_OPACITY = 0.88`, higher than
+> the regular `IPC_PHASE_OPACITY` table so it visually pops) plus a
+> crisp 4px full-strength outline, meant to read like a highlighter pen:
+> translucent body, slightly more defined edge. Two cases:
+> - **Zones with a matched admin2 boundary** (202 of 315): the *real*
+>   district polygon is highlighted — `build_admin2_zones()` now also
+>   returns the matched geometry (previously it computed the centroid
+>   and threw the polygon away), written to the new
+>   `public/data/starvation_zone_boundaries.geojson` (same shape as
+>   `admin1_boundaries.geojson`: `FeatureCollection`, keyed by a
+>   `zoneId` property).
+> - **Zones with no matched boundary** (113 of 315 — informal/operational
+>   names like IDP camps that don't correspond to a real administrative
+>   unit): a synthetic circle (`ellipse_ring()`, radius
+>   `FALLBACK_ZONE_RADIUS_DEG` — 0.45° for Phase 4, 0.65° for Phase 5,
+>   still severity-scaled like the old marker's size was) centered on the
+>   same admin1/country centroid fallback point as before. Each zone's
+>   `fallbackRadiusDeg` (null when a real boundary matched) is written to
+>   `starvation_zones.json` so the client can replicate the same circle
+>   for click hit-testing.
+>
+> **Click-to-inspect had to move too** — there's no mesh to raycast
+> anymore, so `resolveRegionAt()` in `src/main.ts` now checks starvation
+> zones *first* (before admin1, before country — the most specific,
+> highest-severity layer wins): point-in-polygon against
+> `zoneBoundaryFeatures` for matched zones, or a plain angular-distance
+> check (`withinFallbackZone`, `Math.hypot(Δlat, Δlng) <=
+> fallbackRadiusDeg`) for the circle fallback — same math the bake
+> script's `ellipse_ring()` used to draw it, so the clickable area and
+> the visible highlight agree. `buildZoneMarker`, the `zoneMarkers` array,
+> `ZONE_ALTITUDE`, and the per-frame pulse animation were deleted
+> entirely — nothing about starvation zones is a scene-graph object
+> anymore, they're pure texture + click-hit-test data.
+>
+> Why this doesn't reopen the Chromium-crash question: the crash was from
+> ~700 *live, extruded, curvature-subdivided* `ConicPolygonGeometry`
+> meshes recalculated in the render loop. This is 315 flat `ImageDraw`
+> polygon fills done once, offline, in Python, at build time — the exact
+> same technique (and even the exact same `polygon_rings`/`lnglat_to_px`
+> helpers) already proven safe for the country/admin1 heatmap layer. Zero
+> new client-side geometry, zero new draw calls — if anything this is
+> *less* client-side work than the marker version it replaced (no more
+> per-frame pulse scale update on 315 objects).
+>
+> Verified: `npm run build` passes clean. Re-ran the build script;
+> `starvation_zone_boundaries.geojson` has 202 features. Pixel-sampled
+> the regenerated texture at a matched zone's centroid and at a fallback
+> zone's centroid — both landed exactly on the expected highlight color
+> (`heat_color`-style pre-composite at `ZONE_HIGHLIGHT_OPACITY`), verified
+> by direct RGB comparison in Python, not by eye. Not yet visually
+> confirmed by the user in-browser (see the note on headless-browser tool
+> availability in the update above — unchanged this session).
+
 ## Mission
 
 Build a **3D, web-browser-viewable simulation of a global automated food
@@ -924,42 +1075,73 @@ way."
 
 **Three pieces, two languages, one source of truth:**
 
-1. **Fill color — baked raster texture.**
+1. **Fill color — baked raster texture, discrete IPC classification.**
    `scripts/build_food_security_data.py`'s `bake_heatmap_texture()`
    rasterizes country and admin1 polygon fills (only fills, no lines)
    into `public/data/heatmap_texture.png` — a 4096x2048 equirectangular
-   PNG, `heat_color()` computing the same green→yellow→orange→red→maroon
-   ramp (`HEATMAP_COLOR_STOPS`, mirrored by hand in both the Python
-   script and `src/main.ts`) the old live renderer used, pre-composited
-   over the dark base color since there's no separate transparent sphere
-   for it to blend against anymore. `src/main.ts` loads this via
+   PNG. Each area's color comes from `classify_area_phase()` (the
+   standard IPC "20% rule": highest phase P where ≥20% of the analyzed
+   population is in phase P or worse) looked up in the standard IPC
+   5-color palette (`IPC_PHASE_COLORS` — mirrored by hand in both the
+   Python script and `src/main.ts`, same as before but now 5 discrete
+   phase colors instead of a continuous fraction-keyed ramp), pre-
+   composited over the dark base color at a per-phase opacity
+   (`IPC_PHASE_OPACITY`) since there's no separate transparent sphere for
+   it to blend against anymore. `src/main.ts` loads this via
    `THREE.TextureLoader` and assigns it to `globeMaterial.map` — one
    texture, applied to the globe's existing base sphere. This is the
    *only* thing the raster texture is responsible for: color, nothing
    else.
-2. **Boundary lines — vector geometry, not baked.**
+2. **Boundary lines — vector geometry, colored per-region, not baked.**
    `addBoundaryLines()` in `src/main.ts` builds one `THREE.LineSegments`
    per layer (country, admin1 — 2 draw calls total) directly from the
    GeoJSON, positioned via `globe.getCoords()` at `LINE_ALTITUDE`
-   (0.0015, just above the surface). Crisp at any zoom because it's real
-   line geometry, not a sampled texture. Not baked into the texture
-   because a 1px rasterized line reads as blurry once texture-filtered
-   onto a sphere — tried that first, it didn't work. Each line's
-   `.raycast` is a no-op so this costs nothing in hover/click picking.
-3. **Click-to-inspect — point-in-polygon, not raycasting either layer.**
-   Neither the texture nor the boundary lines are individually
-   clickable. A click that doesn't hit a real mesh (hub marker,
+   (0.0015, just above the surface). Each region's line segments are
+   colored by that region's *own* `areaPhase` (a vertex-color buffer
+   attribute, not a material color — still only 2 draw calls total, not
+   one per region) via the same `IPC_PHASE_COLORS` table the fill uses; a
+   region with no HDX data gets a neutral gray (`NO_DATA_COLOR`) outline
+   instead of a flat cyan/pink regardless of data, which is what
+   previously made the lines carry no severity information of their own.
+   Crisp at any zoom because it's real line geometry, not a sampled
+   texture — not baked into the texture because a 1px rasterized line
+   reads as blurry once texture-filtered onto a sphere (tried that first,
+   it didn't work). Each line's `.raycast` is a no-op so this costs
+   nothing in hover/click picking.
+3. **Starvation zones — a third baked fill layer, on top, not a marker.**
+   Admin2 (district) rows classified Phase 4+ by the same
+   `classify_area_phase()` rule become `public/data/starvation_zones.json`
+   plus `public/data/starvation_zone_boundaries.geojson`
+   (`build_admin2_zones()` in the Python script) — see the "flat 2D
+   highlighter zones" update banner above for the full rationale. Baked
+   into the *same* `heatmap_texture.png` as a third pass
+   (`draw_zone_highlight()`, called after the country/admin1 fills so
+   zones always draw on top): the real matched district polygon where
+   `starvation_zone_boundaries.geojson` has one, or a synthetic circle
+   (`ellipse_ring()`, radius `FALLBACK_ZONE_RADIUS_DEG`) centered on the
+   admin1/country fallback centroid otherwise. Not a `src/main.ts` scene
+   object at all — no marker, no `LineSegments`, nothing added to `globe`
+   for this layer.
+4. **Click-to-inspect — point-in-polygon (and one distance check),
+   not raycasting any of the three layers above.** None of the texture,
+   the boundary lines, or the zone highlights are individually clickable
+   as scene objects. A click that doesn't hit a real mesh (hub marker,
    satellite, etc.) gets resolved by raycasting the bare globe sphere for
    a surface point, converting to lat/lng via `globe.toGeoCoords()`, and
-   testing that point against the same GeoJSON with plain point-in-polygon
-   math (`resolveRegionAt` → `pointInPolygon` → `ringContains`). Admin1
-   checked before country, so finer data wins when both exist for a spot.
+   testing that point against the same GeoJSON/zone data
+   (`resolveRegionAt`): starvation zones checked first (point-in-polygon
+   against `zoneBoundaryFeatures` for matched zones, a plain angular-
+   distance check against `fallbackRadiusDeg` for circle zones — same
+   math the bake script used to draw it, kept in sync by hand), then
+   admin1, then country — most specific/severe layer wins when several
+   overlap at one point.
 
-**The "single source of truth" part**: both the Python texture bake and
-the TypeScript vector lines/click detection read the *same* GeoJSON
-files — `public/data/ne_110m_admin_0_countries.geojson` and
-`public/data/admin1_boundaries.geojson`. There's no second, independent
-copy of boundary geometry anywhere. Regenerate the texture
+**The "single source of truth" part**: the Python texture bake and the
+TypeScript vector lines/click detection read the *same* GeoJSON files —
+`public/data/ne_110m_admin_0_countries.geojson`,
+`public/data/admin1_boundaries.geojson`, and, for the zone layer,
+`public/data/starvation_zone_boundaries.geojson`. There's no second,
+independent copy of boundary geometry anywhere. Regenerate the texture
 (`python3 scripts/build_food_security_data.py`) and the fill colors
 change; the lines and click detection automatically still line up
 because they were never a separate dataset to begin with.
@@ -1000,8 +1182,9 @@ after the legend section.
   the enrichment happens once at data-build time rather than doing lookups
   at click time.
 - **`SelectableHit`**: a discriminated union (`type` + typed `data`) over
-  all seven selectable kinds (`node`, `arc`, `ring`, `moving`, `satellite`,
-  `capsule`, `beam`) so `describeSelection`'s switch is exhaustively typed.
+  all ten selectable kinds (`node`, `arc`, `ring`, `moving`, `satellite`,
+  `capsule`, `beam`, `country`, `admin1`, `zone`) so `describeSelection`'s
+  switch is exhaustively typed.
 - **Live values at click time**: satellite and capsule info panels compute
   values (position, reentry progress) at the moment of the click using
   `latestElapsedMs` — a module-level variable updated at the top of the

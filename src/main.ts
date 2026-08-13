@@ -159,8 +159,30 @@ function getPointColor(node: DeliveryNode): string {
 // heatmap rendering to a baked texture" update in SPEC.md for the full
 // incident.
 const GLOBE_SURFACE_COLOR = 0x0b1220;
-const COUNTRY_BORDER_COLOR = "#38bdf8";
-const ADMIN1_BORDER_COLOR = "#f472b6"; // distinct from the country boundary color, so the two layers read as different things
+
+// Standard IPC/CH color-coding (Integrated Food Security Phase
+// Classification cartographic standard) — mirrors IPC_PHASE_COLORS in
+// scripts/build_food_security_data.py. Single source of truth for fill
+// (baked texture, Python), boundary line color, starvation zone marker
+// color, and the legend — every layer that shows severity uses the same
+// 5 discrete phases and the same colors for them, not an invented ramp.
+const IPC_PHASE_COLORS: Record<number, string> = {
+  1: "#cdfacd", // Minimal
+  2: "#fae61e", // Stressed
+  3: "#e67800", // Crisis
+  4: "#c80000", // Emergency
+  5: "#640000", // Catastrophe/Famine
+};
+const IPC_PHASE_LABELS: Record<number, string> = {
+  1: "Minimal",
+  2: "Stressed",
+  3: "Crisis",
+  4: "Emergency",
+  5: "Catastrophe/Famine",
+};
+// No HDX coverage at all for this country/region — neutral, not part of
+// the severity scale (so it doesn't read as "Minimal").
+const NO_DATA_COLOR = "#475569";
 
 const globeMaterial = new THREE.MeshPhongMaterial({
   color: GLOBE_SURFACE_COLOR,
@@ -256,6 +278,7 @@ interface FoodSecurityRecord {
   periodStart: string;
   periodEnd: string;
   populationAnalyzed: number;
+  areaPhase: number | null; // IPC 1-5, via the 20% rule — see IPC_PHASE_COLORS
   phase3PlusFraction: number | null;
   phase3PlusPopulation: number | null;
   phases: Record<string, FoodSecurityPhase>;
@@ -286,6 +309,59 @@ interface Admin1Dataset {
   regions: Record<string, Admin1Record>; // keyed by geoBoundaries shapeID
 }
 
+// District-level (admin2) "starvation zone" — localized Phase 4/5 areas,
+// pre-resolved server-side (scripts/build_food_security_data.py) to a
+// point: the matched admin2 boundary's centroid where geoBoundaries had
+// one, else the parent admin1's centroid, else the country's — see
+// locationSource. These are the areas a country/admin1-level average can
+// hide entirely (e.g. a famine district in an otherwise "Crisis"-level
+// country). Rendered as a flat "highlighter" fill baked directly into the
+// heatmap texture (scripts/build_food_security_data.py's
+// draw_zone_highlight) — the real matched district shape where one exists
+// (zoneBoundaryFeatures below), or a soft circular approximation of
+// radius fallbackRadiusDeg centered on lat/lng otherwise. Not a client-
+// side 3D object at all; this interface exists purely for click-to-inspect
+// hit-testing (see resolveRegionAt) and the info panel.
+interface StarvationZone {
+  id: string;
+  locationCode: string;
+  countryName: string;
+  admin1Name: string;
+  admin2Name: string;
+  lat: number;
+  lng: number;
+  locationSource: "admin2" | "admin1" | "country";
+  fallbackRadiusDeg: number | null; // null when a real boundary matched (locationSource === "admin2")
+  periodStart: string;
+  periodEnd: string;
+  populationAnalyzed: number;
+  areaPhase: number;
+  phase4PlusFraction: number;
+  phase5Fraction: number;
+  phases: Record<string, FoodSecurityPhase>;
+}
+
+interface StarvationZoneDataset {
+  source: string;
+  sourceUrl: string;
+  threshold: number;
+  zones: StarvationZone[];
+}
+
+// Real matched district polygons for the zones where geoBoundaries had
+// one (StarvationZone.locationSource === "admin2") — used only for
+// click-to-inspect point-in-polygon testing; the fill itself is already
+// baked into the heatmap texture, this is not rendered as separate
+// geometry.
+interface ZoneBoundaryFeature {
+  properties: { zoneId: string };
+  geometry: GeoJsonGeometry;
+}
+
+interface ZoneBoundaryFeatureCollection {
+  features: ZoneBoundaryFeature[];
+}
+
 // Populated once /data/food_security_current.json and
 // /data/food_security_admin1.json load; describeSelection (defined
 // further down) reads these by closing over the variables, not the
@@ -299,20 +375,9 @@ let foodSecurityByAdmin1Id = new Map<string, Admin1Record>();
 // mesh per region to raycast against anymore.
 let countryFeatures: CountryFeature[] = [];
 let admin1Features: Admin1Feature[] = [];
-
-// IPC-style severity ramp (green -> yellow -> orange -> red -> maroon),
-// keyed on the Phase-3-or-worse ("Crisis or worse") population fraction.
-// The heatmap fill itself is baked into the texture now (Python-side copy
-// of this same ramp — see scripts/build_food_security_data.py's
-// HEATMAP_COLOR_STOPS, kept in sync by hand); this copy is only used for
-// the legend swatches.
-const HEATMAP_COLOR_STOPS: Array<[number, THREE.Color]> = [
-  [0, new THREE.Color(0x16a34a)],
-  [0.15, new THREE.Color(0xeab308)],
-  [0.3, new THREE.Color(0xf97316)],
-  [0.5, new THREE.Color(0xdc2626)],
-  [0.75, new THREE.Color(0x7f1d1d)],
-];
+let starvationZones: StarvationZone[] = [];
+let zoneBoundaryFeatures: ZoneBoundaryFeature[] = [];
+const zoneBoundaryById = new Map<string, ZoneBoundaryFeature>();
 
 // Shoelace-formula centroid + area of a single ring, in lng/lat space —
 // approximate (doesn't account for spherical curvature), fine for label
@@ -371,9 +436,15 @@ const LINE_ALTITUDE = 0.0015;
 // fine (lines are cheap), but merging every ring's segments into a single
 // buffer is strictly better and costs nothing extra to do: 2 draw calls
 // total for ~700 combined country+admin1 regions instead of ~700+.
-function addBoundaryLines(features: Array<{ geometry: GeoJsonGeometry }>, color: THREE.ColorRepresentation): void {
-  const segmentPoints: THREE.Vector3[] = [];
+//
+// Each region's line color reflects its OWN food-insecurity classification
+// (IPC_PHASE_COLORS) rather than a flat per-layer color — vertex colors on
+// one shared buffer keep this at 2 draw calls total, same as before.
+function addBoundaryLines<F extends { geometry: GeoJsonGeometry }>(features: F[], colorForFeature: (feature: F) => THREE.Color): void {
+  const positions: number[] = [];
+  const vertexColors: number[] = [];
   for (const feature of features) {
+    const { r, g, b } = colorForFeature(feature);
     for (const polygon of geometryPolygons(feature.geometry)) {
       const ring = polygon[0];
       for (let i = 0; i < ring.length - 1; i++) {
@@ -381,12 +452,15 @@ function addBoundaryLines(features: Array<{ geometry: GeoJsonGeometry }>, color:
         const [lng1, lat1] = ring[i + 1];
         const c0 = globe.getCoords(lat0, lng0, LINE_ALTITUDE);
         const c1 = globe.getCoords(lat1, lng1, LINE_ALTITUDE);
-        segmentPoints.push(new THREE.Vector3(c0.x, c0.y, c0.z), new THREE.Vector3(c1.x, c1.y, c1.z));
+        positions.push(c0.x, c0.y, c0.z, c1.x, c1.y, c1.z);
+        vertexColors.push(r, g, b, r, g, b);
       }
     }
   }
-  const geometry = new THREE.BufferGeometry().setFromPoints(segmentPoints);
-  const material = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.85 });
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute("color", new THREE.Float32BufferAttribute(vertexColors, 3));
+  const material = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.9 });
   const lines = new THREE.LineSegments(geometry, material);
   // Decorative only — not selectable, and skipping raycast entirely keeps
   // hover/click picking exactly as cheap as it is without these lines.
@@ -394,22 +468,46 @@ function addBoundaryLines(features: Array<{ geometry: GeoJsonGeometry }>, color:
   globe.add(lines);
 }
 
+function ipcColor(areaPhase: number | null | undefined): THREE.Color {
+  return new THREE.Color(areaPhase != null ? IPC_PHASE_COLORS[areaPhase] : NO_DATA_COLOR);
+}
+
 Promise.all([
   fetch("/data/ne_110m_admin_0_countries.geojson").then((res) => res.json() as Promise<CountryFeatureCollection>),
   fetch("/data/food_security_current.json").then((res) => res.json() as Promise<FoodSecurityDataset>),
   fetch("/data/admin1_boundaries.geojson").then((res) => res.json() as Promise<Admin1FeatureCollection>),
   fetch("/data/food_security_admin1.json").then((res) => res.json() as Promise<Admin1Dataset>),
-]).then(([countries, foodSecurity, admin1, admin1FoodSecurity]) => {
+  fetch("/data/starvation_zones.json").then((res) => res.json() as Promise<StarvationZoneDataset>),
+  fetch("/data/starvation_zone_boundaries.geojson").then((res) => res.json() as Promise<ZoneBoundaryFeatureCollection>),
+]).then(([countries, foodSecurity, admin1, admin1FoodSecurity, zoneDataset, zoneBoundaries]) => {
   foodSecurityByIso3 = new Map(Object.entries(foodSecurity.countries));
   foodSecurityByAdmin1Id = new Map(Object.entries(admin1FoodSecurity.regions));
   countryFeatures = countries.features;
   admin1Features = admin1.features;
+  starvationZones = zoneDataset.zones;
+  zoneBoundaryFeatures = zoneBoundaries.features;
+  for (const feature of zoneBoundaryFeatures) zoneBoundaryById.set(feature.properties.zoneId, feature);
 
   // Country lines first (coarser, everywhere), admin1 lines on top
   // (finer, wherever matched) — same layering the old live-mesh version
-  // used, just as lines instead of extruded fills now.
-  addBoundaryLines(countryFeatures, COUNTRY_BORDER_COLOR);
-  addBoundaryLines(admin1Features, ADMIN1_BORDER_COLOR);
+  // used, just as lines instead of extruded fills now. Every country gets
+  // a line regardless of data coverage (neutral gray if none) so its
+  // shape stays visible even where the fill texture has nothing to draw.
+  // Starvation zones are NOT rendered here at all — they're a flat fill
+  // already baked into the heatmap texture (see
+  // scripts/build_food_security_data.py's draw_zone_highlight); the
+  // starvationZones/zoneBoundaryFeatures arrays above exist purely for
+  // click-to-inspect (resolveRegionAt checks them before admin1/country).
+  addBoundaryLines(countryFeatures, (feature) => ipcColor(foodSecurityByIso3.get(feature.properties.ISO_A3)?.areaPhase));
+  addBoundaryLines(admin1Features, (feature) => {
+    const own = foodSecurityByAdmin1Id.get(feature.properties.shapeID)?.areaPhase;
+    if (own != null) return ipcColor(own);
+    // Admin1 shape exists (boundary matched) but this specific region has
+    // no HDX row — fall back to the parent country's classification
+    // rather than a flat neutral, so it still reads as *something*
+    // sensible instead of looking like a data gap right next to data.
+    return ipcColor(foodSecurityByIso3.get(feature.properties.locationCode)?.areaPhase);
+  });
 
   const labelsData: CountryLabelDatum[] = countries.features.map((feature) => {
     const { lat, lng } = countryCentroid(feature.geometry);
@@ -788,20 +886,25 @@ function buildLegend() {
         .join("")
     : "";
 
-  const foodSecurityLabels = ["Low", "Elevated", "High", "Severe", "Catastrophic"];
-  const foodSecurityRows = HEATMAP_COLOR_STOPS.map(
-    ([, color], i) =>
-      `<div class="legend-row"><span class="swatch" style="background:#${color.getHexString()}"></span>${foodSecurityLabels[i] ?? ""}</div>`,
-  ).join("");
+  const foodSecurityRows = ([1, 2, 3, 4, 5] as const)
+    .map(
+      (phase) =>
+        `<div class="legend-row"><span class="swatch" style="background:${IPC_PHASE_COLORS[phase]}"></span>IPC ${phase} — ${IPC_PHASE_LABELS[phase]}</div>`,
+    )
+    .join("");
 
   legend.innerHTML = `
     <h1>Food Relief Network</h1>
     <p class="tagline">Click anything on the globe to inspect it.</p>
     ${hubRows}
     ${routeRows}
-    <div class="legend-heading">Food insecurity (Crisis+ share)</div>
+    <div class="legend-heading">Food insecurity (IPC classification)</div>
     ${foodSecurityRows}
-    <p class="tagline">Admin1 (state/province) detail where available, country-level otherwise.</p>
+    <div class="legend-row"><span class="swatch" style="background:${NO_DATA_COLOR}"></span>No data</div>
+    <p class="tagline">Admin1 (state/province) detail where available, country-level otherwise. Region classified at the highest IPC phase reaching 20% of its population.</p>
+    <div class="legend-heading">Starvation zones</div>
+    <div class="legend-row"><span class="swatch" style="background:${IPC_PHASE_COLORS[4]}"></span>Highlighted district, Phase 4+</div>
+    <p class="tagline">Localized (admin2) areas where Emergency or Catastrophe/Famine reaches 20% of the population, highlighted over the real district shape where known — often masked by a lower country/region-level average.</p>
   `;
   document.body.appendChild(legend);
 }
@@ -838,7 +941,8 @@ type SelectableHit =
     }
   | { type: "beam"; data: { hubName: string } }
   | { type: "country"; data: CountryFeature }
-  | { type: "admin1"; data: Admin1Feature };
+  | { type: "admin1"; data: Admin1Feature }
+  | { type: "zone"; data: StarvationZone };
 
 function resolveSelectable(object: THREE.Object3D): SelectableHit | null {
   let obj: THREE.Object3D | null = object;
@@ -883,7 +987,27 @@ function pointInPolygon(lat: number, lng: number, geometry: GeoJsonGeometry): bo
   return geometryPolygons(geometry).some((polygon) => ringContains(polygon[0], lng, lat));
 }
 
+// Simple angular-distance check against the same ellipse radius the bake
+// script used (FALLBACK_ZONE_RADIUS_DEG / ellipse_ring) — matches the
+// baked circle closely enough for click purposes without needing to ship
+// the ellipse's exact vertex ring to the client.
+function withinFallbackZone(lat: number, lng: number, zone: StarvationZone): boolean {
+  if (zone.fallbackRadiusDeg == null) return false;
+  return Math.hypot(lat - zone.lat, lng - zone.lng) <= zone.fallbackRadiusDeg;
+}
+
 function resolveRegionAt(lat: number, lng: number): SelectableHit | null {
+  // Starvation zones first — the most specific, most severe layer, baked
+  // on top of everything else visually, so a click should prefer it over
+  // the admin1/country fill underneath.
+  for (const zone of starvationZones) {
+    if (zone.fallbackRadiusDeg == null) {
+      const boundary = zoneBoundaryById.get(zone.id);
+      if (boundary && pointInPolygon(lat, lng, boundary.geometry)) return { type: "zone", data: zone };
+    } else if (withinFallbackZone(lat, lng, zone)) {
+      return { type: "zone", data: zone };
+    }
+  }
   for (const feature of admin1Features) {
     if (pointInPolygon(lat, lng, feature.geometry)) return { type: "admin1", data: feature };
   }
@@ -1030,6 +1154,36 @@ function describeSelection(hit: SelectableHit): SelectionInfo {
         title: shapeName,
         subtitle: `${locationCode} — ${record.periodStart} to ${record.periodEnd}`,
         rows: foodSecurityDetailRows(record),
+      };
+    }
+    case "zone": {
+      const zone = hit.data;
+      const locationLabel = [zone.admin1Name, zone.countryName].filter(Boolean).join(", ");
+      const phaseOrder = ["1", "2", "3", "4", "5"];
+      const phaseRows: Array<[string, string]> = phaseOrder
+        .filter((phaseNum) => zone.phases[phaseNum])
+        .map((phaseNum) => {
+          const phase = zone.phases[phaseNum];
+          return [`IPC Phase ${phaseNum} — ${phase.label}`, `${phase.population.toLocaleString()} (${Math.round(phase.fraction * 100)}%)`];
+        });
+      const precisionLabel =
+        zone.locationSource === "admin2"
+          ? "Real district (admin2) boundary shape"
+          : zone.locationSource === "admin1"
+            ? `Approximate — district boundary unmatched, highlighted as a ${zone.fallbackRadiusDeg}° circle around the admin1 region's centroid`
+            : `Approximate — no finer boundary matched, highlighted as a ${zone.fallbackRadiusDeg}° circle around the country's centroid`;
+      return {
+        title: zone.admin2Name,
+        subtitle: `Starvation zone — IPC Phase ${zone.areaPhase} (${IPC_PHASE_LABELS[zone.areaPhase]}), ${zone.periodStart} to ${zone.periodEnd}`,
+        rows: [
+          ["Location", locationLabel],
+          ["Population analyzed", zone.populationAnalyzed.toLocaleString()],
+          ["Phase 4+5 (Emergency or worse)", `${Math.round(zone.phase4PlusFraction * 100)}%`],
+          ["Phase 5 (Catastrophe/Famine)", `${Math.round(zone.phase5Fraction * 100)}%`],
+          ...phaseRows,
+          ["Highlight shape", precisionLabel],
+          ["Source", "HDX HAPI Food Security"],
+        ],
       };
     }
   }

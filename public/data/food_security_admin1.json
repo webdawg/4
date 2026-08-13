@@ -3,6 +3,7 @@
   "sourceUrl": "https://data.humdata.org/dataset/hdx-hapi-food-security",
   "boundarySource": "geoBoundaries.org (Open Database, CC BY 4.0 / Public Domain per-country)",
   "matchNote": "Joined to HDX admin1 names by normalized string match, not a shared ID scheme \u2014 some regions have no match, see build script console output.",
+  "classificationRule": "IPC-style 20% rule: an area is classified at the highest phase P where >=20% of the analyzed population is in phase P or worse.",
   "regions": {
     "12653393B78791504725813": {
       "locationCode": "AFG",
@@ -10,6 +11,7 @@
       "periodStart": "2025-03-01",
       "periodEnd": "2025-04-30",
       "populationAnalyzed": 858718,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.35,
       "phase3PlusPopulation": 300551,
       "phases": {
@@ -46,6 +48,7 @@
       "periodStart": "2025-03-01",
       "periodEnd": "2025-04-30",
       "populationAnalyzed": 654909,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.25,
       "phase3PlusPopulation": 163727,
       "phases": {
@@ -76,12 +79,50 @@
         }
       }
     },
+    "12653393B40111500734429": {
+      "locationCode": "AFG",
+      "name": "Kandahar Urban",
+      "periodStart": "2025-03-01",
+      "periodEnd": "2025-04-30",
+      "populationAnalyzed": 698242,
+      "areaPhase": 3,
+      "phase3PlusFraction": 0.3,
+      "phase3PlusPopulation": 209473,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 209473,
+          "fraction": 0.3
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 279297,
+          "fraction": 0.4
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 174561,
+          "fraction": 0.25
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 34912,
+          "fraction": 0.05
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
     "12653393B46637216309148": {
       "locationCode": "AFG",
       "name": "Badakhshan",
       "periodStart": "2025-03-01",
       "periodEnd": "2025-04-30",
       "populationAnalyzed": 1723151,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.4,
       "phase3PlusPopulation": 689260,
       "phases": {
@@ -118,6 +159,7 @@
       "periodStart": "2025-03-01",
       "periodEnd": "2025-04-30",
       "populationAnalyzed": 1316277,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.25,
       "phase3PlusPopulation": 329069,
       "phases": {
@@ -154,6 +196,7 @@
       "periodStart": "2025-03-01",
       "periodEnd": "2025-04-30",
       "populationAnalyzed": 1012772,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.3,
       "phase3PlusPopulation": 303832,
       "phases": {
@@ -190,6 +233,7 @@
       "periodStart": "2025-03-01",
       "periodEnd": "2025-04-30",
       "populationAnalyzed": 645836,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.25,
       "phase3PlusPopulation": 161459,
       "phases": {
@@ -226,6 +270,7 @@
       "periodStart": "2025-03-01",
       "periodEnd": "2025-04-30",
       "populationAnalyzed": 826436,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.25,
       "phase3PlusPopulation": 206609,
       "phases": {
@@ -256,12 +301,50 @@
         }
       }
     },
+    "12653393B65816425001124": {
+      "locationCode": "AFG",
+      "name": "Takhar Urban",
+      "periodStart": "2025-03-01",
+      "periodEnd": "2025-04-30",
+      "populationAnalyzed": 253913,
+      "areaPhase": 3,
+      "phase3PlusFraction": 0.25,
+      "phase3PlusPopulation": 63479,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 76174,
+          "fraction": 0.3
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 114261,
+          "fraction": 0.45
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 50783,
+          "fraction": 0.2
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 12696,
+          "fraction": 0.05
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
     "12653393B60423242182357": {
       "locationCode": "AFG",
       "name": "Kabul",
       "periodStart": "2025-03-01",
       "periodEnd": "2025-04-30",
       "populationAnalyzed": 786745,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.25,
       "phase3PlusPopulation": 196686,
       "phases": {
@@ -292,12 +375,50 @@
         }
       }
     },
+    "12653393B15327610512620": {
+      "locationCode": "AFG",
+      "name": "Faryab Urban",
+      "periodStart": "2025-03-01",
+      "periodEnd": "2025-04-30",
+      "populationAnalyzed": 153490,
+      "areaPhase": 3,
+      "phase3PlusFraction": 0.25,
+      "phase3PlusPopulation": 38373,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 38373,
+          "fraction": 0.25
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 76745,
+          "fraction": 0.5
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 38373,
+          "fraction": 0.25
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 0,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
     "12653393B66876919073955": {
       "locationCode": "AFG",
       "name": "Khost",
       "periodStart": "2025-03-01",
       "periodEnd": "2025-04-30",
       "populationAnalyzed": 1357526,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 203629,
       "phases": {
@@ -334,6 +455,7 @@
       "periodStart": "2025-03-01",
       "periodEnd": "2025-04-30",
       "populationAnalyzed": 698261,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.25,
       "phase3PlusPopulation": 174565,
       "phases": {
@@ -370,6 +492,7 @@
       "periodStart": "2025-03-01",
       "periodEnd": "2025-04-30",
       "populationAnalyzed": 2513508,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.3,
       "phase3PlusPopulation": 754052,
       "phases": {
@@ -406,6 +529,7 @@
       "periodStart": "2025-03-01",
       "periodEnd": "2025-04-30",
       "populationAnalyzed": 594082,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.3,
       "phase3PlusPopulation": 178225,
       "phases": {
@@ -436,33 +560,71 @@
         }
       }
     },
-    "12653393B15327610512620": {
+    "12653393B32704257785092": {
       "locationCode": "AFG",
-      "name": "Faryab",
+      "name": "Balkh Urban",
       "periodStart": "2025-03-01",
       "periodEnd": "2025-04-30",
-      "populationAnalyzed": 1432629,
+      "populationAnalyzed": 1036996,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.3,
-      "phase3PlusPopulation": 429788,
+      "phase3PlusPopulation": 311099,
       "phases": {
         "1": {
           "label": "Minimal",
-          "population": 429789,
-          "fraction": 0.3
+          "population": 362949,
+          "fraction": 0.35
         },
         "2": {
           "label": "Stressed",
-          "population": 573052,
-          "fraction": 0.4
+          "population": 362949,
+          "fraction": 0.35
         },
         "3": {
           "label": "Crisis",
-          "population": 358157,
+          "population": 259249,
           "fraction": 0.25
         },
         "4": {
           "label": "Emergency",
-          "population": 71631,
+          "population": 51850,
+          "fraction": 0.05
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "12653393B44617690613931": {
+      "locationCode": "AFG",
+      "name": "Helmand Urban",
+      "periodStart": "2025-03-01",
+      "periodEnd": "2025-04-30",
+      "populationAnalyzed": 272741,
+      "areaPhase": 3,
+      "phase3PlusFraction": 0.3,
+      "phase3PlusPopulation": 81822,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 81822,
+          "fraction": 0.3
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 109096,
+          "fraction": 0.4
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 68185,
+          "fraction": 0.25
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 13637,
           "fraction": 0.05
         },
         "5": {
@@ -478,6 +640,7 @@
       "periodStart": "2025-03-01",
       "periodEnd": "2025-04-30",
       "populationAnalyzed": 1095483,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.35,
       "phase3PlusPopulation": 383419,
       "phases": {
@@ -514,6 +677,7 @@
       "periodStart": "2025-03-01",
       "periodEnd": "2025-04-30",
       "populationAnalyzed": 1252432,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.3,
       "phase3PlusPopulation": 375730,
       "phases": {
@@ -550,6 +714,7 @@
       "periodStart": "2025-03-01",
       "periodEnd": "2025-04-30",
       "populationAnalyzed": 420559,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.3,
       "phase3PlusPopulation": 126168,
       "phases": {
@@ -586,6 +751,7 @@
       "periodStart": "2025-03-01",
       "periodEnd": "2025-04-30",
       "populationAnalyzed": 349249,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.3,
       "phase3PlusPopulation": 104774,
       "phases": {
@@ -622,6 +788,7 @@
       "periodStart": "2025-03-01",
       "periodEnd": "2025-04-30",
       "populationAnalyzed": 843192,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.25,
       "phase3PlusPopulation": 210798,
       "phases": {
@@ -658,6 +825,7 @@
       "periodStart": "2025-03-01",
       "periodEnd": "2025-04-30",
       "populationAnalyzed": 918160,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.3,
       "phase3PlusPopulation": 275448,
       "phases": {
@@ -688,48 +856,13 @@
         }
       }
     },
-    "12653393B65816425001124": {
-      "locationCode": "AFG",
-      "name": "Takhar",
-      "periodStart": "2025-03-01",
-      "periodEnd": "2025-04-30",
-      "populationAnalyzed": 1476999,
-      "phase3PlusFraction": 0.25,
-      "phase3PlusPopulation": 369250,
-      "phases": {
-        "1": {
-          "label": "Minimal",
-          "population": 516950,
-          "fraction": 0.35
-        },
-        "2": {
-          "label": "Stressed",
-          "population": 590800,
-          "fraction": 0.4
-        },
-        "3": {
-          "label": "Crisis",
-          "population": 295400,
-          "fraction": 0.2
-        },
-        "4": {
-          "label": "Emergency",
-          "population": 73850,
-          "fraction": 0.05
-        },
-        "5": {
-          "label": "Catastrophe/Famine",
-          "population": 0,
-          "fraction": 0.0
-        }
-      }
-    },
     "12653393B17428819721147": {
       "locationCode": "AFG",
       "name": "Samangan",
       "periodStart": "2025-03-01",
       "periodEnd": "2025-04-30",
       "populationAnalyzed": 591930,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.3,
       "phase3PlusPopulation": 177580,
       "phases": {
@@ -766,6 +899,7 @@
       "periodStart": "2025-03-01",
       "periodEnd": "2025-04-30",
       "populationAnalyzed": 947698,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.25,
       "phase3PlusPopulation": 236925,
       "phases": {
@@ -796,48 +930,13 @@
         }
       }
     },
-    "12653393B40111500734429": {
-      "locationCode": "AFG",
-      "name": "Kandahar",
-      "periodStart": "2025-03-01",
-      "periodEnd": "2025-04-30",
-      "populationAnalyzed": 1232054,
-      "phase3PlusFraction": 0.15,
-      "phase3PlusPopulation": 184808,
-      "phases": {
-        "1": {
-          "label": "Minimal",
-          "population": 431219,
-          "fraction": 0.35
-        },
-        "2": {
-          "label": "Stressed",
-          "population": 616027,
-          "fraction": 0.5
-        },
-        "3": {
-          "label": "Crisis",
-          "population": 123205,
-          "fraction": 0.1
-        },
-        "4": {
-          "label": "Emergency",
-          "population": 61603,
-          "fraction": 0.05
-        },
-        "5": {
-          "label": "Catastrophe/Famine",
-          "population": 0,
-          "fraction": 0.0
-        }
-      }
-    },
     "12653393B40451261903281": {
       "locationCode": "AFG",
       "name": "Bamyan",
       "periodStart": "2025-03-01",
       "periodEnd": "2025-04-30",
       "populationAnalyzed": 533973,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.35,
       "phase3PlusPopulation": 186891,
       "phases": {
@@ -868,48 +967,13 @@
         }
       }
     },
-    "12653393B32704257785092": {
-      "locationCode": "AFG",
-      "name": "Balkh",
-      "periodStart": "2025-03-01",
-      "periodEnd": "2025-04-30",
-      "populationAnalyzed": 1475899,
-      "phase3PlusFraction": 0.35,
-      "phase3PlusPopulation": 516565,
-      "phases": {
-        "1": {
-          "label": "Minimal",
-          "population": 368975,
-          "fraction": 0.25
-        },
-        "2": {
-          "label": "Stressed",
-          "population": 590360,
-          "fraction": 0.4
-        },
-        "3": {
-          "label": "Crisis",
-          "population": 442770,
-          "fraction": 0.3
-        },
-        "4": {
-          "label": "Emergency",
-          "population": 73795,
-          "fraction": 0.05
-        },
-        "5": {
-          "label": "Catastrophe/Famine",
-          "population": 0,
-          "fraction": 0.0
-        }
-      }
-    },
     "26408823B93569072225888": {
       "locationCode": "AGO",
       "name": "Cunene",
       "periodStart": "2021-06-01",
       "periodEnd": "2021-09-30",
       "populationAnalyzed": 1232536,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.51,
       "phase3PlusPopulation": 630440,
       "phases": {
@@ -946,6 +1010,7 @@
       "periodStart": "2021-06-01",
       "periodEnd": "2021-09-30",
       "populationAnalyzed": 805849,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.58,
       "phase3PlusPopulation": 469787,
       "phases": {
@@ -982,6 +1047,7 @@
       "periodStart": "2021-06-01",
       "periodEnd": "2021-09-30",
       "populationAnalyzed": 629405,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.35,
       "phase3PlusPopulation": 215306,
       "phases": {
@@ -1018,6 +1084,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 191893,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.07,
       "phase3PlusPopulation": 14281,
       "phases": {
@@ -1054,6 +1121,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 95861,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 4793,
       "phases": {
@@ -1090,6 +1158,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 127411,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.03,
       "phase3PlusPopulation": 3822,
       "phases": {
@@ -1126,6 +1195,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 297380,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.06,
       "phase3PlusPopulation": 17678,
       "phases": {
@@ -1162,6 +1232,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 294839,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.06,
       "phase3PlusPopulation": 17690,
       "phases": {
@@ -1198,6 +1269,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 310504,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 14174,
       "phases": {
@@ -1234,6 +1306,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 340540,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.06,
       "phase3PlusPopulation": 20864,
       "phases": {
@@ -1270,6 +1343,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 289771,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.03,
       "phase3PlusPopulation": 10044,
       "phases": {
@@ -1306,6 +1380,7 @@
       "periodStart": "2025-03-01",
       "periodEnd": "2025-05-31",
       "populationAnalyzed": 876178,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.04,
       "phase3PlusPopulation": 35047,
       "phases": {
@@ -1342,6 +1417,7 @@
       "periodStart": "2024-03-01",
       "periodEnd": "2024-05-31",
       "populationAnalyzed": 1078082,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.03,
       "phase3PlusPopulation": 34451,
       "phases": {
@@ -1378,6 +1454,7 @@
       "periodStart": "2024-03-01",
       "periodEnd": "2024-05-31",
       "populationAnalyzed": 2195824,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.14,
       "phase3PlusPopulation": 303298,
       "phases": {
@@ -1414,6 +1491,7 @@
       "periodStart": "2024-03-01",
       "periodEnd": "2024-05-31",
       "populationAnalyzed": 969523,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.03,
       "phase3PlusPopulation": 27433,
       "phases": {
@@ -1450,6 +1528,7 @@
       "periodStart": "2024-03-01",
       "periodEnd": "2024-05-31",
       "populationAnalyzed": 859347,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.02,
       "phase3PlusPopulation": 19818,
       "phases": {
@@ -1486,6 +1565,7 @@
       "periodStart": "2024-03-01",
       "periodEnd": "2024-05-31",
       "populationAnalyzed": 2086060,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 107717,
       "phases": {
@@ -1522,6 +1602,7 @@
       "periodStart": "2024-03-01",
       "periodEnd": "2024-05-31",
       "populationAnalyzed": 925353,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.02,
       "phase3PlusPopulation": 14512,
       "phases": {
@@ -1558,6 +1639,7 @@
       "periodStart": "2024-03-01",
       "periodEnd": "2024-05-31",
       "populationAnalyzed": 2522636,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.0,
       "phase3PlusPopulation": 0,
       "phases": {
@@ -1594,6 +1676,7 @@
       "periodStart": "2024-03-01",
       "periodEnd": "2024-05-31",
       "populationAnalyzed": 1834277,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 82573,
       "phases": {
@@ -1630,6 +1713,7 @@
       "periodStart": "2024-03-01",
       "periodEnd": "2024-05-31",
       "populationAnalyzed": 2094910,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.18,
       "phase3PlusPopulation": 383799,
       "phases": {
@@ -1666,6 +1750,7 @@
       "periodStart": "2024-03-01",
       "periodEnd": "2024-05-31",
       "populationAnalyzed": 3537996,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.02,
       "phase3PlusPopulation": 70760,
       "phases": {
@@ -1702,6 +1787,7 @@
       "periodStart": "2024-03-01",
       "periodEnd": "2024-05-31",
       "populationAnalyzed": 1755468,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.07,
       "phase3PlusPopulation": 116087,
       "phases": {
@@ -1738,6 +1824,7 @@
       "periodStart": "2025-04-01",
       "periodEnd": "2025-04-30",
       "populationAnalyzed": 7637103,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.12,
       "phase3PlusPopulation": 896872,
       "phases": {
@@ -1774,6 +1861,7 @@
       "periodStart": "2025-04-01",
       "periodEnd": "2025-04-30",
       "populationAnalyzed": 6494420,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.19,
       "phase3PlusPopulation": 1224993,
       "phases": {
@@ -1810,6 +1898,7 @@
       "periodStart": "2026-05-01",
       "periodEnd": "2026-08-31",
       "populationAnalyzed": 2711968,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 271197,
       "phases": {
@@ -1846,6 +1935,7 @@
       "periodStart": "2026-05-01",
       "periodEnd": "2026-08-31",
       "populationAnalyzed": 6320467,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 632047,
       "phases": {
@@ -1882,6 +1972,7 @@
       "periodStart": "2026-05-01",
       "periodEnd": "2026-08-31",
       "populationAnalyzed": 4007294,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 601094,
       "phases": {
@@ -1918,6 +2009,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 60113,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.53,
       "phase3PlusPopulation": 31969,
       "phases": {
@@ -1954,6 +2046,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 366709,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.14,
       "phase3PlusPopulation": 52800,
       "phases": {
@@ -1990,6 +2083,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 399176,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.47,
       "phase3PlusPopulation": 185996,
       "phases": {
@@ -2026,6 +2120,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 285505,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.18,
       "phase3PlusPopulation": 50244,
       "phases": {
@@ -2062,6 +2157,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 297009,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.12,
       "phase3PlusPopulation": 34811,
       "phases": {
@@ -2098,6 +2194,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 242745,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.35,
       "phase3PlusPopulation": 84961,
       "phases": {
@@ -2134,6 +2231,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 377442,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.25,
       "phase3PlusPopulation": 95867,
       "phases": {
@@ -2170,6 +2268,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 154965,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.29,
       "phase3PlusPopulation": 45109,
       "phases": {
@@ -2206,6 +2305,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 1486899,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 154745,
       "phases": {
@@ -2242,6 +2342,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 200500,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.28,
       "phase3PlusPopulation": 57880,
       "phases": {
@@ -2278,6 +2379,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 466307,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.4,
       "phase3PlusPopulation": 186446,
       "phases": {
@@ -2314,6 +2416,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 258470,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.4,
       "phase3PlusPopulation": 104006,
       "phases": {
@@ -2350,6 +2453,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 271660,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.46,
       "phase3PlusPopulation": 123768,
       "phases": {
@@ -2386,6 +2490,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 90527,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.55,
       "phase3PlusPopulation": 49417,
       "phases": {
@@ -2422,6 +2527,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 146454,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.49,
       "phase3PlusPopulation": 71407,
       "phases": {
@@ -2458,6 +2564,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 86754,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.41,
       "phase3PlusPopulation": 35265,
       "phases": {
@@ -2494,6 +2601,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 0,
+      "areaPhase": null,
       "phase3PlusFraction": null,
       "phase3PlusPopulation": null,
       "phases": {}
@@ -2504,6 +2612,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 0,
+      "areaPhase": null,
       "phase3PlusFraction": null,
       "phase3PlusPopulation": null,
       "phases": {}
@@ -2514,6 +2623,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 2196261,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.21,
       "phase3PlusPopulation": 455611,
       "phases": {
@@ -2550,6 +2660,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 2842433,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.22,
       "phase3PlusPopulation": 637611,
       "phases": {
@@ -2586,6 +2697,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1287898,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.04,
       "phase3PlusPopulation": 56481,
       "phases": {
@@ -2622,6 +2734,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 3216035,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 160802,
       "phases": {
@@ -2658,6 +2771,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 2870402,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.03,
       "phase3PlusPopulation": 86013,
       "phases": {
@@ -2694,6 +2808,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1059105,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.06,
       "phase3PlusPopulation": 58927,
       "phases": {
@@ -2730,6 +2845,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 5027816,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.17,
       "phase3PlusPopulation": 860610,
       "phases": {
@@ -2766,6 +2882,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 5169991,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.07,
       "phase3PlusPopulation": 351376,
       "phases": {
@@ -2802,6 +2919,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 4189105,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.07,
       "phase3PlusPopulation": 314618,
       "phases": {
@@ -2838,6 +2956,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 15181583,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 2300582,
       "phases": {
@@ -2874,6 +2993,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 6496792,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.12,
       "phase3PlusPopulation": 760697,
       "phases": {
@@ -2910,6 +3030,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 2918603,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.24,
       "phase3PlusPopulation": 698213,
       "phases": {
@@ -2946,6 +3067,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 7347997,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 1102637,
       "phases": {
@@ -2982,6 +3104,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 3206115,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.25,
       "phase3PlusPopulation": 815854,
       "phases": {
@@ -3018,6 +3141,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 2068150,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.16,
       "phase3PlusPopulation": 327896,
       "phases": {
@@ -3054,6 +3178,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 4160459,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.13,
       "phase3PlusPopulation": 556562,
       "phases": {
@@ -3090,6 +3215,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 2919810,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.17,
       "phase3PlusPopulation": 494248,
       "phases": {
@@ -3126,6 +3252,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 3669471,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.14,
       "phase3PlusPopulation": 528702,
       "phases": {
@@ -3162,6 +3289,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 3383694,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.16,
       "phase3PlusPopulation": 541657,
       "phases": {
@@ -3198,6 +3326,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 2161167,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.26,
       "phase3PlusPopulation": 556738,
       "phases": {
@@ -3234,6 +3363,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1721445,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.22,
       "phase3PlusPopulation": 379977,
       "phases": {
@@ -3270,6 +3400,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 4841791,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.34,
       "phase3PlusPopulation": 1627926,
       "phases": {
@@ -3306,6 +3437,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 7452345,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 761107,
       "phases": {
@@ -3342,6 +3474,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 3328127,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.16,
       "phase3PlusPopulation": 517633,
       "phases": {
@@ -3378,6 +3511,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 4350120,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.19,
       "phase3PlusPopulation": 827475,
       "phases": {
@@ -3414,6 +3548,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 2515121,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.17,
       "phase3PlusPopulation": 448461,
       "phases": {
@@ -3450,6 +3585,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 2355662,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.17,
       "phase3PlusPopulation": 400247,
       "phases": {
@@ -3486,6 +3622,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 3119137,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.16,
       "phase3PlusPopulation": 476022,
       "phases": {
@@ -3522,6 +3659,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 4312671,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.26,
       "phase3PlusPopulation": 1122525,
       "phases": {
@@ -3558,6 +3696,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 3823418,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.26,
       "phase3PlusPopulation": 996759,
       "phases": {
@@ -3594,6 +3733,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 37746,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.06,
       "phase3PlusPopulation": 2265,
       "phases": {
@@ -3630,6 +3770,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 12626,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.04,
       "phase3PlusPopulation": 505,
       "phases": {
@@ -3666,6 +3807,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 14743,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 737,
       "phases": {
@@ -3702,6 +3844,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 14533,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.06,
       "phase3PlusPopulation": 872,
       "phases": {
@@ -3738,6 +3881,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 25693,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.07,
       "phase3PlusPopulation": 1799,
       "phases": {
@@ -3774,6 +3918,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 6237,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 312,
       "phases": {
@@ -3810,6 +3955,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 5608,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.02,
       "phase3PlusPopulation": 112,
       "phases": {
@@ -3846,6 +3992,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 15057,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 753,
       "phases": {
@@ -3882,6 +4029,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 7941,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.06,
       "phase3PlusPopulation": 476,
       "phases": {
@@ -3918,6 +4066,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 17018,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.07,
       "phase3PlusPopulation": 1191,
       "phases": {
@@ -3954,6 +4103,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 7885,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.18,
       "phase3PlusPopulation": 1419,
       "phases": {
@@ -3990,6 +4140,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 5762,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.03,
       "phase3PlusPopulation": 173,
       "phases": {
@@ -4026,6 +4177,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 5564,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.02,
       "phase3PlusPopulation": 111,
       "phases": {
@@ -4062,6 +4214,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 7084,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.03,
       "phase3PlusPopulation": 213,
       "phases": {
@@ -4098,6 +4251,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 78987,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 7899,
       "phases": {
@@ -4134,6 +4288,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 4751,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.04,
       "phase3PlusPopulation": 190,
       "phases": {
@@ -4170,6 +4325,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 7393,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.07,
       "phase3PlusPopulation": 518,
       "phases": {
@@ -4206,6 +4362,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 6377,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.06,
       "phase3PlusPopulation": 383,
       "phases": {
@@ -4242,6 +4399,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 38566,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 1928,
       "phases": {
@@ -4278,6 +4436,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 157021,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.09,
       "phase3PlusPopulation": 14132,
       "phases": {
@@ -4314,6 +4473,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 21347,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.03,
       "phase3PlusPopulation": 640,
       "phases": {
@@ -4350,6 +4510,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 16058,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.07,
       "phase3PlusPopulation": 1124,
       "phases": {
@@ -4386,6 +4547,7 @@
       "periodStart": "2025-05-01",
       "periodEnd": "2025-06-30",
       "populationAnalyzed": 71576,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.21,
       "phase3PlusPopulation": 15258,
       "phases": {
@@ -4422,6 +4584,7 @@
       "periodStart": "2025-05-01",
       "periodEnd": "2025-06-30",
       "populationAnalyzed": 109475,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.23,
       "phase3PlusPopulation": 25784,
       "phases": {
@@ -4458,6 +4621,7 @@
       "periodStart": "2025-05-01",
       "periodEnd": "2025-06-30",
       "populationAnalyzed": 106942,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.26,
       "phase3PlusPopulation": 27121,
       "phases": {
@@ -4494,6 +4658,7 @@
       "periodStart": "2025-05-01",
       "periodEnd": "2025-06-30",
       "populationAnalyzed": 76837,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.27,
       "phase3PlusPopulation": 20453,
       "phases": {
@@ -4530,6 +4695,7 @@
       "periodStart": "2025-05-01",
       "periodEnd": "2025-06-30",
       "populationAnalyzed": 36950,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.18,
       "phase3PlusPopulation": 6682,
       "phases": {
@@ -4566,6 +4732,7 @@
       "periodStart": "2025-12-01",
       "periodEnd": "2026-04-30",
       "populationAnalyzed": 839268,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 83927,
       "phases": {
@@ -4602,6 +4769,7 @@
       "periodStart": "2025-12-01",
       "periodEnd": "2026-04-30",
       "populationAnalyzed": 204620,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 20462,
       "phases": {
@@ -4638,6 +4806,7 @@
       "periodStart": "2025-12-01",
       "periodEnd": "2026-04-30",
       "populationAnalyzed": 237517,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 23752,
       "phases": {
@@ -4674,6 +4843,7 @@
       "periodStart": "2025-12-01",
       "periodEnd": "2026-04-30",
       "populationAnalyzed": 176748,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 17675,
       "phases": {
@@ -4710,6 +4880,7 @@
       "periodStart": "2025-12-01",
       "periodEnd": "2026-04-30",
       "populationAnalyzed": 486213,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 48621,
       "phases": {
@@ -4746,6 +4917,7 @@
       "periodStart": "2025-12-01",
       "periodEnd": "2026-04-30",
       "populationAnalyzed": 497544,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 74632,
       "phases": {
@@ -4782,6 +4954,7 @@
       "periodStart": "2025-12-01",
       "periodEnd": "2026-04-30",
       "populationAnalyzed": 757938,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 113690,
       "phases": {
@@ -4818,6 +4991,7 @@
       "periodStart": "2025-12-01",
       "periodEnd": "2026-04-30",
       "populationAnalyzed": 609590,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.27,
       "phase3PlusPopulation": 164590,
       "phases": {
@@ -4854,6 +5028,7 @@
       "periodStart": "2025-12-01",
       "periodEnd": "2026-04-30",
       "populationAnalyzed": 4835479,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.19,
       "phase3PlusPopulation": 918741,
       "phases": {
@@ -4890,6 +5065,7 @@
       "periodStart": "2025-12-01",
       "periodEnd": "2026-04-30",
       "populationAnalyzed": 502275,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 75341,
       "phases": {
@@ -4926,6 +5102,7 @@
       "periodStart": "2025-12-01",
       "periodEnd": "2026-04-30",
       "populationAnalyzed": 499729,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 49973,
       "phases": {
@@ -4962,6 +5139,7 @@
       "periodStart": "2025-12-01",
       "periodEnd": "2026-04-30",
       "populationAnalyzed": 988852,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 148328,
       "phases": {
@@ -4998,6 +5176,7 @@
       "periodStart": "2025-12-01",
       "periodEnd": "2026-04-30",
       "populationAnalyzed": 1731039,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 259656,
       "phases": {
@@ -5034,6 +5213,7 @@
       "periodStart": "2025-12-01",
       "periodEnd": "2026-04-30",
       "populationAnalyzed": 213457,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.16,
       "phase3PlusPopulation": 34154,
       "phases": {
@@ -5070,6 +5250,7 @@
       "periodStart": "2025-12-01",
       "periodEnd": "2026-04-30",
       "populationAnalyzed": 142465,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 21370,
       "phases": {
@@ -5106,6 +5287,7 @@
       "periodStart": "2025-12-01",
       "periodEnd": "2026-04-30",
       "populationAnalyzed": 199171,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.16,
       "phase3PlusPopulation": 31868,
       "phases": {
@@ -5142,6 +5324,7 @@
       "periodStart": "2025-12-01",
       "periodEnd": "2026-04-30",
       "populationAnalyzed": 122784,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.25,
       "phase3PlusPopulation": 30696,
       "phases": {
@@ -5178,6 +5361,7 @@
       "periodStart": "2025-12-01",
       "periodEnd": "2026-04-30",
       "populationAnalyzed": 3316636,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 165832,
       "phases": {
@@ -5214,6 +5398,7 @@
       "periodStart": "2025-12-01",
       "periodEnd": "2026-04-30",
       "populationAnalyzed": 410498,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 61575,
       "phases": {
@@ -5250,6 +5435,7 @@
       "periodStart": "2025-12-01",
       "periodEnd": "2026-04-30",
       "populationAnalyzed": 533522,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 80028,
       "phases": {
@@ -5286,6 +5472,7 @@
       "periodStart": "2025-12-01",
       "periodEnd": "2026-04-30",
       "populationAnalyzed": 203164,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 30475,
       "phases": {
@@ -5322,6 +5509,7 @@
       "periodStart": "2025-12-01",
       "periodEnd": "2026-04-30",
       "populationAnalyzed": 584638,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 29232,
       "phases": {
@@ -5358,6 +5546,7 @@
       "periodStart": "2025-12-01",
       "periodEnd": "2026-04-30",
       "populationAnalyzed": 120221,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 12022,
       "phases": {
@@ -5394,6 +5583,7 @@
       "periodStart": "2024-06-01",
       "periodEnd": "2024-08-31",
       "populationAnalyzed": 30082,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 1504,
       "phases": {
@@ -5430,6 +5620,7 @@
       "periodStart": "2021-05-01",
       "periodEnd": "2021-06-30",
       "populationAnalyzed": 5765914,
+      "areaPhase": 4,
       "phase3PlusFraction": 0.71,
       "phase3PlusPopulation": 4061487,
       "phases": {
@@ -5466,6 +5657,7 @@
       "periodStart": "2021-05-01",
       "periodEnd": "2021-06-30",
       "populationAnalyzed": 18965016,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.26,
       "phase3PlusPopulation": 4851785,
       "phases": {
@@ -5502,6 +5694,7 @@
       "periodStart": "2021-05-01",
       "periodEnd": "2021-06-30",
       "populationAnalyzed": 5448015,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.36,
       "phase3PlusPopulation": 1978449,
       "phases": {
@@ -5538,6 +5731,7 @@
       "periodStart": "2021-05-01",
       "periodEnd": "2021-06-30",
       "populationAnalyzed": 2461842,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.41,
       "phase3PlusPopulation": 1009529,
       "phases": {
@@ -5574,6 +5768,7 @@
       "periodStart": "2021-05-01",
       "periodEnd": "2021-06-30",
       "populationAnalyzed": 753211,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.6,
       "phase3PlusPopulation": 451927,
       "phases": {
@@ -5610,6 +5805,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 2751015,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.06,
       "phase3PlusPopulation": 164650,
       "phases": {
@@ -5646,6 +5842,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1372986,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 68649,
       "phases": {
@@ -5682,6 +5879,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1761123,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 88056,
       "phases": {
@@ -5718,6 +5916,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1447550,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.13,
       "phase3PlusPopulation": 192558,
       "phases": {
@@ -5754,6 +5953,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1016061,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 100197,
       "phases": {
@@ -5790,6 +5990,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 758859,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.07,
       "phase3PlusPopulation": 53337,
       "phases": {
@@ -5826,6 +6027,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 6286269,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.01,
       "phase3PlusPopulation": 62863,
       "phases": {
@@ -5862,6 +6064,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1375328,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.07,
       "phase3PlusPopulation": 96273,
       "phases": {
@@ -5898,6 +6101,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 3093705,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.04,
       "phase3PlusPopulation": 123748,
       "phases": {
@@ -5934,6 +6138,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 3237844,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.04,
       "phase3PlusPopulation": 129514,
       "phases": {
@@ -5970,6 +6175,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 610894,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.03,
       "phase3PlusPopulation": 18327,
       "phases": {
@@ -6006,6 +6212,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 810654,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.11,
       "phase3PlusPopulation": 89172,
       "phases": {
@@ -6042,6 +6249,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 2288102,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.02,
       "phase3PlusPopulation": 45762,
       "phases": {
@@ -6078,6 +6286,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 5819707,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.04,
       "phase3PlusPopulation": 232788,
       "phases": {
@@ -6114,6 +6323,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 978298,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.0,
       "phase3PlusPopulation": 0,
       "phases": {
@@ -6150,6 +6360,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1320921,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.14,
       "phase3PlusPopulation": 184929,
       "phases": {
@@ -6186,6 +6397,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1025286,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.12,
       "phase3PlusPopulation": 123034,
       "phases": {
@@ -6222,6 +6434,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1519426,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.14,
       "phase3PlusPopulation": 212720,
       "phases": {
@@ -6258,6 +6471,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1392981,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.12,
       "phase3PlusPopulation": 167158,
       "phases": {
@@ -6294,6 +6508,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 2214148,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.11,
       "phase3PlusPopulation": 243556,
       "phases": {
@@ -6330,6 +6545,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 2189073,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 218907,
       "phases": {
@@ -6366,6 +6582,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 2752930,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.12,
       "phase3PlusPopulation": 330351,
       "phases": {
@@ -6402,6 +6619,7 @@
       "periodStart": "2025-03-01",
       "periodEnd": "2025-05-31",
       "populationAnalyzed": 2269898,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.11,
       "phase3PlusPopulation": 249689,
       "phases": {
@@ -6438,6 +6656,7 @@
       "periodStart": "2025-03-01",
       "periodEnd": "2025-05-31",
       "populationAnalyzed": 116616,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.07,
       "phase3PlusPopulation": 8163,
       "phases": {
@@ -6474,6 +6693,7 @@
       "periodStart": "2025-03-01",
       "periodEnd": "2025-05-31",
       "populationAnalyzed": 457564,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.03,
       "phase3PlusPopulation": 13727,
       "phases": {
@@ -6510,6 +6730,7 @@
       "periodStart": "2025-03-01",
       "periodEnd": "2025-05-31",
       "populationAnalyzed": 257754,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 25775,
       "phases": {
@@ -6546,6 +6767,7 @@
       "periodStart": "2025-03-01",
       "periodEnd": "2025-05-31",
       "populationAnalyzed": 76109,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 3805,
       "phases": {
@@ -6582,6 +6804,7 @@
       "periodStart": "2025-03-01",
       "periodEnd": "2025-05-31",
       "populationAnalyzed": 231961,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.06,
       "phase3PlusPopulation": 13918,
       "phases": {
@@ -6618,6 +6841,7 @@
       "periodStart": "2025-03-01",
       "periodEnd": "2025-05-31",
       "populationAnalyzed": 251760,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.04,
       "phase3PlusPopulation": 10070,
       "phases": {
@@ -6654,6 +6878,7 @@
       "periodStart": "2025-03-01",
       "periodEnd": "2025-05-31",
       "populationAnalyzed": 269743,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.12,
       "phase3PlusPopulation": 32369,
       "phases": {
@@ -6690,6 +6915,7 @@
       "periodStart": "2025-03-01",
       "periodEnd": "2025-05-31",
       "populationAnalyzed": 114255,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 11426,
       "phases": {
@@ -6726,6 +6952,7 @@
       "periodStart": "2026-04-01",
       "periodEnd": "2026-06-30",
       "populationAnalyzed": 1482083,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.21,
       "phase3PlusPopulation": 311238,
       "phases": {
@@ -6762,6 +6989,7 @@
       "periodStart": "2026-04-01",
       "periodEnd": "2026-06-30",
       "populationAnalyzed": 360693,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 36069,
       "phases": {
@@ -6798,6 +7026,7 @@
       "periodStart": "2026-04-01",
       "periodEnd": "2026-06-30",
       "populationAnalyzed": 808669,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 121300,
       "phases": {
@@ -6834,6 +7063,7 @@
       "periodStart": "2026-04-01",
       "periodEnd": "2026-06-30",
       "populationAnalyzed": 476362,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.16,
       "phase3PlusPopulation": 76218,
       "phases": {
@@ -6870,6 +7100,7 @@
       "periodStart": "2026-04-01",
       "periodEnd": "2026-06-30",
       "populationAnalyzed": 200433,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 20043,
       "phases": {
@@ -6906,6 +7137,7 @@
       "periodStart": "2026-04-01",
       "periodEnd": "2026-06-30",
       "populationAnalyzed": 854115,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 85412,
       "phases": {
@@ -6942,6 +7174,7 @@
       "periodStart": "2026-04-01",
       "periodEnd": "2026-06-30",
       "populationAnalyzed": 3755757,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.06,
       "phase3PlusPopulation": 225346,
       "phases": {
@@ -6978,6 +7211,7 @@
       "periodStart": "2026-04-01",
       "periodEnd": "2026-06-30",
       "populationAnalyzed": 1533735,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 230060,
       "phases": {
@@ -7014,6 +7248,7 @@
       "periodStart": "2026-04-01",
       "periodEnd": "2026-06-30",
       "populationAnalyzed": 474800,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.12,
       "phase3PlusPopulation": 56976,
       "phases": {
@@ -7050,6 +7285,7 @@
       "periodStart": "2026-04-01",
       "periodEnd": "2026-06-30",
       "populationAnalyzed": 432547,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 64882,
       "phases": {
@@ -7086,6 +7322,7 @@
       "periodStart": "2026-04-01",
       "periodEnd": "2026-06-30",
       "populationAnalyzed": 580689,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 87103,
       "phases": {
@@ -7122,6 +7359,7 @@
       "periodStart": "2026-04-01",
       "periodEnd": "2026-06-30",
       "populationAnalyzed": 666257,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.12,
       "phase3PlusPopulation": 79951,
       "phases": {
@@ -7158,6 +7396,7 @@
       "periodStart": "2026-04-01",
       "periodEnd": "2026-06-30",
       "populationAnalyzed": 974752,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 146213,
       "phases": {
@@ -7194,6 +7433,7 @@
       "periodStart": "2026-04-01",
       "periodEnd": "2026-06-30",
       "populationAnalyzed": 1173669,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.19,
       "phase3PlusPopulation": 222997,
       "phases": {
@@ -7230,6 +7470,7 @@
       "periodStart": "2026-04-01",
       "periodEnd": "2026-06-30",
       "populationAnalyzed": 507638,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 76146,
       "phases": {
@@ -7266,6 +7507,7 @@
       "periodStart": "2026-04-01",
       "periodEnd": "2026-06-30",
       "populationAnalyzed": 401613,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.19,
       "phase3PlusPopulation": 76306,
       "phases": {
@@ -7302,6 +7544,7 @@
       "periodStart": "2026-04-01",
       "periodEnd": "2026-06-30",
       "populationAnalyzed": 426324,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 42632,
       "phases": {
@@ -7338,6 +7581,7 @@
       "periodStart": "2026-04-01",
       "periodEnd": "2026-06-30",
       "populationAnalyzed": 1271974,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 190796,
       "phases": {
@@ -7374,6 +7618,7 @@
       "periodStart": "2026-04-01",
       "periodEnd": "2026-06-30",
       "populationAnalyzed": 471823,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.14,
       "phase3PlusPopulation": 66055,
       "phases": {
@@ -7410,6 +7655,7 @@
       "periodStart": "2026-04-01",
       "periodEnd": "2026-06-30",
       "populationAnalyzed": 646587,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.18,
       "phase3PlusPopulation": 116386,
       "phases": {
@@ -7446,6 +7692,7 @@
       "periodStart": "2026-04-01",
       "periodEnd": "2026-06-30",
       "populationAnalyzed": 528065,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 79210,
       "phases": {
@@ -7482,6 +7729,7 @@
       "periodStart": "2026-04-01",
       "periodEnd": "2026-06-30",
       "populationAnalyzed": 283788,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 42568,
       "phases": {
@@ -7518,6 +7766,7 @@
       "periodStart": "2025-11-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 530355,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 79553,
       "phases": {
@@ -7554,6 +7803,7 @@
       "periodStart": "2025-11-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 507492,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 76124,
       "phases": {
@@ -7590,6 +7840,7 @@
       "periodStart": "2025-11-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 375615,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 37562,
       "phases": {
@@ -7626,6 +7877,7 @@
       "periodStart": "2025-11-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 626172,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 62617,
       "phases": {
@@ -7662,6 +7914,7 @@
       "periodStart": "2025-11-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 449210,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.12,
       "phase3PlusPopulation": 53905,
       "phases": {
@@ -7698,6 +7951,7 @@
       "periodStart": "2025-11-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 1988751,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 198875,
       "phases": {
@@ -7734,6 +7988,7 @@
       "periodStart": "2025-11-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 540716,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 81107,
       "phases": {
@@ -7770,6 +8025,7 @@
       "periodStart": "2025-11-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 448205,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 67231,
       "phases": {
@@ -7806,6 +8062,7 @@
       "periodStart": "2025-11-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 116400,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.4,
       "phase3PlusPopulation": 46560,
       "phases": {
@@ -7842,6 +8099,7 @@
       "periodStart": "2025-11-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 293365,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 44005,
       "phases": {
@@ -7878,6 +8136,7 @@
       "periodStart": "2025-11-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 246726,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 37009,
       "phases": {
@@ -7914,6 +8173,7 @@
       "periodStart": "2025-11-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 401357,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.25,
       "phase3PlusPopulation": 100340,
       "phases": {
@@ -7950,6 +8210,7 @@
       "periodStart": "2025-11-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 183062,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 27459,
       "phases": {
@@ -7986,6 +8247,7 @@
       "periodStart": "2025-11-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 626467,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.13,
       "phase3PlusPopulation": 81441,
       "phases": {
@@ -8022,6 +8284,7 @@
       "periodStart": "2025-11-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 510770,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 76616,
       "phases": {
@@ -8058,6 +8321,7 @@
       "periodStart": "2025-11-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 203100,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 30465,
       "phases": {
@@ -8094,6 +8358,7 @@
       "periodStart": "2025-11-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 680104,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.2,
       "phase3PlusPopulation": 136021,
       "phases": {
@@ -8130,6 +8395,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2026-02-28",
       "populationAnalyzed": 1897032,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.51,
       "phase3PlusPopulation": 960237,
       "phases": {
@@ -8166,6 +8432,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2026-02-28",
       "populationAnalyzed": 960185,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.54,
       "phase3PlusPopulation": 526612,
       "phases": {
@@ -8202,6 +8469,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 764000,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 114600,
       "phases": {
@@ -8238,6 +8506,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 296000,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 14800,
       "phases": {
@@ -8274,6 +8543,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 971000,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.25,
       "phase3PlusPopulation": 242750,
       "phases": {
@@ -8310,6 +8580,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 330000,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.2,
       "phase3PlusPopulation": 66000,
       "phases": {
@@ -8346,6 +8617,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 176000,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 26400,
       "phases": {
@@ -8382,6 +8654,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 1328000,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 66400,
       "phases": {
@@ -8418,6 +8691,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 221090,
+      "areaPhase": 4,
       "phase3PlusFraction": 0.6,
       "phase3PlusPopulation": 132655,
       "phases": {
@@ -8454,6 +8728,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 1637000,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 245550,
       "phases": {
@@ -8490,6 +8765,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 1259000,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 188850,
       "phases": {
@@ -8526,6 +8802,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 988000,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.2,
       "phase3PlusPopulation": 197600,
       "phases": {
@@ -8562,6 +8839,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 583000,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 29150,
       "phases": {
@@ -8598,6 +8876,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 1065000,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 159750,
       "phases": {
@@ -8634,6 +8913,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 1007000,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.5,
       "phase3PlusPopulation": 503500,
       "phases": {
@@ -8670,6 +8950,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 539000,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.25,
       "phase3PlusPopulation": 134750,
       "phases": {
@@ -8706,6 +8987,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 994000,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.2,
       "phase3PlusPopulation": 198800,
       "phases": {
@@ -8742,6 +9024,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 1355000,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 67750,
       "phases": {
@@ -8778,6 +9061,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 223500,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 11175,
       "phases": {
@@ -8814,6 +9098,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 367000,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.25,
       "phase3PlusPopulation": 91750,
       "phases": {
@@ -8850,6 +9135,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 373000,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 18650,
       "phases": {
@@ -8886,6 +9172,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 370000,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.5,
       "phase3PlusPopulation": 185000,
       "phases": {
@@ -8922,6 +9209,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 1074000,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.3,
       "phase3PlusPopulation": 322200,
       "phases": {
@@ -8958,6 +9246,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 915000,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.3,
       "phase3PlusPopulation": 274500,
       "phases": {
@@ -8994,6 +9283,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 706000,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 70600,
       "phases": {
@@ -9030,6 +9320,7 @@
       "periodStart": "2023-02-01",
       "periodEnd": "2023-02-28",
       "populationAnalyzed": 141599,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.0,
       "phase3PlusPopulation": 0,
       "phases": {
@@ -9066,6 +9357,7 @@
       "periodStart": "2023-02-01",
       "periodEnd": "2023-02-28",
       "populationAnalyzed": 1234082,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.0,
       "phase3PlusPopulation": 0,
       "phases": {
@@ -9102,6 +9394,7 @@
       "periodStart": "2023-02-01",
       "periodEnd": "2023-02-28",
       "populationAnalyzed": 1231659,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.0,
       "phase3PlusPopulation": 0,
       "phases": {
@@ -9138,6 +9431,7 @@
       "periodStart": "2023-02-01",
       "periodEnd": "2023-02-28",
       "populationAnalyzed": 495239,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.0,
       "phase3PlusPopulation": 0,
       "phases": {
@@ -9174,6 +9468,7 @@
       "periodStart": "2023-02-01",
       "periodEnd": "2023-02-28",
       "populationAnalyzed": 550683,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.0,
       "phase3PlusPopulation": 0,
       "phases": {
@@ -9210,6 +9505,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 386549,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 19327,
       "phases": {
@@ -9246,6 +9542,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 495962,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 49596,
       "phases": {
@@ -9282,6 +9579,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 308940,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.07,
       "phase3PlusPopulation": 21626,
       "phases": {
@@ -9318,6 +9616,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 189838,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.07,
       "phase3PlusPopulation": 13289,
       "phases": {
@@ -9354,6 +9653,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 180350,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.14,
       "phase3PlusPopulation": 25249,
       "phases": {
@@ -9390,6 +9690,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 136910,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.21,
       "phase3PlusPopulation": 28751,
       "phases": {
@@ -9426,6 +9727,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 236060,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.04,
       "phase3PlusPopulation": 9442,
       "phases": {
@@ -9462,6 +9764,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 94909,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.08,
       "phase3PlusPopulation": 7593,
       "phases": {
@@ -9492,12 +9795,50 @@
         }
       }
     },
+    "1627179B44982627598129": {
+      "locationCode": "LBR",
+      "name": "Montserrado Rural",
+      "periodStart": "2025-10-01",
+      "periodEnd": "2025-12-31",
+      "populationAnalyzed": 176417,
+      "areaPhase": 2,
+      "phase3PlusFraction": 0.05,
+      "phase3PlusPopulation": 8821,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 127020,
+          "fraction": 0.72
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 40576,
+          "fraction": 0.23
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 8821,
+          "fraction": 0.05
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 0,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
     "1627179B73218899246114": {
       "locationCode": "LBR",
       "name": "Grand Kru",
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 120236,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 12024,
       "phases": {
@@ -9534,6 +9875,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 98665,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.09,
       "phase3PlusPopulation": 8880,
       "phases": {
@@ -9570,6 +9912,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 144209,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.09,
       "phase3PlusPopulation": 12979,
       "phases": {
@@ -9606,6 +9949,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 325074,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.12,
       "phase3PlusPopulation": 39009,
       "phases": {
@@ -9642,6 +9986,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 655694,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.11,
       "phase3PlusPopulation": 72126,
       "phases": {
@@ -9678,6 +10023,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 161477,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.08,
       "phase3PlusPopulation": 12918,
       "phases": {
@@ -9714,6 +10060,7 @@
       "periodStart": "2026-05-01",
       "periodEnd": "2026-09-30",
       "populationAnalyzed": 187993,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 28199,
       "phases": {
@@ -9750,6 +10097,7 @@
       "periodStart": "2026-05-01",
       "periodEnd": "2026-09-30",
       "populationAnalyzed": 89778,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 13467,
       "phases": {
@@ -9786,6 +10134,7 @@
       "periodStart": "2026-05-01",
       "periodEnd": "2026-09-30",
       "populationAnalyzed": 268354,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 26835,
       "phases": {
@@ -9822,6 +10171,7 @@
       "periodStart": "2026-05-01",
       "periodEnd": "2026-09-30",
       "populationAnalyzed": 161381,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 24207,
       "phases": {
@@ -9858,6 +10208,7 @@
       "periodStart": "2026-05-01",
       "periodEnd": "2026-09-30",
       "populationAnalyzed": 240424,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.2,
       "phase3PlusPopulation": 48085,
       "phases": {
@@ -9894,6 +10245,7 @@
       "periodStart": "2026-05-01",
       "periodEnd": "2026-09-30",
       "populationAnalyzed": 164529,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.25,
       "phase3PlusPopulation": 41132,
       "phases": {
@@ -9930,6 +10282,7 @@
       "periodStart": "2026-05-01",
       "periodEnd": "2026-09-30",
       "populationAnalyzed": 102117,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 15318,
       "phases": {
@@ -9966,6 +10319,7 @@
       "periodStart": "2026-05-01",
       "periodEnd": "2026-09-30",
       "populationAnalyzed": 57513,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 5751,
       "phases": {
@@ -10002,6 +10356,7 @@
       "periodStart": "2026-05-01",
       "periodEnd": "2026-09-30",
       "populationAnalyzed": 121752,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 18263,
       "phases": {
@@ -10038,6 +10393,7 @@
       "periodStart": "2026-05-01",
       "periodEnd": "2026-09-30",
       "populationAnalyzed": 132113,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 13211,
       "phases": {
@@ -10074,6 +10430,7 @@
       "periodStart": "2026-03-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 1229021,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.09,
       "phase3PlusPopulation": 112721,
       "phases": {
@@ -10110,6 +10467,7 @@
       "periodStart": "2026-03-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 2509705,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.03,
       "phase3PlusPopulation": 84867,
       "phases": {
@@ -10146,6 +10504,7 @@
       "periodStart": "2026-03-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 412708,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.06,
       "phase3PlusPopulation": 24560,
       "phases": {
@@ -10182,6 +10541,7 @@
       "periodStart": "2026-03-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 1579364,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.03,
       "phase3PlusPopulation": 49734,
       "phases": {
@@ -10218,6 +10578,7 @@
       "periodStart": "2026-03-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 4567581,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 228379,
       "phases": {
@@ -10254,6 +10615,7 @@
       "periodStart": "2026-03-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 1770283,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.04,
       "phase3PlusPopulation": 65507,
       "phases": {
@@ -10290,6 +10652,7 @@
       "periodStart": "2026-03-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 1188929,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.04,
       "phase3PlusPopulation": 42147,
       "phases": {
@@ -10326,6 +10689,7 @@
       "periodStart": "2026-03-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 1016487,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.21,
       "phase3PlusPopulation": 208822,
       "phases": {
@@ -10362,6 +10726,7 @@
       "periodStart": "2026-03-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 1226853,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.37,
       "phase3PlusPopulation": 454179,
       "phases": {
@@ -10398,6 +10763,7 @@
       "periodStart": "2026-03-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 2387429,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.14,
       "phase3PlusPopulation": 338385,
       "phases": {
@@ -10434,6 +10800,7 @@
       "periodStart": "2026-03-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 1934658,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 90082,
       "phases": {
@@ -10470,6 +10837,7 @@
       "periodStart": "2026-03-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 1375776,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.0,
       "phase3PlusPopulation": 0,
       "phases": {
@@ -10506,6 +10874,7 @@
       "periodStart": "2026-03-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 1822764,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 183288,
       "phases": {
@@ -10542,6 +10911,7 @@
       "periodStart": "2026-03-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 1110410,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.0,
       "phase3PlusPopulation": 0,
       "phases": {
@@ -10578,6 +10948,7 @@
       "periodStart": "2026-03-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 1361367,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.17,
       "phase3PlusPopulation": 231346,
       "phases": {
@@ -10614,6 +10985,7 @@
       "periodStart": "2026-03-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 933997,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 46699,
       "phases": {
@@ -10650,6 +11022,7 @@
       "periodStart": "2026-03-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 812483,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.06,
       "phase3PlusPopulation": 47819,
       "phases": {
@@ -10686,6 +11059,7 @@
       "periodStart": "2026-03-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 945307,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.01,
       "phase3PlusPopulation": 12704,
       "phases": {
@@ -10722,6 +11096,7 @@
       "periodStart": "2026-03-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 609449,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.0,
       "phase3PlusPopulation": 0,
       "phases": {
@@ -10758,6 +11133,7 @@
       "periodStart": "2026-03-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 516358,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 25818,
       "phases": {
@@ -10794,6 +11170,7 @@
       "periodStart": "2025-12-01",
       "periodEnd": "2026-01-31",
       "populationAnalyzed": 1816114,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.14,
       "phase3PlusPopulation": 260428,
       "phases": {
@@ -10830,6 +11207,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 4651726,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.01,
       "phase3PlusPopulation": 51403,
       "phases": {
@@ -10866,6 +11244,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 3186059,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 168994,
       "phases": {
@@ -10902,6 +11281,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 3583522,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.06,
       "phase3PlusPopulation": 201343,
       "phases": {
@@ -10938,6 +11318,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 3508558,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.02,
       "phase3PlusPopulation": 71209,
       "phases": {
@@ -10974,6 +11355,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 4115254,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.02,
       "phase3PlusPopulation": 75959,
       "phases": {
@@ -11010,6 +11392,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 119214,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.27,
       "phase3PlusPopulation": 32028,
       "phases": {
@@ -11046,6 +11429,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 954400,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.14,
       "phase3PlusPopulation": 136532,
       "phases": {
@@ -11082,6 +11466,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 1395682,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.16,
       "phase3PlusPopulation": 228464,
       "phases": {
@@ -11118,6 +11503,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 1483713,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.18,
       "phase3PlusPopulation": 271918,
       "phases": {
@@ -11154,6 +11540,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 1059840,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.14,
       "phase3PlusPopulation": 146518,
       "phases": {
@@ -11190,6 +11577,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 719936,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.13,
       "phase3PlusPopulation": 95860,
       "phases": {
@@ -11226,6 +11614,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 664517,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.08,
       "phase3PlusPopulation": 51191,
       "phases": {
@@ -11262,6 +11651,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 969914,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.12,
       "phase3PlusPopulation": 114412,
       "phases": {
@@ -11298,6 +11688,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 1112457,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 111134,
       "phases": {
@@ -11334,6 +11725,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 296108,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.11,
       "phase3PlusPopulation": 32759,
       "phases": {
@@ -11370,6 +11762,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 1530797,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.09,
       "phase3PlusPopulation": 130102,
       "phases": {
@@ -11406,6 +11799,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2026-03-31",
       "populationAnalyzed": 390818,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.06,
       "phase3PlusPopulation": 22478,
       "phases": {
@@ -11442,6 +11836,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 350306,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.04,
       "phase3PlusPopulation": 13327,
       "phases": {
@@ -11478,6 +11873,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 439296,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.04,
       "phase3PlusPopulation": 17325,
       "phases": {
@@ -11514,6 +11910,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 486615,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.09,
       "phase3PlusPopulation": 43082,
       "phases": {
@@ -11550,6 +11947,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 84202,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.03,
       "phase3PlusPopulation": 2472,
       "phases": {
@@ -11586,6 +11984,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 489331,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.12,
       "phase3PlusPopulation": 61072,
       "phases": {
@@ -11622,6 +12021,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 74881,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.07,
       "phase3PlusPopulation": 5499,
       "phases": {
@@ -11658,6 +12058,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 124476,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.09,
       "phase3PlusPopulation": 10586,
       "phases": {
@@ -11694,6 +12095,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 424744,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 21396,
       "phases": {
@@ -11730,6 +12132,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 188092,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 9405,
       "phases": {
@@ -11766,6 +12169,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1558058,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.03,
       "phase3PlusPopulation": 44484,
       "phases": {
@@ -11802,6 +12206,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 19314,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.01,
       "phase3PlusPopulation": 193,
       "phases": {
@@ -11838,6 +12243,7 @@
       "periodStart": "2025-07-01",
       "periodEnd": "2025-09-30",
       "populationAnalyzed": 240206,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 24021,
       "phases": {
@@ -11874,6 +12280,7 @@
       "periodStart": "2025-07-01",
       "periodEnd": "2025-09-30",
       "populationAnalyzed": 106680,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 16002,
       "phases": {
@@ -11910,6 +12317,7 @@
       "periodStart": "2025-07-01",
       "periodEnd": "2025-09-30",
       "populationAnalyzed": 494605,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 74191,
       "phases": {
@@ -11946,6 +12354,7 @@
       "periodStart": "2025-07-01",
       "periodEnd": "2025-09-30",
       "populationAnalyzed": 230801,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 34620,
       "phases": {
@@ -11982,6 +12391,7 @@
       "periodStart": "2025-07-01",
       "periodEnd": "2025-09-30",
       "populationAnalyzed": 257302,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 38595,
       "phases": {
@@ -12018,6 +12428,7 @@
       "periodStart": "2025-07-01",
       "periodEnd": "2025-09-30",
       "populationAnalyzed": 316671,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 47501,
       "phases": {
@@ -12054,6 +12465,7 @@
       "periodStart": "2025-07-01",
       "periodEnd": "2025-09-30",
       "populationAnalyzed": 120762,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.25,
       "phase3PlusPopulation": 30191,
       "phases": {
@@ -12090,6 +12502,7 @@
       "periodStart": "2025-07-01",
       "periodEnd": "2025-09-30",
       "populationAnalyzed": 220811,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 22081,
       "phases": {
@@ -12126,6 +12539,7 @@
       "periodStart": "2025-07-01",
       "periodEnd": "2025-09-30",
       "populationAnalyzed": 337729,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 50659,
       "phases": {
@@ -12162,6 +12576,7 @@
       "periodStart": "2025-07-01",
       "periodEnd": "2025-09-30",
       "populationAnalyzed": 102881,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 15432,
       "phases": {
@@ -12198,6 +12613,7 @@
       "periodStart": "2021-10-01",
       "periodEnd": "2021-11-30",
       "populationAnalyzed": 94294,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.25,
       "phase3PlusPopulation": 23573,
       "phases": {
@@ -12234,6 +12650,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 4297816,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.19,
       "phase3PlusPopulation": 818335,
       "phases": {
@@ -12270,6 +12687,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 5735912,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.02,
       "phase3PlusPopulation": 133735,
       "phases": {
@@ -12306,6 +12724,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1571613,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 78581,
       "phases": {
@@ -12342,6 +12761,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 0,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.6,
       "phase3PlusPopulation": 865566,
       "phases": {
@@ -12378,6 +12798,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 0,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.6,
       "phase3PlusPopulation": 288522,
       "phases": {
@@ -12414,6 +12835,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 5598523,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.12,
       "phase3PlusPopulation": 687116,
       "phases": {
@@ -12450,6 +12872,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 8824167,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.09,
       "phase3PlusPopulation": 817121,
       "phases": {
@@ -12486,6 +12909,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 5353266,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 556185,
       "phases": {
@@ -12522,6 +12946,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 0,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.6,
       "phase3PlusPopulation": 721305,
       "phases": {
@@ -12558,6 +12983,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 9599759,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.08,
       "phase3PlusPopulation": 809127,
       "phases": {
@@ -12594,6 +13020,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 4950164,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.16,
       "phase3PlusPopulation": 795151,
       "phases": {
@@ -12630,6 +13057,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 7740386,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.18,
       "phase3PlusPopulation": 1398596,
       "phases": {
@@ -12666,6 +13094,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 4055147,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.16,
       "phase3PlusPopulation": 655190,
       "phases": {
@@ -12702,6 +13131,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1614418,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.03,
       "phase3PlusPopulation": 48433,
       "phases": {
@@ -12738,6 +13168,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 7609946,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.12,
       "phase3PlusPopulation": 930387,
       "phases": {
@@ -12774,6 +13205,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 31543181,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 1483271,
       "phases": {
@@ -12810,6 +13242,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 0,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.6,
       "phase3PlusPopulation": 577044,
       "phases": {
@@ -12846,6 +13279,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 0,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.6,
       "phase3PlusPopulation": 807862,
       "phases": {
@@ -12882,6 +13316,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 17568746,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.08,
       "phase3PlusPopulation": 1394719,
       "phases": {
@@ -12918,6 +13353,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 4021046,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 584993,
       "phases": {
@@ -12954,6 +13390,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 6133199,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.09,
       "phase3PlusPopulation": 571782,
       "phases": {
@@ -12990,6 +13427,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 0,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.6,
       "phase3PlusPopulation": 346226,
       "phases": {
@@ -13026,6 +13464,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 2621556,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.13,
       "phase3PlusPopulation": 340051,
       "phases": {
@@ -13062,6 +13501,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 5728251,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.12,
       "phase3PlusPopulation": 698486,
       "phases": {
@@ -13098,6 +13538,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 8826892,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 863743,
       "phases": {
@@ -13134,6 +13575,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 5868387,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.09,
       "phase3PlusPopulation": 518081,
       "phases": {
@@ -13170,6 +13612,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 0,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.6,
       "phase3PlusPopulation": 721305,
       "phases": {
@@ -13206,6 +13649,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 6133898,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.18,
       "phase3PlusPopulation": 1146986,
       "phases": {
@@ -13242,6 +13686,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 4229982,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 629924,
       "phases": {
@@ -13278,6 +13723,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 3957857,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.14,
       "phase3PlusPopulation": 544342,
       "phases": {
@@ -13314,6 +13760,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 6897054,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.34,
       "phase3PlusPopulation": 2313499,
       "phases": {
@@ -13350,6 +13797,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 8659095,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.08,
       "phase3PlusPopulation": 708067,
       "phases": {
@@ -13386,6 +13834,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 5418354,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.24,
       "phase3PlusPopulation": 1292979,
       "phases": {
@@ -13422,6 +13871,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 9967819,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.16,
       "phase3PlusPopulation": 1543044,
       "phases": {
@@ -13458,6 +13908,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 5303678,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 783880,
       "phases": {
@@ -13494,6 +13945,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 6860714,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.24,
       "phase3PlusPopulation": 1676754,
       "phases": {
@@ -13530,6 +13982,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 10703025,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.14,
       "phase3PlusPopulation": 1476260,
       "phases": {
@@ -13566,6 +14019,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 0,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.6,
       "phase3PlusPopulation": 230818,
       "phases": {
@@ -13602,6 +14056,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 5631538,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.21,
       "phase3PlusPopulation": 1188981,
       "phases": {
@@ -13638,6 +14093,7 @@
       "periodStart": "2024-11-01",
       "periodEnd": "2025-03-31",
       "populationAnalyzed": 20244286,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.22,
       "phase3PlusPopulation": 4463280,
       "phases": {
@@ -13674,6 +14130,7 @@
       "periodStart": "2024-11-01",
       "periodEnd": "2025-03-31",
       "populationAnalyzed": 9189695,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.24,
       "phase3PlusPopulation": 2211719,
       "phases": {
@@ -13710,6 +14167,7 @@
       "periodStart": "2024-11-01",
       "periodEnd": "2025-03-31",
       "populationAnalyzed": 21354669,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.2,
       "phase3PlusPopulation": 4314570,
       "phases": {
@@ -13746,6 +14204,7 @@
       "periodStart": "2026-02-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 1529740,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.25,
       "phase3PlusPopulation": 373339,
       "phases": {
@@ -13782,6 +14241,7 @@
       "periodStart": "2026-02-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 3001252,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.26,
       "phase3PlusPopulation": 773825,
       "phases": {
@@ -13818,6 +14278,7 @@
       "periodStart": "2026-02-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 0,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.0,
       "phase3PlusPopulation": 0,
       "phases": {
@@ -13854,6 +14315,7 @@
       "periodStart": "2026-02-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 235173,
+      "areaPhase": 4,
       "phase3PlusFraction": 0.6,
       "phase3PlusPopulation": 141104,
       "phases": {
@@ -13890,6 +14352,7 @@
       "periodStart": "2026-02-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 1912494,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.19,
       "phase3PlusPopulation": 361751,
       "phases": {
@@ -13926,6 +14389,7 @@
       "periodStart": "2026-02-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 3470376,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.31,
       "phase3PlusPopulation": 1062524,
       "phases": {
@@ -13962,6 +14426,7 @@
       "periodStart": "2026-02-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 543624,
+      "areaPhase": 4,
       "phase3PlusFraction": 0.8,
       "phase3PlusPopulation": 433842,
       "phases": {
@@ -13998,6 +14463,7 @@
       "periodStart": "2026-02-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 923428,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.42,
       "phase3PlusPopulation": 390460,
       "phases": {
@@ -14034,6 +14500,7 @@
       "periodStart": "2026-02-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 130765,
+      "areaPhase": 4,
       "phase3PlusFraction": 0.79,
       "phase3PlusPopulation": 103297,
       "phases": {
@@ -14070,6 +14537,7 @@
       "periodStart": "2026-02-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 2582799,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.24,
       "phase3PlusPopulation": 602045,
       "phases": {
@@ -14106,6 +14574,7 @@
       "periodStart": "2026-02-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 3866716,
+      "areaPhase": 4,
       "phase3PlusFraction": 0.55,
       "phase3PlusPopulation": 2141658,
       "phases": {
@@ -14142,6 +14611,7 @@
       "periodStart": "2026-02-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 3518500,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.47,
       "phase3PlusPopulation": 1647779,
       "phases": {
@@ -14178,6 +14648,7 @@
       "periodStart": "2026-02-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 1947038,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.47,
       "phase3PlusPopulation": 916733,
       "phases": {
@@ -14214,6 +14685,7 @@
       "periodStart": "2026-02-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 1220625,
+      "areaPhase": 4,
       "phase3PlusFraction": 0.5,
       "phase3PlusPopulation": 612787,
       "phases": {
@@ -14250,6 +14722,7 @@
       "periodStart": "2026-02-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 5410683,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.43,
       "phase3PlusPopulation": 2323238,
       "phases": {
@@ -14286,6 +14759,7 @@
       "periodStart": "2026-02-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 373147,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.34,
       "phase3PlusPopulation": 128017,
       "phases": {
@@ -14322,6 +14796,7 @@
       "periodStart": "2026-02-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 2714977,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.25,
       "phase3PlusPopulation": 672568,
       "phases": {
@@ -14358,6 +14833,7 @@
       "periodStart": "2024-03-01",
       "periodEnd": "2024-05-31",
       "populationAnalyzed": 3896563,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.01,
       "phase3PlusPopulation": 42702,
       "phases": {
@@ -14394,6 +14870,7 @@
       "periodStart": "2024-03-01",
       "periodEnd": "2024-05-31",
       "populationAnalyzed": 1204863,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.02,
       "phase3PlusPopulation": 23523,
       "phases": {
@@ -14430,6 +14907,7 @@
       "periodStart": "2024-03-01",
       "periodEnd": "2024-05-31",
       "populationAnalyzed": 821287,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.02,
       "phase3PlusPopulation": 13616,
       "phases": {
@@ -14466,6 +14944,7 @@
       "periodStart": "2024-03-01",
       "periodEnd": "2024-05-31",
       "populationAnalyzed": 908858,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.01,
       "phase3PlusPopulation": 9089,
       "phases": {
@@ -14502,6 +14981,7 @@
       "periodStart": "2024-03-01",
       "periodEnd": "2024-05-31",
       "populationAnalyzed": 1127119,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.02,
       "phase3PlusPopulation": 21363,
       "phases": {
@@ -14538,6 +15018,7 @@
       "periodStart": "2024-03-01",
       "periodEnd": "2024-05-31",
       "populationAnalyzed": 916513,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.02,
       "phase3PlusPopulation": 18330,
       "phases": {
@@ -14574,6 +15055,7 @@
       "periodStart": "2024-03-01",
       "periodEnd": "2024-05-31",
       "populationAnalyzed": 2080810,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.01,
       "phase3PlusPopulation": 24578,
       "phases": {
@@ -14610,6 +15092,7 @@
       "periodStart": "2024-03-01",
       "periodEnd": "2024-05-31",
       "populationAnalyzed": 1338672,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.01,
       "phase3PlusPopulation": 11868,
       "phases": {
@@ -14646,6 +15129,7 @@
       "periodStart": "2024-03-01",
       "periodEnd": "2024-05-31",
       "populationAnalyzed": 833656,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.02,
       "phase3PlusPopulation": 16926,
       "phases": {
@@ -14682,6 +15166,7 @@
       "periodStart": "2024-03-01",
       "periodEnd": "2024-05-31",
       "populationAnalyzed": 245288,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.08,
       "phase3PlusPopulation": 19516,
       "phases": {
@@ -14718,6 +15203,7 @@
       "periodStart": "2024-03-01",
       "periodEnd": "2024-05-31",
       "populationAnalyzed": 2467522,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.01,
       "phase3PlusPopulation": 24675,
       "phases": {
@@ -14754,6 +15240,7 @@
       "periodStart": "2024-03-01",
       "periodEnd": "2024-05-31",
       "populationAnalyzed": 612343,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.02,
       "phase3PlusPopulation": 14567,
       "phases": {
@@ -14790,6 +15277,7 @@
       "periodStart": "2024-03-01",
       "periodEnd": "2024-05-31",
       "populationAnalyzed": 590784,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.03,
       "phase3PlusPopulation": 17922,
       "phases": {
@@ -14826,6 +15314,7 @@
       "periodStart": "2024-03-01",
       "periodEnd": "2024-05-31",
       "populationAnalyzed": 988193,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.02,
       "phase3PlusPopulation": 20131,
       "phases": {
@@ -14862,6 +15351,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1403630,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.11,
       "phase3PlusPopulation": 160779,
       "phases": {
@@ -14898,6 +15388,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 294022,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.18,
       "phase3PlusPopulation": 52924,
       "phases": {
@@ -14934,6 +15425,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1845036,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 197575,
       "phases": {
@@ -14970,6 +15462,7 @@
       "periodStart": "2021-07-01",
       "periodEnd": "2021-08-31",
       "populationAnalyzed": 797543,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 79754,
       "phases": {
@@ -15006,6 +15499,7 @@
       "periodStart": "2021-07-01",
       "periodEnd": "2021-08-31",
       "populationAnalyzed": 174033,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.12,
       "phase3PlusPopulation": 20884,
       "phases": {
@@ -15042,6 +15536,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-01-31",
       "populationAnalyzed": 564958,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.24,
       "phase3PlusPopulation": 134811,
       "phases": {
@@ -15078,6 +15573,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-01-31",
       "populationAnalyzed": 1204269,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.19,
       "phase3PlusPopulation": 225197,
       "phases": {
@@ -15114,6 +15610,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-01-31",
       "populationAnalyzed": 894874,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.17,
       "phase3PlusPopulation": 154184,
       "phases": {
@@ -15150,6 +15647,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-01-31",
       "populationAnalyzed": 1014335,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.17,
       "phase3PlusPopulation": 171897,
       "phases": {
@@ -15186,6 +15684,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-01-31",
       "populationAnalyzed": 844925,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.4,
       "phase3PlusPopulation": 341927,
       "phases": {
@@ -15222,6 +15721,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-01-31",
       "populationAnalyzed": 1281189,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.34,
       "phase3PlusPopulation": 430730,
       "phases": {
@@ -15258,6 +15758,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-01-31",
       "populationAnalyzed": 570788,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.33,
       "phase3PlusPopulation": 186961,
       "phases": {
@@ -15294,6 +15795,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-01-31",
       "populationAnalyzed": 656910,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.39,
       "phase3PlusPopulation": 249910,
       "phases": {
@@ -15330,6 +15832,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-01-31",
       "populationAnalyzed": 445736,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.35,
       "phase3PlusPopulation": 157824,
       "phases": {
@@ -15366,6 +15869,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-01-31",
       "populationAnalyzed": 1297549,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.4,
       "phase3PlusPopulation": 516904,
       "phases": {
@@ -15402,6 +15906,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-01-31",
       "populationAnalyzed": 1504986,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.14,
       "phase3PlusPopulation": 215950,
       "phases": {
@@ -15438,6 +15943,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-01-31",
       "populationAnalyzed": 1528722,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.43,
       "phase3PlusPopulation": 660696,
       "phases": {
@@ -15474,6 +15980,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-01-31",
       "populationAnalyzed": 661373,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.13,
       "phase3PlusPopulation": 86543,
       "phases": {
@@ -15510,6 +16017,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-01-31",
       "populationAnalyzed": 447217,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.18,
       "phase3PlusPopulation": 78137,
       "phases": {
@@ -15546,6 +16054,7 @@
       "periodStart": "2026-01-01",
       "periodEnd": "2026-01-31",
       "populationAnalyzed": 3289438,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.11,
       "phase3PlusPopulation": 355069,
       "phases": {
@@ -15582,6 +16091,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-11-30",
       "populationAnalyzed": 2187359,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.51,
       "phase3PlusPopulation": 1104416,
       "phases": {
@@ -15618,6 +16128,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-11-30",
       "populationAnalyzed": 1266751,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.53,
       "phase3PlusPopulation": 669003,
       "phases": {
@@ -15654,6 +16165,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-11-30",
       "populationAnalyzed": 2224708,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.57,
       "phase3PlusPopulation": 1272550,
       "phases": {
@@ -15690,6 +16202,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-11-30",
       "populationAnalyzed": 1103829,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.5,
       "phase3PlusPopulation": 543504,
       "phases": {
@@ -15726,6 +16239,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-11-30",
       "populationAnalyzed": 1286922,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.37,
       "phase3PlusPopulation": 482397,
       "phases": {
@@ -15762,6 +16276,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-11-30",
       "populationAnalyzed": 1218368,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.31,
       "phase3PlusPopulation": 371837,
       "phases": {
@@ -15798,6 +16313,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-11-30",
       "populationAnalyzed": 1026173,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.17,
       "phase3PlusPopulation": 175323,
       "phases": {
@@ -15834,6 +16350,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-11-30",
       "populationAnalyzed": 1401874,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.34,
       "phase3PlusPopulation": 472900,
       "phases": {
@@ -15870,6 +16387,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-11-30",
       "populationAnalyzed": 1740513,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.43,
       "phase3PlusPopulation": 751290,
       "phases": {
@@ -15906,6 +16424,7 @@
       "periodStart": "2025-09-01",
       "periodEnd": "2025-11-30",
       "populationAnalyzed": 746534,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.17,
       "phase3PlusPopulation": 128925,
       "phases": {
@@ -15936,34 +16455,72 @@
         }
       }
     },
-    "75366066B12234306804593": {
+    "75366066B25905390127614": {
       "locationCode": "SWZ",
-      "name": "Lubombo",
-      "periodStart": "2021-01-01",
-      "periodEnd": "2021-03-31",
-      "populationAnalyzed": 195260,
-      "phase3PlusFraction": 0.4,
-      "phase3PlusPopulation": 78104,
+      "name": "Hhohho urban",
+      "periodStart": "2026-06-01",
+      "periodEnd": "2026-09-30",
+      "populationAnalyzed": 83760,
+      "areaPhase": 2,
+      "phase3PlusFraction": 0.1,
+      "phase3PlusPopulation": 8376,
       "phases": {
         "1": {
           "label": "Minimal",
-          "population": 39052,
-          "fraction": 0.2
+          "population": 41880,
+          "fraction": 0.5
         },
         "2": {
           "label": "Stressed",
-          "population": 78104,
+          "population": 33504,
           "fraction": 0.4
         },
         "3": {
           "label": "Crisis",
-          "population": 58578,
-          "fraction": 0.3
+          "population": 8376,
+          "fraction": 0.1
         },
         "4": {
           "label": "Emergency",
-          "population": 19526,
+          "population": 0,
+          "fraction": 0.0
+        },
+        "5": {
+          "label": "Catastrophe/Famine",
+          "population": 0,
+          "fraction": 0.0
+        }
+      }
+    },
+    "75366066B12234306804593": {
+      "locationCode": "SWZ",
+      "name": "Lubombo urban",
+      "periodStart": "2026-06-01",
+      "periodEnd": "2026-09-30",
+      "populationAnalyzed": 55726,
+      "areaPhase": 2,
+      "phase3PlusFraction": 0.1,
+      "phase3PlusPopulation": 5573,
+      "phases": {
+        "1": {
+          "label": "Minimal",
+          "population": 27863,
+          "fraction": 0.5
+        },
+        "2": {
+          "label": "Stressed",
+          "population": 22290,
+          "fraction": 0.4
+        },
+        "3": {
+          "label": "Crisis",
+          "population": 5573,
           "fraction": 0.1
+        },
+        "4": {
+          "label": "Emergency",
+          "population": 0,
+          "fraction": 0.0
         },
         "5": {
           "label": "Catastrophe/Famine",
@@ -15974,32 +16531,33 @@
     },
     "75366066B3567364273406": {
       "locationCode": "SWZ",
-      "name": "Manzini",
-      "periodStart": "2021-01-01",
-      "periodEnd": "2021-03-31",
-      "populationAnalyzed": 261790,
-      "phase3PlusFraction": 0.25,
-      "phase3PlusPopulation": 65448,
+      "name": "Manzini urban",
+      "periodStart": "2026-06-01",
+      "periodEnd": "2026-09-30",
+      "populationAnalyzed": 93370,
+      "areaPhase": 2,
+      "phase3PlusFraction": 0.1,
+      "phase3PlusPopulation": 9337,
       "phases": {
         "1": {
           "label": "Minimal",
-          "population": 78537,
-          "fraction": 0.3
+          "population": 46685,
+          "fraction": 0.5
         },
         "2": {
           "label": "Stressed",
-          "population": 117806,
-          "fraction": 0.45
+          "population": 37348,
+          "fraction": 0.4
         },
         "3": {
           "label": "Crisis",
-          "population": 52358,
-          "fraction": 0.2
+          "population": 9337,
+          "fraction": 0.1
         },
         "4": {
           "label": "Emergency",
-          "population": 13090,
-          "fraction": 0.05
+          "population": 0,
+          "fraction": 0.0
         },
         "5": {
           "label": "Catastrophe/Famine",
@@ -16010,68 +16568,33 @@
     },
     "75366066B21527038718027": {
       "locationCode": "SWZ",
-      "name": "Shiselweni",
-      "periodStart": "2021-01-01",
-      "periodEnd": "2021-03-31",
-      "populationAnalyzed": 198251,
-      "phase3PlusFraction": 0.4,
-      "phase3PlusPopulation": 79301,
+      "name": "Shiselweni urban",
+      "periodStart": "2026-06-01",
+      "periodEnd": "2026-09-30",
+      "populationAnalyzed": 51461,
+      "areaPhase": 2,
+      "phase3PlusFraction": 0.1,
+      "phase3PlusPopulation": 5146,
       "phases": {
         "1": {
           "label": "Minimal",
-          "population": 39650,
-          "fraction": 0.2
+          "population": 30877,
+          "fraction": 0.6
         },
         "2": {
           "label": "Stressed",
-          "population": 79300,
-          "fraction": 0.4
-        },
-        "3": {
-          "label": "Crisis",
-          "population": 69388,
-          "fraction": 0.35
-        },
-        "4": {
-          "label": "Emergency",
-          "population": 9913,
-          "fraction": 0.05
-        },
-        "5": {
-          "label": "Catastrophe/Famine",
-          "population": 0,
-          "fraction": 0.0
-        }
-      }
-    },
-    "75366066B25905390127614": {
-      "locationCode": "SWZ",
-      "name": "Hhohho",
-      "periodStart": "2021-01-01",
-      "periodEnd": "2021-03-31",
-      "populationAnalyzed": 253814,
-      "phase3PlusFraction": 0.3,
-      "phase3PlusPopulation": 76145,
-      "phases": {
-        "1": {
-          "label": "Minimal",
-          "population": 101526,
-          "fraction": 0.4
-        },
-        "2": {
-          "label": "Stressed",
-          "population": 76144,
+          "population": 15438,
           "fraction": 0.3
         },
         "3": {
           "label": "Crisis",
-          "population": 63454,
-          "fraction": 0.25
+          "population": 5146,
+          "fraction": 0.1
         },
         "4": {
           "label": "Emergency",
-          "population": 12691,
-          "fraction": 0.05
+          "population": 0,
+          "fraction": 0.0
         },
         "5": {
           "label": "Catastrophe/Famine",
@@ -16086,6 +16609,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1250254,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.08,
       "phase3PlusPopulation": 107804,
       "phases": {
@@ -16122,6 +16646,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 703040,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.1,
       "phase3PlusPopulation": 71036,
       "phases": {
@@ -16158,6 +16683,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 604923,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 90738,
       "phases": {
@@ -16194,6 +16720,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 976840,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.16,
       "phase3PlusPopulation": 150705,
       "phases": {
@@ -16230,6 +16757,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 922449,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.12,
       "phase3PlusPopulation": 113735,
       "phases": {
@@ -16266,6 +16794,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1024218,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.04,
       "phase3PlusPopulation": 41781,
       "phases": {
@@ -16302,6 +16831,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 194697,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.12,
       "phase3PlusPopulation": 23870,
       "phases": {
@@ -16338,6 +16868,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 886296,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.14,
       "phase3PlusPopulation": 126620,
       "phases": {
@@ -16374,6 +16905,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1139610,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.16,
       "phase3PlusPopulation": 180900,
       "phases": {
@@ -16410,6 +16942,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1028551,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.04,
       "phase3PlusPopulation": 41902,
       "phases": {
@@ -16446,6 +16979,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1049539,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.06,
       "phase3PlusPopulation": 59654,
       "phases": {
@@ -16482,6 +17016,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 109988,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.11,
       "phase3PlusPopulation": 12631,
       "phases": {
@@ -16518,6 +17053,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 169806,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 25471,
       "phases": {
@@ -16554,6 +17090,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1271833,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 68579,
       "phases": {
@@ -16590,6 +17127,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1201013,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 63498,
       "phases": {
@@ -16626,6 +17164,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1414093,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 209901,
       "phases": {
@@ -16662,6 +17201,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 447970,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.09,
       "phase3PlusPopulation": 41491,
       "phases": {
@@ -16698,6 +17238,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 46238,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.01,
       "phase3PlusPopulation": 664,
       "phases": {
@@ -16734,6 +17275,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1308540,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.14,
       "phase3PlusPopulation": 182851,
       "phases": {
@@ -16770,6 +17312,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1066927,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.11,
       "phase3PlusPopulation": 109010,
       "phases": {
@@ -16806,6 +17349,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 787101,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.17,
       "phase3PlusPopulation": 129909,
       "phases": {
@@ -16842,6 +17386,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1791724,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.03,
       "phase3PlusPopulation": 48451,
       "phases": {
@@ -16878,6 +17423,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 871281,
+      "areaPhase": 1,
       "phase3PlusFraction": 0.03,
       "phase3PlusPopulation": 24786,
       "phases": {
@@ -16914,6 +17460,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1474844,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 74225,
       "phases": {
@@ -16950,6 +17497,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1252408,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.07,
       "phase3PlusPopulation": 87864,
       "phases": {
@@ -16986,6 +17534,7 @@
       "periodStart": "2025-10-01",
       "periodEnd": "2025-12-31",
       "populationAnalyzed": 1079355,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.05,
       "phase3PlusPopulation": 53058,
       "phases": {
@@ -17022,6 +17571,7 @@
       "periodStart": "2023-11-01",
       "periodEnd": "2024-04-30",
       "populationAnalyzed": 133881,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 20082,
       "phases": {
@@ -17058,6 +17608,7 @@
       "periodStart": "2023-11-01",
       "periodEnd": "2024-04-30",
       "populationAnalyzed": 54631,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.2,
       "phase3PlusPopulation": 10926,
       "phases": {
@@ -17094,6 +17645,7 @@
       "periodStart": "2023-11-01",
       "periodEnd": "2024-04-30",
       "populationAnalyzed": 10302,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.35,
       "phase3PlusPopulation": 3606,
       "phases": {
@@ -17130,6 +17682,7 @@
       "periodStart": "2023-11-01",
       "periodEnd": "2024-04-30",
       "populationAnalyzed": 106543,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.3,
       "phase3PlusPopulation": 31963,
       "phases": {
@@ -17166,6 +17719,7 @@
       "periodStart": "2023-11-01",
       "periodEnd": "2024-04-30",
       "populationAnalyzed": 138080,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.5,
       "phase3PlusPopulation": 69040,
       "phases": {
@@ -17202,6 +17756,7 @@
       "periodStart": "2023-11-01",
       "periodEnd": "2024-04-30",
       "populationAnalyzed": 60536,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.35,
       "phase3PlusPopulation": 21188,
       "phases": {
@@ -17238,6 +17793,7 @@
       "periodStart": "2023-11-01",
       "periodEnd": "2024-04-30",
       "populationAnalyzed": 69836,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.2,
       "phase3PlusPopulation": 13967,
       "phases": {
@@ -17274,6 +17830,7 @@
       "periodStart": "2023-11-01",
       "periodEnd": "2024-04-30",
       "populationAnalyzed": 324269,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.15,
       "phase3PlusPopulation": 48640,
       "phases": {
@@ -17310,6 +17867,7 @@
       "periodStart": "2023-11-01",
       "periodEnd": "2024-04-30",
       "populationAnalyzed": 50989,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.25,
       "phase3PlusPopulation": 12747,
       "phases": {
@@ -17346,6 +17904,7 @@
       "periodStart": "2023-11-01",
       "periodEnd": "2024-04-30",
       "populationAnalyzed": 80054,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.2,
       "phase3PlusPopulation": 16011,
       "phases": {
@@ -17382,6 +17941,7 @@
       "periodStart": "2023-11-01",
       "periodEnd": "2024-04-30",
       "populationAnalyzed": 83689,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.35,
       "phase3PlusPopulation": 29291,
       "phases": {
@@ -17418,6 +17978,7 @@
       "periodStart": "2026-03-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 654100,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.5,
       "phase3PlusPopulation": 328220,
       "phases": {
@@ -17454,6 +18015,7 @@
       "periodStart": "2026-03-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 576191,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.5,
       "phase3PlusPopulation": 287970,
       "phases": {
@@ -17490,6 +18052,7 @@
       "periodStart": "2026-03-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 736350,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.48,
       "phase3PlusPopulation": 359160,
       "phases": {
@@ -17526,6 +18089,7 @@
       "periodStart": "2026-03-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 82012,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.35,
       "phase3PlusPopulation": 28705,
       "phases": {
@@ -17562,6 +18126,7 @@
       "periodStart": "2026-03-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 1632530,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.5,
       "phase3PlusPopulation": 815468,
       "phases": {
@@ -17598,6 +18163,7 @@
       "periodStart": "2026-03-01",
       "periodEnd": "2026-05-31",
       "populationAnalyzed": 86163,
+      "areaPhase": 4,
       "phase3PlusFraction": 0.55,
       "phase3PlusPopulation": 47390,
       "phases": {
@@ -17634,6 +18200,7 @@
       "periodStart": "2025-05-01",
       "periodEnd": "2025-08-31",
       "populationAnalyzed": 2688497,
+      "areaPhase": 4,
       "phase3PlusFraction": 0.57,
       "phase3PlusPopulation": 1524999,
       "phases": {
@@ -17670,6 +18237,7 @@
       "periodStart": "2025-05-01",
       "periodEnd": "2025-08-31",
       "populationAnalyzed": 823313,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.51,
       "phase3PlusPopulation": 412375,
       "phases": {
@@ -17706,6 +18274,7 @@
       "periodStart": "2025-05-01",
       "periodEnd": "2025-08-31",
       "populationAnalyzed": 1252713,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.53,
       "phase3PlusPopulation": 665336,
       "phases": {
@@ -17742,6 +18311,7 @@
       "periodStart": "2025-05-01",
       "periodEnd": "2025-08-31",
       "populationAnalyzed": 1306831,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.51,
       "phase3PlusPopulation": 660810,
       "phases": {
@@ -17778,6 +18348,7 @@
       "periodStart": "2025-05-01",
       "periodEnd": "2025-08-31",
       "populationAnalyzed": 3329147,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.47,
       "phase3PlusPopulation": 1562623,
       "phases": {
@@ -17814,6 +18385,7 @@
       "periodStart": "2025-05-01",
       "periodEnd": "2025-08-31",
       "populationAnalyzed": 2382513,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.46,
       "phase3PlusPopulation": 1091390,
       "phases": {
@@ -17850,6 +18422,7 @@
       "periodStart": "2025-05-01",
       "periodEnd": "2025-08-31",
       "populationAnalyzed": 616000,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.5,
       "phase3PlusPopulation": 310901,
       "phases": {
@@ -17886,6 +18459,7 @@
       "periodStart": "2025-05-01",
       "periodEnd": "2025-08-31",
       "populationAnalyzed": 841568,
+      "areaPhase": 3,
       "phase3PlusFraction": 0.5,
       "phase3PlusPopulation": 418922,
       "phases": {
@@ -17922,6 +18496,7 @@
       "periodStart": "2025-04-01",
       "periodEnd": "2025-09-30",
       "populationAnalyzed": 1133818,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.09,
       "phase3PlusPopulation": 98570,
       "phases": {
@@ -17958,6 +18533,7 @@
       "periodStart": "2025-04-01",
       "periodEnd": "2025-09-30",
       "populationAnalyzed": 820535,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.19,
       "phase3PlusPopulation": 158588,
       "phases": {
@@ -17994,6 +18570,7 @@
       "periodStart": "2025-04-01",
       "periodEnd": "2025-09-30",
       "populationAnalyzed": 1214980,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.14,
       "phase3PlusPopulation": 163996,
       "phases": {
@@ -18030,6 +18607,7 @@
       "periodStart": "2025-04-01",
       "periodEnd": "2025-09-30",
       "populationAnalyzed": 671507,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.12,
       "phase3PlusPopulation": 79126,
       "phases": {
@@ -18066,6 +18644,7 @@
       "periodStart": "2025-04-01",
       "periodEnd": "2025-09-30",
       "populationAnalyzed": 1000536,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.09,
       "phase3PlusPopulation": 86029,
       "phases": {
@@ -18102,6 +18681,7 @@
       "periodStart": "2025-04-01",
       "periodEnd": "2025-09-30",
       "populationAnalyzed": 1430164,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.12,
       "phase3PlusPopulation": 166609,
       "phases": {
@@ -18138,6 +18718,7 @@
       "periodStart": "2025-04-01",
       "periodEnd": "2025-09-30",
       "populationAnalyzed": 1117231,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.09,
       "phase3PlusPopulation": 103921,
       "phases": {
@@ -18174,6 +18755,7 @@
       "periodStart": "2025-04-01",
       "periodEnd": "2025-09-30",
       "populationAnalyzed": 660177,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.13,
       "phase3PlusPopulation": 84794,
       "phases": {
@@ -18210,6 +18792,7 @@
       "periodStart": "2025-04-01",
       "periodEnd": "2025-09-30",
       "populationAnalyzed": 1228877,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.11,
       "phase3PlusPopulation": 136158,
       "phases": {
@@ -18246,6 +18829,7 @@
       "periodStart": "2025-04-01",
       "periodEnd": "2025-09-30",
       "populationAnalyzed": 796090,
+      "areaPhase": 2,
       "phase3PlusFraction": 0.16,
       "phase3PlusPopulation": 125902,
       "phases": {

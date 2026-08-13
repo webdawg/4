@@ -16,6 +16,7 @@ dist-ssr
 # — re-derivable by re-running the script, not worth committing (the CSV in
 # source_data/ itself IS committed, for provenance, per user request).
 source_data/admin1_raw
+source_data/admin2_raw
 
 # Editor directories and files
 .vscode/*
