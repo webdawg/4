@@ -3,20 +3,23 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import ThreeGlobe from "three-globe";
 import { nodes, nodeById, type DeliveryNode, type HubType } from "./data/nodes";
 import { routes } from "./data/routes";
+import { droneStations, droneStationById, type DroneStation } from "./data/droneStations";
 import { MODE_STYLES, type DeliveryMode } from "./data/modes";
 import { buildLineShape, type LineShapeKind } from "./lineShapes";
+import { haversineDistanceKm } from "./geo";
 import "./style.css";
 
-// Toggle: show/hide active deliveries (arcs, moving ship/plane/catapult
-// objects, knowledge-broadcast rings, resupply beams, deorbit capsules).
-// Halted for now — the previous arc/moving-object animation speeds were
-// arbitrary ("not real"), not modeling real transit time, so rather than
-// guess at real-world speeds this turns delivery motion off entirely while
-// the orbital growing facilities (satellites — NOT gated by this flag,
-// they're the persistent infrastructure, not a "delivery") get built out.
-// Flip back to `true` once delivery timing is worth revisiting. See
-// SPEC.md "Distribution routes toggle" for details.
-const SHOW_DELIVERIES = false;
+// Toggle: show/hide active deliveries (arcs, moving objects for every
+// physical mode — ship/plane/catapult/drone/submarine/train/porter —
+// knowledge-broadcast rings, resupply beams, deorbit capsules). Was off
+// for several sessions (the old arc/moving-object speeds were arbitrary,
+// "not real") while the orbital growing facilities and then the
+// ocean farm / autonomous transport / drone / expansion-mode subsystems
+// got built out (satellites/hubs/drone stations were never gated by this
+// flag — they're persistent infrastructure, not a "delivery"). Turned
+// back on now that there's a full set of modes worth actually seeing
+// move. See SPEC.md "Deliveries toggle" for the history.
+const SHOW_DELIVERIES = true;
 
 const app = document.querySelector<HTMLDivElement>("#app")!;
 app.innerHTML = `<canvas id="globe-canvas"></canvas>`;
@@ -61,37 +64,15 @@ const instructionRoutes = SHOW_DELIVERIES ? routes.filter((r) => !MODE_STYLES[r.
 const surfaceRoutes = physicalRoutes.filter((r) => r.mode !== "space");
 const spaceRoutes = physicalRoutes.filter((r) => r.mode === "space");
 
-interface ArcDatum {
-  startLat: number;
-  startLng: number;
-  endLat: number;
-  endLng: number;
-  color: [string, string];
-  altitude: number;
-  stroke: number;
-  dashDuration: number;
-  mode: DeliveryMode;
-  fromName: string;
-  toName: string;
+// A route's `from` can be a hub id (nodeById) or a drone station id
+// (droneStationById) — stations are deliberately not hubs (see
+// src/data/droneStations.ts), so route origin resolution has to check
+// both rather than assume every route starts at a hub.
+function resolveRouteOrigin(id: string): { lat: number; lng: number; name: string } {
+  const origin = nodeById.get(id) ?? droneStationById.get(id);
+  if (!origin) throw new Error(`Route origin "${id}" is not a known hub or drone station`);
+  return origin;
 }
-
-const arcsData: ArcDatum[] = surfaceRoutes.map((r) => {
-  const from = nodeById.get(r.from)!;
-  const style = MODE_STYLES[r.mode];
-  return {
-    startLat: from.lat,
-    startLng: from.lng,
-    endLat: r.toLat,
-    endLng: r.toLng,
-    color: style.color,
-    altitude: style.altitude,
-    stroke: style.stroke,
-    dashDuration: style.dashDuration,
-    mode: r.mode,
-    fromName: from.name,
-    toName: r.toName,
-  };
-});
 
 interface RingDatum {
   lat: number;
@@ -123,6 +104,7 @@ const HUB_TYPE_COLORS: Record<HubType, string> = {
   air: "#fbbf24",
   space: "#a78bfa",
   depot: "#2dd4bf",
+  ocean_farm: "#22c55e",
 };
 
 const HUB_TYPE_LABELS: Record<HubType, string> = {
@@ -130,15 +112,20 @@ const HUB_TYPE_LABELS: Record<HubType, string> = {
   air: "Air Cargo Hub",
   space: "Launch Site",
   depot: "Humanitarian Depot",
+  ocean_farm: "Floating Ocean Farm",
 };
 
 // Every hub type gets its own line-intersection shape family (see
-// src/lineShapes.ts).
+// src/lineShapes.ts) — as of ocean_farm's star20, all five Platonic
+// solids are now represented (octahedron/tetrahedron/cube/icosahedron/
+// dodecahedron), not by coincidence — see docs/OCEAN_FARM.md's closing
+// section.
 const HUB_TYPE_SHAPES: Record<HubType, LineShapeKind> = {
   port: "cross6",
   air: "tetraX",
   space: "star12",
   depot: "cubeStar",
+  ocean_farm: "star20",
 };
 
 function getPointColor(node: DeliveryNode): string {
@@ -196,13 +183,6 @@ const globe = new ThreeGlobe()
   .showAtmosphere(true)
   .atmosphereColor("#60a5fa")
   .atmosphereAltitude(0.18)
-  .arcsData(arcsData)
-  .arcColor("color")
-  .arcAltitude("altitude")
-  .arcStroke("stroke")
-  .arcDashLength(0.4)
-  .arcDashGap(0.2)
-  .arcDashAnimateTime("dashDuration")
   .ringsData(ringsData)
   .ringColor((d: object) => {
     const c = new THREE.Color((d as { color: string }).color);
@@ -545,8 +525,18 @@ new THREE.TextureLoader().load("/data/heatmap_texture.png", (texture) => {
 // in SPEC.md — it's carried entirely by the country/admin1 boundary
 // polygon heatmap further down instead.
 
+// Ocean farms are physically enormous relative to every other hub — a
+// ~1km² platform vs. a port terminal or a depot warehouse — and now sit
+// out in open ocean where there's nothing else nearby to give them scale,
+// so they get a distinctly larger marker instead of the shared hub size.
+const HUB_MARKER_SIZE: Partial<Record<HubType, number>> = {
+  ocean_farm: 4.2,
+};
+const DEFAULT_HUB_MARKER_SIZE = 1.8;
+
 function buildNodeMarker(node: DeliveryNode): THREE.Object3D {
-  const marker = buildLineShape(HUB_TYPE_SHAPES[node.hubType], 1.8, getPointColor(node));
+  const size = HUB_MARKER_SIZE[node.hubType] ?? DEFAULT_HUB_MARKER_SIZE;
+  const marker = buildLineShape(HUB_TYPE_SHAPES[node.hubType], size, getPointColor(node));
   marker.userData.selectableType = "node";
   marker.userData.selectableData = node;
   return marker;
@@ -557,6 +547,56 @@ for (const node of nodes) {
   const marker = buildNodeMarker(node);
   marker.position.set(coords.x, coords.y, coords.z);
   globe.add(marker);
+}
+
+// Ocean farm production model, per docs/OCEAN_FARM.md's per-unit spec
+// table: ~120 t/yr combined dehydrated kelp+dulse product, and — a
+// secondary benefit riding on the same infrastructure, not the site's
+// reason for existing — "low hundreds of kg to low single-digit
+// tonnes/yr" microplastic/debris capture, 1 t/yr taken as this
+// counter's baseline (the doc's own range midpoint-ish, framed there as
+// a planning estimate, not a delivered fact). Same real-elapsed-time,
+// deliberately uncapped counter pattern as the orbital platforms'
+// foodGrownGrams — grows for as long as the farm exists, nothing more.
+const OCEAN_FARM_FOOD_OUTPUT_TONNES_PER_YEAR = 120;
+const OCEAN_FARM_MICROPLASTIC_TONNES_PER_YEAR = 1;
+const YEAR_MS = 365 * 24 * 60 * 60 * 1000;
+const OCEAN_FARM_CROPS = "Sugar kelp (bulk biomass) + dulse (protein-dense red algae) — no animal aquaculture";
+
+function oceanFarmFoodGrownGrams(elapsedMs: number): number {
+  return (OCEAN_FARM_FOOD_OUTPUT_TONNES_PER_YEAR * 1_000_000 * elapsedMs) / YEAR_MS;
+}
+
+function oceanFarmMicroplasticGrams(elapsedMs: number): number {
+  return (OCEAN_FARM_MICROPLASTIC_TONNES_PER_YEAR * 1_000_000 * elapsedMs) / YEAR_MS;
+}
+
+// --- Drone stations --------------------------------------------------------
+// See docs/DRONE_DELIVERY.md. Deliberately not a hub type (src/data/nodes.ts)
+// — stations are lightweight, numerous, and frequently not co-located with
+// any hub at all, the same architectural reason satellites aren't hubs
+// either. Static (no orbital motion, unlike satellites), so no per-frame
+// position update is needed once placed.
+const DRONE_STATION_COLOR = 0xe879f9; // fuchsia — distinct from every hub/mode color already in use
+
+function makeDroneStationMesh(): THREE.Object3D {
+  const group = new THREE.Group();
+  // Compound shape, same visual grammar as the satellites' core+array
+  // construction: a small sharp core (the launch rail / airframe) plus a
+  // wider cross (solar + wind power system).
+  const core = buildLineShape("tetraX", 1.1, DRONE_STATION_COLOR);
+  const powerSystem = buildLineShape("cross6", 2.0, DRONE_STATION_COLOR);
+  group.add(core, powerSystem);
+  return group;
+}
+
+for (const station of droneStations) {
+  const coords = globe.getCoords(station.lat, station.lng, 0.01);
+  const mesh = makeDroneStationMesh();
+  mesh.position.set(coords.x, coords.y, coords.z);
+  mesh.userData.selectableType = "droneStation";
+  mesh.userData.selectableData = station;
+  globe.add(mesh);
 }
 
 // --- Moving delivery objects --------------------------------------------
@@ -587,21 +627,28 @@ function buildArcCurve(
   return new THREE.QuadraticBezierCurve3(start, mid, end);
 }
 
-// Each delivery mode gets its own line-shape family (src/lineShapes.ts):
-// ship = 3D cross, plane = 8-arm diamond spread, catapult = sharp 4-arm X,
-// space = dense 12-arm star. Non-directional by construction, so it reads
-// correctly from any camera angle with no per-frame orientation logic.
-const MODE_SHAPES: Record<DeliveryMode, LineShapeKind> = {
-  ship: "cross6",
-  plane: "cubeStar",
-  catapult: "tetraX",
-  space: "star12",
-  instructions: "cross6", // unused: instructions is non-physical, renders as rings only
-};
+// Moving shipments (and deorbit capsules, see spawnCapsule) render as a
+// plain glowing dot — replaced the earlier per-mode line-shape sprites
+// (crosses/stars) and the arcs' animated dash trail both: just a dot
+// traveling from origin to destination, nothing else drawing the path.
+// The dot still follows the mode-specific curve altitude from
+// buildArcCurve, so different modes still read as flying at different
+// heights — that information didn't depend on the arc line being drawn.
+function makeDotMesh(size: number, colorValue: THREE.ColorRepresentation): THREE.Object3D {
+  const color = new THREE.Color(colorValue);
+  const geometry = new THREE.SphereGeometry(size, 12, 12);
+  const material = new THREE.MeshStandardMaterial({
+    color,
+    emissive: color,
+    emissiveIntensity: 0.9,
+    roughness: 0.3,
+    metalness: 0.1,
+  });
+  return new THREE.Mesh(geometry, material);
+}
 
 function makeModeMesh(mode: DeliveryMode): THREE.Object3D {
-  const style = MODE_STYLES[mode];
-  return buildLineShape(MODE_SHAPES[mode], 2.2, style.color[0]);
+  return makeDotMesh(1.1, MODE_STYLES[mode].color[0]);
 }
 
 interface MovingObject {
@@ -611,19 +658,55 @@ interface MovingObject {
   offsetMs: number;
 }
 
+// Every route used to take the same fixed animation time regardless of
+// how far it actually traveled — a route from Rotterdam to Yemen looped
+// in the exact same time as one a tenth the distance, which read as
+// obviously wrong (specifically flagged for the land modes, whose
+// generated routes include some of the longest same-continent hauls).
+// Duration is now derived from each route's real great-circle distance
+// and its mode's real speedKmh, so relative speed differences between
+// routes (and between modes) are real, not arbitrary.
+//
+// Real transit time (distanceKm / speedKmh, in hours) is compressed
+// through a square root, not used linearly — a route 100x farther in
+// real transit time only takes ~10x longer on screen, not literally
+// 100x. Linear scaling would mean either short routes are instant or
+// long ocean crossings take many minutes to complete a single loop;
+// sqrt keeps every route perceptibly moving while still preserving real
+// relative order (farther/slower routes visibly take longer than
+// closer/faster ones), the same "real but still watchable" tradeoff
+// already made for the satellites' production counter.
+// "it should all be real world speeds" — no compression, no min/max
+// clamp, full stop. A route's duration is exactly distanceKm / speedKmh
+// converted to milliseconds: real wall-clock transit time, the same
+// "real, not fake-watchable" standard already applied to the satellites'
+// orbital period (real ~97 minutes, Kepler's third law) and the food
+// production counters (real grams per real minute). Direct consequence,
+// not a bug: a ship on a multi-thousand-km route takes real days to
+// cross the globe, so during any normal browsing session it will look
+// close to stationary — exactly as close to stationary as a real ship
+// crossing a real ocean looks over five real minutes of watching it.
+const MS_PER_HOUR = 60 * 60 * 1000;
+
+function movingObjectDurationMs(distanceKm: number, speedKmh: number): number {
+  return (distanceKm / speedKmh) * MS_PER_HOUR;
+}
+
 const movingObjects: MovingObject[] = surfaceRoutes.map((r, i) => {
-  const from = nodeById.get(r.from)!;
+  const from = resolveRouteOrigin(r.from);
   const style = MODE_STYLES[r.mode];
   const curve = buildArcCurve(from.lat, from.lng, r.toLat, r.toLng, style.altitude);
   const mesh = makeModeMesh(r.mode);
   mesh.userData.selectableType = "moving";
   mesh.userData.selectableData = { mode: r.mode, fromName: from.name, toName: r.toName };
   globe.add(mesh);
+  const distanceKm = haversineDistanceKm(from.lat, from.lng, r.toLat, r.toLng);
+  const durationMs = movingObjectDurationMs(distanceKm, style.speedKmh ?? 100);
   return {
     curve,
     mesh,
-    durationMs: style.dashDuration,
-    offsetMs: (i / surfaceRoutes.length) * style.dashDuration,
+    durationMs,
+    offsetMs: (i / surfaceRoutes.length) * durationMs,
   };
 });
 
@@ -803,7 +886,7 @@ function spawnCapsule(spawner: CapsuleSpawner, elapsedMs: number) {
   const launch = nearestSatellitePosition(target, elapsedMs);
   const mid = launch.clone().add(target).multiplyScalar(0.5);
   const curve = new THREE.QuadraticBezierCurve3(launch, mid, target);
-  const mesh = buildLineShape("tetraX", 1.6, 0x7dd3fc);
+  const mesh = makeDotMesh(0.9, 0x7dd3fc);
   mesh.userData.selectableType = "capsule";
   mesh.userData.selectableData = {
     targetName: spawner.targetName,
@@ -824,11 +907,34 @@ window.addEventListener("resize", () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
+// --- Time acceleration/deceleration ---------------------------------
+// Real-world speed (see SPEC.md's last several updates) means most
+// routes/orbits are close to motionless over a normal viewing session —
+// intentional, not a bug, but not always what you want to be looking at.
+// This scales the *simulated clock*, not the underlying physics —
+// distances, speeds, and orbital periods stay real; this only controls
+// how fast simulated time itself passes. 1x is true real time; >1x
+// fast-forwards (watch a multi-week voyage in seconds); <1x is slow
+// motion (actually see a fast mode like a drone in detail instead of a
+// blink). Accumulated rather than derived from a single clock read, so
+// changing the scale mid-session doesn't jump anything — only time from
+// this point forward speeds up or slows down.
+let timeScale = 1;
+const TIME_SCALE_MIN = 0.01;
+const TIME_SCALE_MAX = 100000;
+const TIME_SCALE_STEP_FACTOR = 10;
+
+function formatTimeScale(scale: number): string {
+  return scale >= 1 ? `${scale.toLocaleString()}x` : `1/${Math.round(1 / scale)}x`;
+}
+
 const clock = new THREE.Clock();
+let simulatedElapsedMs = 0;
 let latestElapsedMs = 0;
 
 renderer.setAnimationLoop(() => {
-  const elapsedMs = clock.getElapsedTime() * 1000;
+  simulatedElapsedMs += clock.getDelta() * 1000 * timeScale;
+  const elapsedMs = simulatedElapsedMs;
   latestElapsedMs = elapsedMs;
 
   for (const obj of movingObjects) {
@@ -863,6 +969,45 @@ renderer.setAnimationLoop(() => {
 });
 
 buildLegend();
+buildTimeControls();
+
+// --- Time controls overlay -----------------------------------------------
+
+function buildTimeControls() {
+  const panel = document.createElement("div");
+  panel.id = "time-controls";
+  panel.innerHTML = `
+    <button id="time-slower" aria-label="Slow down">−</button>
+    <span id="time-scale-label"></span>
+    <button id="time-faster" aria-label="Speed up">+</button>
+    <button id="time-reset" aria-label="Reset to real time">1x</button>
+  `;
+  document.body.appendChild(panel);
+
+  const label = panel.querySelector<HTMLSpanElement>("#time-scale-label")!;
+  function render() {
+    if (timeScale === 1) {
+      label.textContent = "1x — real time";
+    } else {
+      label.textContent = `${formatTimeScale(timeScale)} ${timeScale > 1 ? "faster" : "slower"}`;
+    }
+  }
+
+  panel.querySelector<HTMLButtonElement>("#time-slower")!.addEventListener("click", () => {
+    timeScale = Math.max(TIME_SCALE_MIN, timeScale / TIME_SCALE_STEP_FACTOR);
+    render();
+  });
+  panel.querySelector<HTMLButtonElement>("#time-faster")!.addEventListener("click", () => {
+    timeScale = Math.min(TIME_SCALE_MAX, timeScale * TIME_SCALE_STEP_FACTOR);
+    render();
+  });
+  panel.querySelector<HTMLButtonElement>("#time-reset")!.addEventListener("click", () => {
+    timeScale = 1;
+    render();
+  });
+
+  render();
+}
 
 // --- Legend overlay -----------------------------------------------------
 
@@ -897,6 +1042,7 @@ function buildLegend() {
     <h1>Food Relief Network</h1>
     <p class="tagline">Click anything on the globe to inspect it.</p>
     ${hubRows}
+    <div class="legend-row"><span class="swatch" style="background:#${DRONE_STATION_COLOR.toString(16)}"></span>Drone Station</div>
     ${routeRows}
     <div class="legend-heading">Food insecurity (IPC classification)</div>
     ${foodSecurityRows}
@@ -931,7 +1077,6 @@ interface GlobeObjectExtras {
 
 type SelectableHit =
   | { type: "node"; data: DeliveryNode }
-  | { type: "arc"; data: ArcDatum }
   | { type: "ring"; data: RingDatum }
   | { type: "moving"; data: { mode: DeliveryMode; fromName: string; toName: string } }
   | { type: "satellite"; data: { index: number } }
@@ -942,7 +1087,8 @@ type SelectableHit =
   | { type: "beam"; data: { hubName: string } }
   | { type: "country"; data: CountryFeature }
   | { type: "admin1"; data: Admin1Feature }
-  | { type: "zone"; data: StarvationZone };
+  | { type: "zone"; data: StarvationZone }
+  | { type: "droneStation"; data: DroneStation };
 
 function resolveSelectable(object: THREE.Object3D): SelectableHit | null {
   let obj: THREE.Object3D | null = object;
@@ -953,7 +1099,6 @@ function resolveSelectable(object: THREE.Object3D): SelectableHit | null {
     }
     const extras = obj as unknown as GlobeObjectExtras;
     if (extras.__data !== undefined) {
-      if (extras.__globeObjType === "arc") return { type: "arc", data: extras.__data as ArcDatum };
       if (extras.__globeObjType === "ring") return { type: "ring", data: extras.__data as RingDatum };
     }
     obj = obj.parent;
@@ -1040,27 +1185,44 @@ function foodSecurityDetailRows(record: FoodSecurityRecord): Array<[string, stri
   ];
 }
 
+// "this entire network communicates wirelessly and wired using whatever
+// super secure mesh networking we can put everywhere" — data-level for
+// now, deliberately not a new rendered layer (a globe-spanning mesh of
+// connecting lines between every hub/station/satellite would reintroduce
+// the kind of heavy geometry that crashed Chromium earlier this session,
+// for a feature that's still just a description, not a modeled system).
+// Every infrastructure node's info panel gets this same row.
+const MESH_COMMS_NOTE = "Secure encrypted P2P mesh, wireless + wired";
+
 function describeSelection(hit: SelectableHit): SelectionInfo {
   switch (hit.type) {
     case "node": {
       const node = hit.data;
       const typeLabel = HUB_TYPE_LABELS[node.hubType];
+      if (node.hubType === "ocean_farm") {
+        return {
+          title: node.name,
+          subtitle: typeLabel,
+          rows: [
+            ["Crops", OCEAN_FARM_CROPS],
+            ["Solar capacity", "~15 MW peak (~0.2 km² floating array)"],
+            ["Footprint", "~1 km² (60 km kelp line, 20 km dulse line)"],
+            ["Food grown so far (real time, unbounded)", `${(oceanFarmFoodGrownGrams(latestElapsedMs) / 1000).toFixed(1)} kg`],
+            ["Microplastic captured so far (real time, unbounded)", `${(oceanFarmMicroplasticGrams(latestElapsedMs) / 1000).toFixed(2)} kg`],
+            ["Coordinates", `${node.lat.toFixed(2)}, ${node.lng.toFixed(2)}`],
+            ["Comms", MESH_COMMS_NOTE],
+            ["Design reference", "docs/OCEAN_FARM.md"],
+          ],
+        };
+      }
       return {
         title: node.name,
         subtitle: typeLabel,
         rows: [
           ["Type", typeLabel],
           ["Coordinates", `${node.lat.toFixed(2)}, ${node.lng.toFixed(2)}`],
+          ["Comms", MESH_COMMS_NOTE],
         ],
-      };
-    }
-    case "arc": {
-      const arc = hit.data;
-      const style = MODE_STYLES[arc.mode];
-      return {
-        title: `${arc.fromName} → ${arc.toName}`,
-        subtitle: style.label,
-        rows: [["Description", style.description]],
       };
     }
     case "ring": {
@@ -1096,6 +1258,7 @@ function describeSelection(hit: SelectableHit): SelectionInfo {
           ["Output rate", `~${FOOD_OUTPUT_KG_PER_WEEK} kg dehydrated product / week`],
           ["Grown so far (real time, unbounded)", `${foodGrownGrams(latestElapsedMs).toFixed(2)} g`],
           ["Position (sim coords)", `${pos.x.toFixed(0)}, ${pos.y.toFixed(0)}, ${pos.z.toFixed(0)}`],
+          ["Comms", MESH_COMMS_NOTE],
           ["Design reference", "docs/SPACE_DELIVERY.md"],
         ],
       };
@@ -1183,6 +1346,22 @@ function describeSelection(hit: SelectableHit): SelectionInfo {
           ...phaseRows,
           ["Highlight shape", precisionLabel],
           ["Source", "HDX HAPI Food Security"],
+        ],
+      };
+    }
+    case "droneStation": {
+      const station = hit.data;
+      return {
+        title: station.name,
+        subtitle: "Autonomous electric drone launch/charging station",
+        rows: [
+          ["Payload", "~8 kg dehydrated food product per flight"],
+          ["Range", "~120 km one-way (precision parachute drop, no landing)"],
+          ["Power", "~50 kW solar + ~10 kW wind, battery buffered"],
+          ["Cargo", "Food only — no weapons, no surveillance payload, humanitarian delivery exclusively"],
+          ["Coordinates", `${station.lat.toFixed(2)}, ${station.lng.toFixed(2)}`],
+          ["Comms", MESH_COMMS_NOTE],
+          ["Design reference", "docs/DRONE_DELIVERY.md"],
         ],
       };
     }
@@ -1305,3 +1484,67 @@ canvas.addEventListener("pointermove", (e) => {
     if (latestHoverEvent) canvas.style.cursor = pickAt(latestHoverEvent) ? "pointer" : "";
   });
 });
+
+// --- Verification ledger ---------------------------------------------------
+// "we randomly choose shipments to verify and post this to some type of
+// public ledger" — a local hash-chained ledger (SHA-256 via the Web Crypto
+// API), each entry linked to the previous one's hash, structured so it
+// could be handed to a real P2P blockchain API later without changing the
+// record shape. submitToBlockchain() below is that future integration
+// point — it only logs right now. Deliberately not wired to any live
+// network: actually posting somewhere is a real, consequential action this
+// simulation shouldn't take on its own. Shallow, no dedicated UI yet —
+// inspect the running ledger via `window.__ledger` in the browser console.
+
+interface LedgerEntry {
+  index: number;
+  timestampMs: number;
+  routeId: string;
+  detail: string;
+  previousHash: string;
+  hash: string;
+}
+
+const ledger: LedgerEntry[] = [];
+
+async function sha256Hex(input: string): Promise<string> {
+  const bytes = new TextEncoder().encode(input);
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function submitToBlockchain(entry: LedgerEntry): void {
+  console.log("[ledger] would submit to P2P blockchain API:", entry);
+}
+
+async function verifyRandomShipment(): Promise<void> {
+  if (routes.length === 0) return;
+  const route = routes[Math.floor(Math.random() * routes.length)];
+  const previous = ledger[ledger.length - 1];
+  const previousHash = previous ? previous.hash : "0".repeat(64);
+  const index = ledger.length;
+  const timestampMs = Date.now();
+  const detail = `Verified ${route.mode} shipment ${route.id} -> ${route.toName}`;
+  const hash = await sha256Hex(`${index}|${timestampMs}|${route.id}|${previousHash}`);
+  const entry: LedgerEntry = { index, timestampMs, routeId: route.id, detail, previousHash, hash };
+  ledger.push(entry);
+  submitToBlockchain(entry);
+}
+
+// Verification cadence is independent of SHOW_DELIVERIES — network
+// integrity checking isn't gated on whether delivery motion happens to be
+// visible right now.
+const LEDGER_VERIFICATION_INTERVAL_MS = 45000;
+verifyRandomShipment().catch((err) => console.error("[ledger] verification failed:", err));
+setInterval(() => {
+  verifyRandomShipment().catch((err) => console.error("[ledger] verification failed:", err));
+}, LEDGER_VERIFICATION_INTERVAL_MS);
+
+declare global {
+  interface Window {
+    __ledger?: LedgerEntry[];
+  }
+}
+window.__ledger = ledger;

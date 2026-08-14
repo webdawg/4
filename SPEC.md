@@ -724,6 +724,420 @@ Status as of 2026-08-12. Written so a new session can pick this up cold.
 > confirmed by the user in-browser (see the note on headless-browser tool
 > availability in the update above — unchanged this session).
 
+> **Update (2026-08-13, further session): floating ocean farms +
+> autonomous solar transport, implemented.** User asked for a new
+> "large floating ocean farm with floating solar panels" subsystem, then
+> — mid-design — corrected the crop to **all plant-based** (no mussels/
+> shellfish) and added a **microplastic filtration** requirement; wrote
+> `docs/OCEAN_FARM.md` (sugar kelp + dulse longline polyculture, ~15 MW
+> floating solar, passive filtration riding on the mooring
+> infrastructure). Then asked for "a transport system to every continent
+> - automated - solar power"; wrote `docs/AUTONOMOUS_TRANSPORT.md` — the
+> concrete vehicle design behind the existing (previously undescribed)
+> "ship" mode: solar-electric with hydrogen fuel-cell buffering (stated
+> honestly: pure solar can't propel a cargo hull at cargo speed, so
+> surplus daylight solar makes hydrogen via onboard electrolysis, fuel
+> cells burn it at night/low-sun — the tradeoff is ~10-12 knots instead
+> of ~18-22, made acceptable by having no crew to keep at sea longer).
+> That doc flagged a real gap rather than hiding it: **zero hub coverage
+> in Australia/Oceania** in the existing data, so "every continent"
+> wasn't actually true yet.
+>
+> Then asked to implement all three (space delivery was already done in
+> an earlier session — this was really about the two new docs, plus
+> closing the coverage gap the transport doc flagged):
+>
+> - **`src/lineShapes.ts`**: added `star20` (dodecahedron, 20 vertices).
+>   Not an arbitrary new shape — `cross6`/`tetraX`/`cubeStar`/`star12`
+>   already covered 4 of the 5 Platonic solids (octahedron, tetrahedron,
+>   cube, icosahedron); this completes the set. Verified the 20 vertex
+>   coordinates numerically (equidistant, no duplicates) before trusting
+>   them.
+> - **`src/data/nodes.ts`**: new `HubType` member `"ocean_farm"`. Four
+>   ocean farm hubs sited at **real, named upwelling systems with
+>   existing commercial fishing/aquaculture today** (not arbitrary ocean
+>   coordinates, per the doc's own siting constraint) — Walvis Bay
+>   (Benguela upwelling), Chimbote (Humboldt upwelling), Monterey Bay
+>   (California Current upwelling), Dakhla (Canary upwelling — genuinely
+>   an active real-world seaweed-aquaculture development site today).
+>   Also added `hub-fremantle` (Australia, `port` type) specifically to
+>   close the coverage gap `AUTONOMOUS_TRANSPORT.md` flagged.
+> - **`src/main.ts`**: `ocean_farm` wired into `HUB_TYPE_COLORS`
+>   (`#22c55e`, green)/`HUB_TYPE_LABELS`/`HUB_TYPE_SHAPES` (`star20`) —
+>   the existing hub marker/legend/selection machinery picked it up with
+>   no further changes needed, same as every prior hub type. Two new
+>   live counters mirroring the satellites' `foodGrownGrams` pattern
+>   exactly (real elapsed wall-clock time, deliberately uncapped):
+>   `oceanFarmFoodGrownGrams` (~120 t/yr combined kelp+dulse, from the
+>   doc's spec table) and `oceanFarmMicroplasticGrams` (1 t/yr taken as
+>   this counter's baseline — the doc's own range is "low hundreds of kg
+>   to low single-digit tonnes/yr," framed there as a planning estimate,
+>   not a delivered fact). `describeSelection`'s `"node"` case branches
+>   on `hubType === "ocean_farm"` for a richer panel (crops, solar
+>   capacity, footprint, both live counters, design reference) instead of
+>   the generic hub rows every other type still gets.
+> - **`src/data/modes.ts`**: `ship` mode's `description` rewritten to
+>   name the actual vehicle (solar-electric, hydrogen-buffered, ~3,000-
+>   4,000 dwt, no crew) instead of the old generic "bulk shipping" text —
+>   same relationship `docs/SPACE_DELIVERY.md` already has to the
+>   `space` mode's description.
+> - **`src/data/routes.ts`**: two new `ship`-mode routes
+>   (`hub-dakhla` → Sahel, `hub-chimbote` → Haiti) demonstrating
+>   `OCEAN_FARM.md`'s explicit claim that ocean farms feed the existing
+>   ship delivery mode with no new mechanism. **User separately confirmed
+>   this is correct**: ocean farm cargo must never route through the
+>   space/capsule system — verified `spaceRoutes` only ever filters
+>   `mode === "space"`, and both new routes are `mode: "ship"`, so
+>   there's no path for that to happen even accidentally.
+> - **Space delivery required no code changes** — verified `spaceRoutes`/
+>   `capsuleSpawners`/`orbitalPeriodMs`/satellite production counter are
+>   all still intact and untouched by this session's edits.
+>
+> **New, explicitly open item — not yet implemented**: user pointed out
+> mid-session that space-grown food shouldn't ALL go to Earth ("some
+> goes to the planet, and some goes elsewhere") — plausibly in-orbit
+> reserve/crew consumption, or a Moon/Mars supply precursor role
+> `SPACE_DELIVERY.md` already gestures at ("the direct precursor
+> technology for Moon/Mars food production"). Structurally, the
+> satellites' production counter and the deorbit-capsule system are
+> already decoupled (production ticks up continuously; only 2 space
+> routes actually deorbit capsules, on a fixed cadence unrelated to the
+> counter) — so "not everything grown reaches Earth" is already true in
+> spirit, just never stated anywhere or made visible. Deliberately NOT
+> bolted on ad hoc this session — a real multi-destination
+> capsule-routing design (which destinations, what split, how it's
+> visualized) deserves the same doc-first treatment the other three
+> systems got, not a rushed addition mid-flow. Do that next if the user
+> returns to it.
+>
+> **Not yet visually confirmed by the user** — build/typecheck pass, dev
+> server confirmed serving. No browser tool available to the agent, same
+> limitation as every prior addition this session.
+
+> **Update (2026-08-13, further session): drone delivery + five shallow
+> expansion modes.** User asked for autonomous electric drone delivery
+> with drone stations, "modern physics," explicitly including delivering
+> into North Korea regardless of political access — wrote
+> `docs/DRONE_DELIVERY.md` (small fixed-wing electric aircraft, ~8kg/
+> ~120km one-way, parachute-drop not landing, real Zipline precedent
+> cited) and implemented it:
+> - New `"drone"` `DeliveryMode` (`src/data/modes.ts`).
+> - New non-hub object class, `src/data/droneStations.ts` +
+>   `main.ts`'s `makeDroneStationMesh`/`droneStations` loop — stations
+>   are deliberately NOT a hub type, the same architectural reason
+>   satellites aren't hubs, since they're lightweight and frequently not
+>   co-located with any hub. Two stations placed: one in the Yellow Sea
+>   (international waters, ~85km from Pyongyang — reaches North Korea
+>   without needing a station inside its border) and one in central
+>   Afghanistan.
+> - `resolveRouteOrigin()` added so a route's `from` can resolve against
+>   either `nodeById` (hubs) or `droneStationById` (stations) — previously
+>   every route assumed a hub origin.
+> - User separately confirmed ocean farm cargo must route by ship, never
+>   space — verified `spaceRoutes` only ever filters `mode === "space"`,
+>   unaffected by any of this.
+>
+> Then, mid-flow, user rapid-fired five more additions (electric subs,
+> autonomous trains, secure mesh comms, human porters, random shipment
+> verification + a public ledger) faster than any could get the same
+> doc-first treatment. **Paused and asked** rather than guess at five
+> designs at once (`AskUserQuestion` x2) — answers: submarines are
+> general-purpose (storm-resilience + long-haul + farm logistics, "all of
+> the above"), trains are dual-mode (drive off-rail directly, not
+> pod-transfer), porters get their own full delivery mode, mesh comms
+> stays data-level only (explicitly avoiding new globe geometry given the
+> Chromium crash earlier this session), and the ledger should be built as
+> a real structure ready for eventual P2P blockchain posting, not just a
+> flat log. User then explicitly confirmed: **do all five, shallow,
+> speed-focused, derate every naive speed estimate 10-20%, ask about each
+> one first** (already done via the two `AskUserQuestion` calls) —
+> `docs/EXPANSION_MODES.md` is the resulting placeholder doc, explicitly
+> *not* written in the same "decision, not a survey" depth as the four
+> prior subsystem docs, with each section saying plainly what's still
+> undesigned.
+>
+> Implemented:
+> - Three new `DeliveryMode`s (`submarine`, `train`, `porter`) in
+>   `src/data/modes.ts`, each with a derated speed
+>   (`dashDuration`)/color/description, reusing existing line shapes (no
+>   new geometry) — submarine is the one physical mode with a *negative*
+>   arc altitude (renders below the surface).
+> - One example route per new mode in `src/data/routes.ts`, including a
+>   porter route from the same Afghanistan drone station reaching a spot
+>   even a parachute drop can't hit precisely.
+> - **A real (not shallow) hash-chained verification ledger** in
+>   `main.ts`: SHA-256 (`crypto.subtle.digest`, actual Web Crypto, not a
+>   placeholder) chained entries, a random route "verified" every 45s
+>   independent of `SHOW_DELIVERIES`, and a named, explicitly stubbed
+>   `submitToBlockchain()` integration point — logs only, deliberately
+>   not wired to any live network, since actually posting somewhere
+>   external is a real action this simulation shouldn't take
+>   unprompted. Inspectable via `window.__ledger` in the browser console;
+>   no dedicated UI yet.
+> - `MESH_COMMS_NOTE` — one shared string, added as a "Comms" row to
+>   every hub/drone-station/satellite info panel. That's the entire mesh
+>   network implementation right now, deliberately: a described
+>   attribute, not a modeled system or a new rendered layer.
+>
+> **Not yet visually confirmed by the user** — build/typecheck pass after
+> every step (verified incrementally, not just at the end), dev server
+> confirmed serving. No browser tool available to the agent, same
+> limitation as every prior addition this session — in particular, the
+> ledger's `setInterval`/`crypto.subtle` behavior has not been observed
+> actually running in a real browser, only reasoned about.
+
+> **Update (2026-08-13, further session): SHOW_DELIVERIES turned back on,
+> arcs replaced with plain moving dots.** User: "I do not see any of
+> these in the model - do we have to turn them on?" — `SHOW_DELIVERIES`
+> had been `false` since an earlier session and every new mode
+> (drone/submarine/train/porter) inherited that, on top of ship/plane/
+> catapult/space/instructions already being hidden. Confirmed via
+> `AskUserQuestion` and flipped to `true` (see "Deliveries toggle"
+> section for the updated history).
+>
+> Then: "for moving things - instead of jumping lines - we just want dots
+> moving from place to place - different color dots." The "jumping
+> lines" was three-globe's animated arc-dash rendering
+> (`.arcDashLength`/`.arcDashGap`/`.arcDashAnimateTime`). Rather than
+> just disable the dash animation, **removed arc rendering entirely** —
+> `.arcsData()` and its whole chain deleted from the `globe` construction,
+> along with the now-dead `ArcDatum` interface/`arcsData` computation, the
+> `"arc"` `SelectableHit` variant, and its `resolveSelectable`/
+> `describeSelection` cases. This didn't lose any information: the
+> moving dot already travels along a `buildArcCurve` curve that encodes
+> the mode's altitude, independent of whether an arc line was drawn
+> alongside it — so different modes still read as flying at different
+> heights, just without a line tracing the path.
+>
+> `makeModeMesh` and the deorbit capsule mesh (`spawnCapsule`) both used
+> to be per-mode `buildLineShape` sprites (crosses/stars, `MODE_SHAPES` —
+> now deleted, fully unused). Replaced with a shared `makeDotMesh(size,
+> color)` — a small glowing `MeshStandardMaterial` sphere, colored per
+> mode (`MODE_STYLES[mode].color[0]`, already-established per-mode
+> colors, so "different color dots" was already satisfied by reusing
+> them) — moving objects at radius 1.1, capsules at 0.9. Note this is a
+> deliberate, scoped exception to the "everything is line-intersections"
+> aesthetic established earlier this project (`src/lineShapes.ts`) — that
+> principle covered *static* sprites (hubs, satellites, stations); the
+> user's explicit, current instruction for *moving* shipments specifically
+> asked for dots, which takes precedence over the earlier general
+> principle for this one category of object.
+>
+> Also refreshed `README.md`'s "Status" section, which had drifted well
+> out of date (`SHOW_DISTRIBUTION_ROUTES`, "need-region severity" — both
+> long removed) — now describes the current mode set, the dot-based
+> moving-object rendering, and links all five subsystem docs.
+>
+> **Not yet visually confirmed by the user** — build/typecheck pass, dev
+> server confirmed serving. No browser tool available to the agent.
+
+> **Update (2026-08-13, further session): "correct vehicle for correct
+> movement," 100 generated routes, ocean farms into open ocean.** User:
+> "you can't have cars going over water - etc - lets do 100 routes, put
+> the ocean masses in the middle of the ocean, and make the[m] much
+> bigger, the transport should go big to small - except human it can
+> choose to transport things any way it wants." Four changes:
+>
+> 1. **Continent + domain metadata**: `DeliveryNode`/`DroneStation` both
+>    gained a `continent: Continent` field (`src/data/nodes.ts`'s new
+>    `Continent` type — Africa/Asia/Europe/NorthAmerica/SouthAmerica/
+>    Oceania). Added 5 more drone stations (Sahel, South Sudan, Gaza,
+>    Yemen, Haiti — was 2, now 7) for route-generation variety.
+> 2. **Ocean farms moved into open ocean**: all four pulled off the
+>    coast into open water within the same ocean basin as their original
+>    real upwelling current (e.g. Dakhla: was 23.71°N 15.94°W hugging
+>    the Western Sahara coast, now 21°N 28°W, well out in the open North
+>    Atlantic). Honest tension noted in `nodes.ts`'s file comment: this
+>    loosens the "real coastal upwelling zone" siting claim
+>    `OCEAN_FARM.md` originally made — a direct instruction to visually
+>    isolate them in open water took priority over that earlier science
+>    framing. Marker size also increased specifically for `ocean_farm`
+>    (`HUB_MARKER_SIZE` in `main.ts`, 4.2 vs. the 1.8 every other hub
+>    type still uses) — reflects the real ~1km² physical scale
+>    difference, and gives them visual presence now that they're
+>    isolated with nothing else nearby for scale.
+> 3. **`src/data/routes.ts` rewritten as a generator, not a hand-typed
+>    list** — this is the actual "correct vehicle" fix. `HUB_TYPE_MODES`
+>    fixes which modes each hub type can dispatch at all (`ocean_farm`:
+>    ship/submarine only; drone stations: drone/porter only; every
+>    land-based hub type: no ship/submarine). `LAND_LOCKED_MODES`
+>    (currently just `train`) additionally requires origin and
+>    destination to share a `continent` — the literal "can't have cars
+>    going over water" fix. `porter` has no domain or continent
+>    restriction at all, matching "it can choose to transport things any
+>    way it wants" literally — worth knowing this means a handful of the
+>    15 generated porter routes span continents (e.g. Rotterdam →
+>    Zimbabwe), which reads as a courier accompanying cargo through
+>    whatever combination of transport they choose, not literal
+>    continuous walking; flagged here rather than silently, in case that
+>    reads as *too* permissive once seen in the browser and warrants
+>    tightening later.
+> 4. **"Big to small"**: `BULK_MODES`
+>    (ship/plane/train/submarine/space) prefer the 14 `BROAD_DESTINATIONS`
+>    (regional names, e.g. "Sahel Region"); everything else
+>    (drone/catapult/porter) prefers the 8 `PRECISE_DESTINATIONS`
+>    (village/camp/district-level, e.g. "Dadaab Refugee Camp, Kenya",
+>    "Cite Soleil, Port-au-Prince") — bulk carries broad, small carries
+>    precise, by construction via `candidatesForMode()`'s scale filter.
+>
+> Route count is exactly 100 by design
+> (`MODE_TARGET_COUNTS`: ship 18, plane 13, train 12, submarine 10,
+> catapult 8, drone 14, porter 15, space 5, instructions 5), selected via
+> `pickEvenly()` — a deterministic stride-sampler over each mode's full
+> valid-candidate pool, not random, so the route set is reproducible
+> across builds. **Verified independently before touching the real
+> file**: wrote a standalone reimplementation of the exact same
+> algorithm/data (`scratchpad/verify_routes.mjs`, not part of the repo)
+> and ran it — confirmed 100 total, confirmed the per-mode counts match,
+> and confirmed **zero** rule violations (no train route crosses a
+> continent boundary, no ship/submarine originates anywhere but a port or
+> ocean farm, no drone route originates anywhere but a station) before
+> trusting the real `routes.ts` to behave the same way.
+>
+> **Not yet visually confirmed by the user** — build/typecheck pass, dev
+> server confirmed serving, route-generation logic verified independently
+> (above) but not observed rendering in an actual browser. No browser
+> tool available to the agent.
+
+> **Update (2026-08-13, further session): distance-proportional travel
+> time; drone/catapult range limits.** User: "the routes on land seem to
+> be going too fast." Root cause: every moving-object's animation
+> duration was `style.dashDuration`, a **fixed** per-mode constant —
+> completely independent of how far the route actually went. A train
+> route spanning a huge same-continent distance (continent-matching
+> allows this — e.g. Shanghai to Yemen, both Asia) completed its loop in
+> the exact same time as a short one, which is exactly why it read as
+> "too fast": it wasn't wrong for trains specifically, every mode had
+> this bug, land modes' generated routes just happened to include some
+> of the most egregious distance mismatches.
+>
+> Fix: `MODE_STYLES` gained `speedKmh` (real cruise speeds, reusing
+> figures already documented in each mode's own description — plane
+> 850, ship 20 [~11 knots], submarine 12.6 [~6.8 knots], train 59.5,
+> porter 3.4, drone 110, catapult 200 nominal). New `src/geo.ts` —
+> `haversineDistanceKm()`, shared by both the renderer and the route
+> generator. `main.ts`'s `movingObjectDurationMs()` computes each route's
+> real transit time (`distanceKm / speedKmh` hours) and passes it through
+> a **square-root** compression before converting to an animation
+> duration (`MOVING_OBJECT_MIN/MAX_DURATION_MS` = 1200/12000ms,
+> `MOVING_OBJECT_DURATION_SCALE` = 480) — linear scaling would mean
+> either short hops are instant or ocean crossings take many real
+> minutes to loop once; sqrt keeps everything perceptibly moving while
+> still preserving real relative order (a route with 100x the real
+> transit time takes ~10x longer on screen, not 100x or 1x). Same
+> "real but still watchable" tradeoff already made for the satellites'
+> production counter, applied to route timing this time.
+>
+> **Side effect caught before it shipped**: fixing timing exposed that
+> `drone` (real ~120km range) and `catapult` (nominal ~300km) had **no
+> distance limit at all** in the route generator — a route could pair a
+> station with a destination on the other side of the world and nothing
+> would stop it. Added `MODE_MAX_RANGE_KM` (`{drone: 120, catapult: 300}`)
+> to `routes.ts`'s `candidatesForMode()`. Re-verified pool sizes after
+> adding it (same `scratchpad/verify_routes*.mjs` standalone-check
+> pattern as the 100-route work) and found the real problem: **catapult's
+> candidate pool went to 0, drone's to 4** — the existing "precise"
+> destinations weren't actually close to any hub or station. Fixed by
+> adding destinations placed deliberately near something that can reach
+> them (7 near drone stations, 6 near hubs specifically for catapult),
+> not by loosening the range caps to paper over the shortfall. Even
+> after that, real achievable pool sizes (6 for catapult, 7 for drone)
+> were below the original targets (8, 14) — **reduced those targets to
+> match reality** (6, 7) rather than force a bigger number a genuinely
+> short-range mode can't realistically support, and redistributed the
+> difference to the bulk modes' deep candidate pools (ship 18→21, plane
+> 13→15, train 12→14, porter 15→17), keeping the total at exactly 100.
+>
+> **Not yet visually confirmed by the user** — build/typecheck pass, dev
+> server confirmed serving, both the distance/speed math and the
+> rebalanced route counts verified independently via the scratchpad
+> scripts before touching the real files. No browser tool available to
+> the agent.
+
+> **Update (2026-08-13, further session): speed recalibrated again —
+> still too fast.** User: "you have transport crossing entire countries
+> in seconds - fix this - update the speeds of all of these." The
+> distance-proportional timing added the previous update was directionally
+> right (duration now depends on real distance) but the absolute scale
+> was still far too fast: computed a train crossing a 3,000km country at
+> 59.5 km/h — 26,367ms with the new numbers had ONLY 4,608ms (4.6s)
+> before this fix, literally "crossing an entire country in seconds."
+> `MOVING_OBJECT_MIN_DURATION_MS`/`MAX`/`DURATION_SCALE` moved from
+> 1200/12000/480 to **4000/90000/3150** — verified against real example
+> routes before touching the file (same
+> country-crossing train: 4.6s → 26.4s; a 15,000km ocean crossing:
+> 12.0s → 90.0s, the new cap; a short ~80km drone hop: 1.6s → 6.7s).
+> Still compressed (a real ~750-hour ocean voyage doesn't take 750 real
+> hours on screen — that would defeat the point of an animated delivery
+> network), but no route completes in a handful of seconds anymore.
+>
+> **Not yet visually confirmed by the user** — same limitation as every
+> prior addition this session; the numbers above were computed and
+> checked against real route distances/speeds before editing the file,
+> not observed in an actual running browser.
+
+> **Update (2026-08-13, further session): full real-world speed, no
+> compression at all.** User: "it should all be real world speeds." The
+> sqrt-compression + min/max clamp from the previous update was still a
+> compromise, not real speed — removed entirely.
+> `movingObjectDurationMs()` is now just `distanceKm / speedKmh` converted
+> to milliseconds, nothing else. This is the exact same "real, not
+> fake-watchable" standard already applied twice before in this session —
+> the satellites' orbital period (real Kepler's-third-law ~97 minutes)
+> and the food-production counters (real grams per real minute) — now
+> applied a third time, to route travel time.
+>
+> **Direct, known consequence, not a bug**: a 15,000km ship route at 20
+> km/h now takes a real ~750 hours (~31 days) to complete one crossing.
+> A 3,000km train route takes ~50 real hours (~2 days). During any
+> normal browsing session, most routes will look close to motionless —
+> the same tradeoff already accepted for the satellites (which visibly
+> barely move over a session at their real ~97-minute period) and now
+> extended to every delivery mode. If this reads as "nothing is moving"
+> rather than "this is what real transit time actually looks like,"
+> that's the same open question already flagged for the satellites: a
+> future optional time-acceleration/demo-speed toggle would be the way
+> to have both real physics and a watchable demo, without faking the
+> underlying numbers the way the two previous speed passes did.
+>
+> **Not yet visually confirmed by the user** — same limitation as every
+> prior addition this session.
+
+> **Update (2026-08-13, further session): time acceleration/deceleration
+> toggle.** Exactly the follow-up flagged in the previous update — user
+> asked for it directly. Implementation scales the *simulated clock*,
+> not the underlying physics: every real speed/distance/orbital-period
+> number from the last several updates is untouched; this only changes
+> how fast simulated time passes.
+>
+> `let timeScale = 1` (real time) — `simulatedElapsedMs` is now
+> **accumulated** every frame (`+= clock.getDelta() * 1000 * timeScale`)
+> rather than derived from a single `clock.getElapsedTime()` read, so
+> changing the scale mid-session doesn't retroactively warp anything
+> already computed — only time from that point forward speeds up or
+> slows down. `simulatedElapsedMs` replaces the old `elapsedMs` as the
+> single time source for moving-object position, satellite position,
+> capsule spawn cadence, and (via `latestElapsedMs`, unchanged
+> mechanism) every click-time production-counter/orbital-period
+> calculation. Range: 0.01x to 100,000x, ×10/÷10 per step
+> (`TIME_SCALE_MIN`/`MAX`/`STEP_FACTOR`) — wide enough to both slow down
+> and actually *watch* a fast mode like a drone in detail (values <1x),
+> and fast-forward a multi-week ship voyage into seconds (values up to
+> 100,000x).
+>
+> New `#time-controls` UI: a small pill at the bottom-center of the
+> screen (`buildTimeControls()` in `main.ts`, styled in `style.css`
+> matching the legend/info-panel's existing dark-glass aesthetic) — "−"
+> /"+" buttons stepping by 10x, a "1x" button that resets to true real
+> time, and a live label. Deliberately NOT wired to the verification
+> ledger's 45-second check interval — that's real wall-clock, unaffected
+> by this toggle, consistent with its own existing "independent of
+> SHOW_DELIVERIES" design note (network-integrity checking isn't a
+> visual-motion concern).
+>
+> **Not yet visually confirmed by the user** — build/typecheck pass, dev
+> server confirmed serving. No browser tool available to the agent.
+
 ## Mission
 
 Build a **3D, web-browser-viewable simulation of a global automated food
@@ -864,10 +1278,22 @@ As of writing this spec, `/home/neoweb/DATA/CODE/4` contained only this
 
 **Renamed and re-scoped in the 2026-08-12 "halt deliveries" session** (see
 update banner near the top): `SHOW_DISTRIBUTION_ROUTES` is now
-`SHOW_DELIVERIES`, currently **`false`**. User feedback was that the arc/
+`SHOW_DELIVERIES`. User feedback at the time was that the arc/
 moving-object animation speeds were arbitrary — "moving way too fast and
 not real" — and rather than guess at real-world transit speeds, the
-decision was to halt delivery motion entirely for now, not tune it.
+decision was to halt delivery motion entirely rather than tune it.
+
+**Turned back on 2026-08-13**: after several sessions building out ocean
+farms, autonomous ships, drones, and the shallow expansion modes
+(submarine/train/porter), user asked "I do not see any of these in the
+model - do we have to turn them on?" — yes, `SHOW_DELIVERIES` was still
+`false` the whole time, hiding every mode's arcs/moving objects, old and
+new alike. Confirmed via `AskUserQuestion` and flipped to **`true`**.
+The original "too fast" complaint about arc/moving-object speed was never
+actually resolved (no per-mode speed tuning happened) — turning this back
+on means that's now visible again and worth a fresh look, particularly
+for the older modes (ship/plane/catapult) whose `dashDuration` values
+weren't touched by this session's new-mode work.
 
 - Single switch: `SHOW_DELIVERIES` constant near the top of `src/main.ts`.
 - When `false`: `physicalRoutes` and `instructionRoutes` resolve to `[]`,
@@ -886,10 +1312,13 @@ decision was to halt delivery motion entirely for now, not tune it.
   not a "delivery" — halting deliveries should not also remove them. See
   "Orbital growing facilities" section below for what was built out on
   top of them in the same session.
-- **To resume deliveries**: flip `SHOW_DELIVERIES` back to `true` — no
-  other changes needed. Revisiting *how fast* things move (the original
-  complaint) is still open; this session halted motion rather than tuning
-  it, see the update banner for why.
+- **Currently `true`** (flipped back 2026-08-13, see update banner near
+  the top) — no other changes were needed to turn it back on, same as
+  when it was turned off. Per-mode speed tuning (the original "too fast"
+  complaint) is still open — the new modes (drone/submarine/train/porter)
+  got deliberately-derated `dashDuration` values, but the older
+  ship/plane/catapult values are untouched since the complaint was first
+  raised.
 
 ## Real hub/need-region dataset
 

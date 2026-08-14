@@ -10,7 +10,15 @@ infrastructure. See [`docs/VISION.md`](docs/VISION.md) for the product
 concept, [`docs/GLOBAL_FOOD_SYSTEM.md`](docs/GLOBAL_FOOD_SYSTEM.md) for the
 full strategic design (production layers, technology tradeoffs, phased
 rollout), [`docs/SPACE_DELIVERY.md`](docs/SPACE_DELIVERY.md) for the
-orbital automated growing/delivery subsystem design, and
+orbital automated growing/delivery subsystem design,
+[`docs/OCEAN_FARM.md`](docs/OCEAN_FARM.md) for the floating ocean farm
+(plant-based aquaculture + solar + microplastic filtration) subsystem,
+[`docs/AUTONOMOUS_TRANSPORT.md`](docs/AUTONOMOUS_TRANSPORT.md) for the
+autonomous solar-electric cargo fleet behind the "ship" delivery mode,
+[`docs/DRONE_DELIVERY.md`](docs/DRONE_DELIVERY.md) for the autonomous
+electric drone last-mile network, [`docs/EXPANSION_MODES.md`](docs/EXPANSION_MODES.md)
+for the shallow-pass additions (autonomous submarine/train, human
+porters, mesh comms, the verification ledger), and
 [`SPEC.md`](SPEC.md) for build history and decisions.
 
 ## Stack
@@ -44,23 +52,33 @@ delivered.
 
 ## Status
 
-The globe renders a real hub network — actual sea ports, air cargo hubs,
-orbital launch sites, and UN humanitarian depot locations (WFP's UNHRD
-network), alongside a set of widely-reported food-insecure regions.
-Node/hub coordinates are real; need-region severity levels are illustrative
-approximations, not sourced from a live feed.
+The globe renders a real hub network — sea ports, air cargo hubs, orbital
+launch sites, UN humanitarian depot locations (WFP's UNHRD network),
+floating ocean farms at real coastal upwelling zones, and drone
+launch/charging stations — plus a food-security heatmap (country and
+admin1/district granularity) built from real HDX HAPI data, not
+illustrative points.
 
-Distribution routes are **active** (`SHOW_DISTRIBUTION_ROUTES = true` in
-`src/main.ts` — flip to `false` to go back to a bare hub-network globe):
-ship/plane/catapult routes render as animated arcs with a moving object per
-route; the "instructions" (knowledge-broadcast) mode renders as pulsing
-rings; and the "space" mode is its own subsystem — an orbiting satellite
-constellation that periodically launches deorbit capsules down to target
-need-regions, implementing [`docs/SPACE_DELIVERY.md`](docs/SPACE_DELIVERY.md).
+Deliveries are **active** (`SHOW_DELIVERIES = true` in `src/main.ts` —
+flip to `false` to go back to a bare hub-network globe) across eight
+physical modes: ship, plane, catapult, drone, submarine, train, and
+porter all render as a plain glowing dot traveling from origin to
+destination (no arc line drawn — the dot's own curve conveys the mode's
+altitude); "space" is its own subsystem, an orbiting satellite
+constellation that periodically launches deorbit capsules (also a dot)
+toward target regions; "instructions" (knowledge-broadcast) renders as
+pulsing rings. See `docs/SPACE_DELIVERY.md`, `docs/OCEAN_FARM.md`,
+`docs/AUTONOMOUS_TRANSPORT.md`, `docs/DRONE_DELIVERY.md`, and
+`docs/EXPANSION_MODES.md` for what's behind each mode.
 
-Everything on the globe is **selectable** — click any hub, need-region,
-arc, ring, moving delivery object, orbital satellite, deorbit capsule, or
-resupply beam to open an info panel with detail about it. Click empty
-space, or the panel's close button, to dismiss it.
+Everything on the globe is **selectable** — click any hub, drone station,
+ring, moving shipment, orbital satellite, deorbit capsule, resupply beam,
+country, admin1 region, or starvation zone to open an info panel with
+detail about it. Click empty space, or the panel's close button, to
+dismiss it.
 
 See `SPEC.md` for full implementation detail.
+
+## License
+
+[GNU Affero General Public License v3.0 (or later)](LICENSE).

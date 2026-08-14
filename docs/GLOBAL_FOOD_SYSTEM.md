@@ -502,6 +502,97 @@ Not facilities built, dollars spent, or tons produced. Instead:
 
 ---
 
+## Scaling to the people who are actually starving right now
+
+Every earlier scale question in this project's history got answered against
+the whole world population (~8.2 billion) — useful for an upper bound, but
+not what this system is actually for. **The mission is to reach people who
+are currently starving, not to replace agriculture for everyone who already
+has food.** Recalculated against that narrower, correct target — and against
+real data already loaded in this repo, not a fresh guess.
+
+### Who "starving" means here
+
+`scripts/build_food_security_data.py` already committed to a definition for
+this: a "starvation zone" is IPC Phase 4 (Emergency) or Phase 5
+(Catastrophe/Famine) — see `ZONE_PHASE_THRESHOLD = 4`. Reusing that same
+threshold here for consistency, rather than inventing a second definition:
+
+- Source: `public/data/food_security_current.json` (HDX HAPI, the same data
+  driving the heatmap), snapshot as of the reference periods in that file —
+  **this will drift as the source data refreshes**, it's a snapshot, not a
+  constant.
+- **50 countries** have any HDX HAPI coverage at all.
+- **38 of those** currently have a nonzero Phase 4+5 population.
+- **Phase 4+5 population, summed across all 50: 25,745,063 people.**
+  (For reference, the broader Phase 3+ "Crisis or worse" figure — closer to
+  "acutely food insecure" than "starving" — is 184,566,904. Using the
+  stricter Phase 4+5 number, consistent with what this codebase already
+  calls a starvation zone.)
+- Top five by raw population: Sudan (5.15M), DR Congo (3.23M), Afghanistan
+  (2.87M), Ethiopia (2.43M), Haiti (1.90M).
+
+### Sizing the food, honestly
+
+This system's two production layers (orbital spirulina/microbial protein,
+ocean-farm kelp/dulse) are dense in **protein**, not bulk calories — sizing
+against total caloric/dietary replacement would overclaim what they
+actually deliver. Sizing against protein need instead:
+
+- WHO general guideline: ~50g protein/person/day → **18.25 kg/person/year**
+- For 25,745,063 people: **~469,848 tonnes of pure protein/year**
+- At ~60% protein content (blended spirulina/kelp/dulse dehydrated product
+  average): **~783,080 tonnes/year of dehydrated product** needed to cover
+  every currently-starving person's full protein requirement through this
+  system alone.
+
+### Ocean farms: genuinely buildable at this scale
+
+Each farm: 120 t/yr (`docs/OCEAN_FARM.md`), 1 km² footprint.
+
+- **~6,526 farms** needed to cover the full 783,080 t/yr alone.
+- **~6,526 km²** of ocean — about the size of Delaware, roughly 2.5x
+  Luxembourg's land area.
+- **~0.0018% of the world's total ocean surface** (361 million km²) —
+  at the *world population* scale this was ~0.58%; narrowing the target
+  population correctly shrinks the ocean-farm footprint by more than two
+  orders of magnitude, from "a Greenland-sized commitment" to "a
+  Delaware-sized one."
+
+### Orbital platforms: still the bottleneck, even at this scale
+
+Each satellite: ~2.08 t/yr (`docs/SPACE_DELIVERY.md`'s ~40kg/week baseline).
+
+- Covering the full 783,080 t/yr through orbital alone: **~376,481
+  satellites** — for comparison, roughly **29x the total number of
+  human-made satellites in Earth orbit today, for all purposes combined**
+  (~13,000 as of the mid-2020s). Not physically impossible the way the
+  world-population-scale number was (~60 million), but still confirms
+  orbital's role stays a narrow supplementary reserve, not the primary
+  lever — exactly what `docs/SPACE_DELIVERY.md`'s "cost per kg to orbit
+  will not compete with a field of potatoes for a long time" already
+  said, now with a number attached.
+
+### Routes: close to what's already in the simulation, not a tiny fraction of it
+
+Moving 783,080 t/yr by the autonomous cargo fleet (~3,500 t/voyage,
+`docs/AUTONOMOUS_TRANSPORT.md`): **~224 voyages/year, under 1/day globally**
+— genuinely tractable shipping volume, not a fantasy number.
+
+For distinct **routes** (corridors, not individual voyages): 38 countries
+currently need coverage. Assuming each needs roughly 3-5 legs to actually
+reach people (bulk hub-to-country, regional distribution, last-mile
+drone/porter/catapult) rather than stopping at a single national port:
+**roughly 115-190 routes** for full current coverage. This simulation's 100
+generated routes (`src/data/routes.ts`) aren't a token fraction of real
+scale at this correctly-scoped target — they're already in the right order
+of magnitude, on the low end by perhaps 1.5-2x. Scaling the route generator
+to ~150-200 (one more country-coverage pass, not a fundamentally bigger
+number) would be a reasonable next step if full current-crisis coverage is
+the goal.
+
+---
+
 ## Relationship to the simulation in this repo
 
 This document is the strategic layer; `src/` is currently a *visualization*

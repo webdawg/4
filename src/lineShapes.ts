@@ -6,7 +6,7 @@ import * as THREE from "three";
 // meshes. Each shape below is a named vertex-direction family (drawn from a
 // regular polyhedron's vertices) so the visual vocabulary stays small and
 // mathematically consistent instead of one-off geometry per object.
-export type LineShapeKind = "cross6" | "tetraX" | "cubeStar" | "star12";
+export type LineShapeKind = "cross6" | "tetraX" | "cubeStar" | "star12" | "star20";
 
 function dir(x: number, y: number, z: number): THREE.Vector3 {
   return new THREE.Vector3(x, y, z).normalize();
@@ -59,11 +59,39 @@ const star12: THREE.Vector3[] = [
   dir(-PHI, 0, -1),
 ];
 
+// 20 arms toward dodecahedron vertices — the densest, roundest burst.
+// Completes the set: cross6/tetraX/cubeStar/star12/star20 are the
+// octahedron, tetrahedron, cube, icosahedron, and dodecahedron in turn —
+// all five Platonic solids now represented.
+const star20: THREE.Vector3[] = [
+  dir(1, 1, 1),
+  dir(1, 1, -1),
+  dir(1, -1, 1),
+  dir(1, -1, -1),
+  dir(-1, 1, 1),
+  dir(-1, 1, -1),
+  dir(-1, -1, 1),
+  dir(-1, -1, -1),
+  dir(0, 1 / PHI, PHI),
+  dir(0, 1 / PHI, -PHI),
+  dir(0, -1 / PHI, PHI),
+  dir(0, -1 / PHI, -PHI),
+  dir(1 / PHI, PHI, 0),
+  dir(1 / PHI, -PHI, 0),
+  dir(-1 / PHI, PHI, 0),
+  dir(-1 / PHI, -PHI, 0),
+  dir(PHI, 0, 1 / PHI),
+  dir(PHI, 0, -1 / PHI),
+  dir(-PHI, 0, 1 / PHI),
+  dir(-PHI, 0, -1 / PHI),
+];
+
 const SHAPE_DIRECTIONS: Record<LineShapeKind, THREE.Vector3[]> = {
   cross6,
   tetraX,
   cubeStar,
   star12,
+  star20,
 };
 
 export function buildLineShape(
