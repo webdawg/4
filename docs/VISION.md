@@ -53,3 +53,12 @@ primitive entirely (pulsing rings instead of arcs).
      explicit and comparable rather than purely visual
    - Visual "impact" effect when a deorbit capsule lands, and a clearer
      in-flight vs. delivered state for capsules
+   - **Micro-scale inventory**: extend the simulation down to
+     progressively smaller objects — not just hub/region/vehicle scale,
+     but down toward insect scale and below — each with the systems
+     that regulate them and their own attributes (e.g. an insect is
+     small and has eyes, and can see). Use the simulation itself as a
+     way to inventory and define what exists at the micro level, the
+     same way the macro (global hub/route) level is modeled today.
+     Undefined beyond the idea itself — no data model or scale
+     boundaries decided yet.
